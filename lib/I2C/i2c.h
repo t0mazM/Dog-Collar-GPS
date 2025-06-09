@@ -7,6 +7,9 @@
 #include "freertos/task.h"
 #include "driver/i2c.h"
 #include "freertos/timers.h"
+#include "esp_log.h"
+#include "esp_err.h"
+#include "esp_check.h"
 
 
 
@@ -27,7 +30,7 @@ typedef struct {
 
 
 
-void init_i2c_port(I2CPORT* port);
+esp_err_t init_i2c_port(I2CPORT* port);
 void init_i2c(void);
 esp_err_t write_to_i2c(i2c_port_t i2c_port_num, uint8_t device_addr, uint8_t device_register, uint8_t data);
 esp_err_t read_from_i2c(i2c_port_t i2c_port_num, uint8_t device_addr, uint8_t device_register, uint8_t* data);
