@@ -1,5 +1,6 @@
 #include <uart.h>
 
+static const char *TAG = "UART"; // Used for logging
 
 esp_err_t init_uart() {
     uart_config_t uart_config = {
@@ -10,14 +11,14 @@ esp_err_t init_uart() {
         .flow_ctrl = UART_HW_FLOWCTRL_DISABLE
     };
 
-    esp_err_t error = uart_param_config(UART_PORT_NUM, &uart_config);
-    error = uart_set_pin(UART_PORT_NUM, TX_PIN, RX_PIN, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
-    error = uart_driver_install(UART_PORT_NUM, BUF_SIZE * 2, 0, 0, NULL, 0);
-    return error;
+    ESP_RETURN_ON_ERROR(uart_param_config(UART_PORT_NUM, &uart_config), TAG, "Failed to configure UART");
+    ESP_RETURN_ON_ERROR(uart_set_pin(UART_PORT_NUM, TX_PIN, RX_PIN, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE), TAG, "Failed to set UART pins");
+    ESP_RETURN_ON_ERROR(uart_driver_install(UART_PORT_NUM, BUF_SIZE * 2, 0, 0, NULL, 0), TAG, "Failed to install UART driver");
+    return ESP_OK;
 }
 
 
-int _write(int file, char* data, int len) {
+int _write(int file, const char* data, int len) {
     /*
     _write is re-written so printf redirects the data to uart
     */

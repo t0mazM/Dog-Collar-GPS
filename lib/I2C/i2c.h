@@ -19,6 +19,7 @@
 #define I2C_FREQ_HZ 100000           // I2C master clock frequency
 #define WAIT_TIME 1000 / portTICK_PERIOD_MS
 
+// Custum macro for I2C so we can delete cmd when fail happens (to void memory leak)
 #define RETURN_ON_ERROR_I2C(error, tag, message, cmd_to_delete) \
     do { \
         if (error != ESP_OK) { \

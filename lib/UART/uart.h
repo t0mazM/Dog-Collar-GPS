@@ -8,7 +8,10 @@
 #include "driver/gpio.h"
 #include <string.h>
 #include <errno.h>
-#include <sys/unistd.h> // STDOUT_FILENO, STDERR_FILENO
+#include <sys/unistd.h> 
+#include "esp_log.h"
+#include "esp_err.h"
+#include "esp_check.h"
 
 //UART SPECIFICATIONS
 #define TX_PIN GPIO_NUM_1  
