@@ -19,7 +19,14 @@
 #define I2C_FREQ_HZ 100000           // I2C master clock frequency
 #define WAIT_TIME 1000 / portTICK_PERIOD_MS
 
-   
+#define RETURN_ON_ERROR_I2C(error, tag, message, cmd_to_delete) \
+    do { \
+        if (error != ESP_OK) { \
+            ESP_LOGE(tag, "%s: %s", message, esp_err_to_name(error)); \
+            i2c_cmd_link_delete(cmd_to_delete); \
+            return error; \
+        } \
+    } while (0)
 
 typedef struct {
     uint8_t number;        // I2C port number
@@ -28,12 +35,12 @@ typedef struct {
 } I2CPORT;
 
 
-
-
 esp_err_t init_i2c_port(I2CPORT* port);
 void init_i2c(void);
 esp_err_t write_to_i2c(i2c_port_t i2c_port_num, uint8_t device_addr, uint8_t device_register, uint8_t data);
 esp_err_t read_from_i2c(i2c_port_t i2c_port_num, uint8_t device_addr, uint8_t device_register, uint8_t* data);
+
+
 
 
 

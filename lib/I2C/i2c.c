@@ -48,7 +48,6 @@ esp_err_t write_to_i2c(i2c_port_t i2c_port_num, uint8_t device_addr, uint8_t dev
     // Execute the I2C command
     ESP_RETURN_ON_ERROR(i2c_master_cmd_begin(i2c_port_num, cmd, WAIT_TIME), TAG, "i2c cmd begin fail");
 
-
     i2c_cmd_link_delete(cmd);
     return ESP_OK;
 }
