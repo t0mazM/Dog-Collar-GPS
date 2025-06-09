@@ -35,18 +35,18 @@ esp_err_t write_to_i2c(i2c_port_t i2c_port_num, uint8_t device_addr, uint8_t dev
     */
  
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
-    ESP_RETURN_ON_ERROR(i2c_master_start(cmd), TAG, "i2c start fail");
+    RETURN_ON_ERROR_I2C(i2c_master_start(cmd), TAG, "i2c start fail", cmd);
 
     //We send ack bit (true), also make room for it with <<1
-    ESP_RETURN_ON_ERROR(i2c_master_write_byte(cmd, (device_addr << 1) | I2C_MASTER_WRITE, true), TAG, "i2c write byte fail");
+    RETURN_ON_ERROR_I2C(i2c_master_write_byte(cmd, (device_addr << 1) | I2C_MASTER_WRITE, true), TAG, "i2c write byte fail", cmd);
 
-    //We write data to the register 
-    ESP_RETURN_ON_ERROR(i2c_master_write_byte(cmd, device_register, true), TAG, "i2c write register fail");
-    ESP_RETURN_ON_ERROR(i2c_master_write_byte(cmd, data, true), TAG, "i2c write data fail");
-    ESP_RETURN_ON_ERROR(i2c_master_stop(cmd), TAG, "i2c stop fail");
+    //We write data to the register
+    RETURN_ON_ERROR_I2C(i2c_master_write_byte(cmd, device_register, true), TAG, "i2c write register fail", cmd);
+    RETURN_ON_ERROR_I2C(i2c_master_write_byte(cmd, data, true), TAG, "i2c write data fail", cmd);
+    RETURN_ON_ERROR_I2C(i2c_master_stop(cmd), TAG, "i2c stop fail", cmd);
 
     // Execute the I2C command
-    ESP_RETURN_ON_ERROR(i2c_master_cmd_begin(i2c_port_num, cmd, WAIT_TIME), TAG, "i2c cmd begin fail");
+    RETURN_ON_ERROR_I2C(i2c_master_cmd_begin(i2c_port_num, cmd, WAIT_TIME), TAG, "i2c cmd begin fail", cmd);
 
     i2c_cmd_link_delete(cmd);
     return ESP_OK;
@@ -54,36 +54,25 @@ esp_err_t write_to_i2c(i2c_port_t i2c_port_num, uint8_t device_addr, uint8_t dev
 
 esp_err_t read_from_i2c(i2c_port_t i2c_port_num, uint8_t device_addr, uint8_t device_register, uint8_t* data) {
  
-    esp_err_t error = ESP_OK;
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
 
     // Start i2c to write
-    error = i2c_master_start(cmd);
-        if (error != ESP_OK)  {i2c_cmd_link_delete(cmd); return error; }
+    RETURN_ON_ERROR_I2C(i2c_master_start(cmd), TAG, "i2c start fail", cmd);
 
     // Specify which register to read from
-    error = i2c_master_write_byte(cmd, (device_addr << 1) | I2C_MASTER_WRITE, true);
-        if (error != ESP_OK)  {i2c_cmd_link_delete(cmd); return error; }
-    error = i2c_master_write_byte(cmd, device_register, true);
-        if (error != ESP_OK)  {i2c_cmd_link_delete(cmd); return error; }
+    RETURN_ON_ERROR_I2C(i2c_master_write_byte(cmd, (device_addr << 1) | I2C_MASTER_WRITE, true), TAG, "i2c write byte fail", cmd);
+    RETURN_ON_ERROR_I2C(i2c_master_write_byte(cmd, device_register, true), TAG, "i2c write register fail", cmd);
 
     // Start a new i2c  to read
-    error = i2c_master_start(cmd);
-        if (error != ESP_OK)  {i2c_cmd_link_delete(cmd); return error; }
+    RETURN_ON_ERROR_I2C(i2c_master_start(cmd), TAG, "i2c start fail", cmd);
 
-    error = i2c_master_write_byte(cmd, (device_addr << 1) | I2C_MASTER_READ, true);
-        if (error != ESP_OK)  {i2c_cmd_link_delete(cmd); return error; }
+    RETURN_ON_ERROR_I2C(i2c_master_write_byte(cmd, (device_addr << 1) | I2C_MASTER_READ, true), TAG, "i2c write byte fail", cmd);
 
     // Read from the device register
-    error = i2c_master_read_byte(cmd, data, I2C_MASTER_LAST_NACK);
-        if (error != ESP_OK)  {i2c_cmd_link_delete(cmd); return error; }
+    RETURN_ON_ERROR_I2C(i2c_master_read_byte(cmd, data, I2C_MASTER_LAST_NACK), TAG, "i2c read byte fail", cmd);
 
     i2c_master_stop(cmd);
-        if (error != ESP_OK)  {i2c_cmd_link_delete(cmd); return error; }
-
-    // Execute the I2C command
-    error = i2c_master_cmd_begin(i2c_port_num, cmd, WAIT_TIME);
-        if (error != ESP_OK)  {i2c_cmd_link_delete(cmd); return error; }
+    RETURN_ON_ERROR_I2C(i2c_master_cmd_begin(i2c_port_num, cmd, WAIT_TIME), TAG, "i2c cmd begin fail", cmd);
 
     i2c_cmd_link_delete(cmd);
     return ESP_OK;
