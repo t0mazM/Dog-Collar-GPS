@@ -7,10 +7,12 @@
 #include "driver/gpio.h"
 #include "esp_err.h"
 
-#define PIN_NUM_MISO 19
-#define PIN_NUM_MOSI 23
-#define PIN_NUM_CLK  18
-#define PIN_NUM_CS   5
+#define PIN_NUM_MISO 18
+#define PIN_NUM_MOSI 12
+#define PIN_NUM_CLK  11
+#define PIN_NUM_CS   15
+#define PIN_NUM_WP   17
+#define PIN_NUM_HOLD 10
 
 #define CMD_JEDEC_ID 0x9F
 void init_spi_flash(void);

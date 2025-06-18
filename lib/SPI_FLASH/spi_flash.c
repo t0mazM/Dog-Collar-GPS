@@ -9,15 +9,15 @@ void init_spi_flash(void) {
         .mosi_io_num = PIN_NUM_MOSI,
         .miso_io_num = PIN_NUM_MISO,
         .sclk_io_num = PIN_NUM_CLK,
-        .quadwp_io_num = -1,
-        .quadhd_io_num = -1,
+        .quadwp_io_num = PIN_NUM_WP,      
+        .quadhd_io_num = PIN_NUM_HOLD,    
         .max_transfer_sz = 4096
     };
 
     spi_device_interface_config_t devcfg = {
-        .clock_speed_hz = 8 * 1000 * 1000,
-        .mode = 0, // SPI mode 0
-        .spics_io_num = PIN_NUM_CS,
+        .clock_speed_hz = 8 * 1000 * 1000, // 8 MHz
+        .mode = 0,                         // SPI mode 0
+        .spics_io_num = PIN_NUM_CS,        // CS pin
         .queue_size = 7,
     };
 
@@ -25,7 +25,6 @@ void init_spi_flash(void) {
     ESP_ERROR_CHECK(spi_bus_add_device(SPI2_HOST, &devcfg, &spi));
 
     ESP_LOGI(TAG, "SPI Flash initialized.");
-
 }
 
 
