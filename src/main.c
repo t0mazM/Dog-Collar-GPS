@@ -14,7 +14,6 @@ void app_main() {
     init_i2c();
     init_spi_flash();
 
-    while(1){
     uint8_t jedec_id[3] = {0};
 
     // Call the function
@@ -27,8 +26,5 @@ void app_main() {
     printf("Capacity:        0x%02X\n", jedec_id[2]);
     } else {
     printf("Failed to read JEDEC ID: %d\n", ret);
-    }
-
-        vTaskDelay(pdMS_TO_TICKS(1000));  // Delay for 1 second
-    }
+    } 
 }
