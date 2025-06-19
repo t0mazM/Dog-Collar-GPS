@@ -2,7 +2,6 @@
 #define SPI_FLASH_H
 
 #include "driver/spi_master.h"
-#include "driver/spi_master.h"
 #include "esp_log.h"
 #include "driver/gpio.h"
 #include "esp_err.h"

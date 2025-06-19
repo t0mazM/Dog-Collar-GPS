@@ -21,11 +21,26 @@ void init_spi_flash(void) {
         .queue_size = 7,
     };
 
-    ESP_ERROR_CHECK(spi_bus_initialize(SPI2_HOST, &buscfg, SPI_DMA_CH_AUTO));
-    ESP_ERROR_CHECK(spi_bus_add_device(SPI2_HOST, &devcfg, &spi));
+    esp_err_t ret;
+    printf("Initializing SPI Flash...\n");
 
-    ESP_LOGI(TAG, "SPI Flash initialized.");
+    ret = spi_bus_initialize(SPI2_HOST, &buscfg, SPI_DMA_CH_AUTO);
+    printf("INIT IS:%d\n", ret);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "spi_bus_initialize failed: %s", esp_err_to_name(ret));
+        //abort();
+    }
+    printf("SPI Flash initialized successfully.\n");
+
+    ret = spi_bus_add_device(SPI2_HOST, &devcfg, &spi);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "spi_bus_add_device failed: %s", esp_err_to_name(ret));
+        //abort();
+    }
+
+    ESP_LOGI(TAG, "SPI Flash initialized successfully.");
 }
+
 
 
 

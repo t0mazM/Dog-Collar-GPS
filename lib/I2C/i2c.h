@@ -13,8 +13,8 @@
 
 
 
-#define I2C_SCL  21          // GPIO for SCL
-#define I2C_SDA  22          // GPIO for SDA
+#define I2C_SCL  4          // GPIO for SCL
+#define I2C_SDA  5          // GPIO for SDA
 
 #define I2C_FREQ_HZ 100000           // I2C master clock frequency
 #define WAIT_TIME 1000 / portTICK_PERIOD_MS
@@ -32,7 +32,7 @@
 typedef struct {
     uint8_t number;        // I2C port number
     uint8_t sda_io_num;    // GPIO for SDA
-    uint8_t scl_io_num;    // GPIO for SCL
+    uint8_t scl_io_num;   // GPIO for SCL
 } I2CPORT;
 
 

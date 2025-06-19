@@ -24,8 +24,13 @@ esp_err_t init_i2c_port(I2CPORT* port) {
 }
 
 void init_i2c() {
+    esp_err_t ret = init_i2c_port(&I2CPORT_1);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "I2C init failed: %s", esp_err_to_name(ret));
+        abort();  
+    }
 
-    init_i2c_port(&I2CPORT_1);
+    ESP_LOGI(TAG, "I2C initialized successfully");
 }
 
 
