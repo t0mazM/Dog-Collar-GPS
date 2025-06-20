@@ -19,6 +19,8 @@
 #define SPI_CMD_ENABLE_RESET 0x66
 #define SPI_CMD_RESET_DEVICE 0x99
 
+#define SPI_JEDEC_DATA_BITS 24 // JEDEC ID is 3 bytes (3*8 bits)
+
 #define SPI_MAX_TRANSFER_SIZE 512
 #define SPI_CLOCK_SPEED 8 * 1000 * 1000 // 8 MHz
 

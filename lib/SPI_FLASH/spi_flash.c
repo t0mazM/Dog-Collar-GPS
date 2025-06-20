@@ -79,11 +79,10 @@ void spi_flash_send_reset(void) {
 // Read JEDEC ID: returns 3 bytes
 esp_err_t spi_flash_read_jedec(uint8_t *buf) {
     
-
     // Transaction for JEDEC ID command (0x9F) and 3 bytes of data
     spi_transaction_t t = {
-        .length = 3 * 8, 
-        .rxlength = 3 * 8, 
+        .length = SPI_JEDEC_DATA_BITS, 
+        .rxlength = SPI_JEDEC_DATA_BITS, 
         .cmd = SPI_CMD_JEDEC_ID, 
         .flags = 0,  
     };
