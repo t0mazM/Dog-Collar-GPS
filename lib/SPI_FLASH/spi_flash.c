@@ -86,20 +86,15 @@ esp_err_t spi_flash_read_jedec(uint8_t *buf) {
         .cmd = SPI_CMD_JEDEC_ID, 
         .flags = 0,  
     };
-    esp_err_t ret;
 
-    uint8_t rx_data[3]; // Buffer to hold the 3 received bytes
-    t.rx_buffer = rx_data;
+    uint8_t recived_data[3]; // Buffer to hold the 3 received bytes from the flash chip
+    t.rx_buffer = recived_data;
 
-    ret = spi_device_transmit(spi, &t);
-    if (ret != ESP_OK) {
-        ESP_LOGE(TAG, "JEDEC read failed: %s", esp_err_to_name(ret));
-        return ret;
-    }
+    CUSTUM_ERROR_CHECK( spi_device_transmit(spi, &t));
 
-    buf[0] = rx_data[0]; // Manufacturer ID
-    buf[1] = rx_data[1]; // Memory Type
-    buf[2] = rx_data[2]; // Capacity
+    buf[0] = recived_data[0]; // Manufacturer ID
+    buf[1] = recived_data[1]; // Memory Type
+    buf[2] = recived_data[2]; // Capacity
 
     ESP_LOGI(TAG, "JEDEC ID: %02X %02X %02X", buf[0], buf[1], buf[2]);
     return ESP_OK;
