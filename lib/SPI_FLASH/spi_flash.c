@@ -10,9 +10,7 @@ static const char *TAG = "SPI_FLASH";
 spi_device_handle_t spi;
 
 
-
-void init_spi_flash(void) {
-    spi_bus_config_t buscfg = {
+   spi_bus_config_t buscfg = {
         .mosi_io_num = SPI_PIN_NUM_MOSI,
         .miso_io_num = SPI_PIN_NUM_MISO,
         .sclk_io_num = SPI_PIN_NUM_CLK,
@@ -21,15 +19,36 @@ void init_spi_flash(void) {
         .max_transfer_sz = SPI_MAX_TRANSFER_SIZE, 
     };
 
-    spi_device_interface_config_t devcfg = {
-        .command_bits = 8, 
+
+
+
+spi_bus_config_t get_spi_bus_config(void) {
+    return (spi_bus_config_t) {
+        .mosi_io_num = SPI_PIN_NUM_MOSI,
+        .miso_io_num = SPI_PIN_NUM_MISO,
+        .sclk_io_num = SPI_PIN_NUM_CLK,
+        .quadwp_io_num = -1,
+        .quadhd_io_num = -1,
+        .max_transfer_sz = SPI_MAX_TRANSFER_SIZE,
+    };
+}
+
+spi_device_interface_config_t get_spi_device_config(void) {
+    return (spi_device_interface_config_t) {
+        .command_bits = 8,
         .clock_speed_hz = SPI_CLOCK_SPEED,
-        .mode = 0,                         
-        .spics_io_num = SPI_PIN_NUM_CS,       
+        .mode = 0,
+        .spics_io_num = SPI_PIN_NUM_CS,
         .queue_size = 1,
     };
+}
 
+
+void init_spi_flash(void) {
     SPI_set_HOLD_WP_HIGH();
+    spi_bus_config_t buscfg = get_spi_bus_config();
+    spi_device_interface_config_t devcfg = get_spi_device_config();
+
     esp_err_t ret;
     printf("Initializing SPI Flash bus...\n");
 
