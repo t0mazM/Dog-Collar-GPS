@@ -11,7 +11,9 @@ esp_err_t config_gpio_pin(gpio_num_t GPIO_pin_handle, gpio_mode_t mode) {
     return gpio_config(&io_conf);
 }
 
-void hold_wp_setup(void) {
+
+
+void SPI_set_HOLD_WP_HIGH(void) {
 
     // Configure WP# as output high
     config_gpio_pin(SPI_PIN_NUM_WP, GPIO_MODE_OUTPUT);

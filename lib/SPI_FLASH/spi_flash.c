@@ -29,8 +29,7 @@ void init_spi_flash(void) {
         .queue_size = 1,
     };
 
-    hold_wp_setup();
-
+    SPI_set_HOLD_WP_HIGH();
     esp_err_t ret;
     printf("Initializing SPI Flash bus...\n");
 
