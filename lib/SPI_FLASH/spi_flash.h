@@ -6,6 +6,8 @@
 #include "driver/gpio.h"
 #include "esp_err.h"
 #include "spi_gpio_config.h" // For WP and HOLD pin definitions
+#include "error_handling.h" 
+
 
 #define SPI_PIN_NUM_MOSI GPIO_NUM_21
 #define SPI_PIN_NUM_MISO GPIO_NUM_0

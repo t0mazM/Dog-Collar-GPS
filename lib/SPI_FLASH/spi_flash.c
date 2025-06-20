@@ -19,9 +19,6 @@ spi_device_handle_t spi;
         .max_transfer_sz = SPI_MAX_TRANSFER_SIZE, 
     };
 
-
-
-
 spi_bus_config_t get_spi_bus_config(void) {
     return (spi_bus_config_t) {
         .mosi_io_num = SPI_PIN_NUM_MOSI,
@@ -45,27 +42,17 @@ spi_device_interface_config_t get_spi_device_config(void) {
 
 
 void init_spi_flash(void) {
+
     SPI_set_HOLD_WP_HIGH();
+    
     spi_bus_config_t buscfg = get_spi_bus_config();
     spi_device_interface_config_t devcfg = get_spi_device_config();
 
-    esp_err_t ret;
-    printf("Initializing SPI Flash bus...\n");
 
-    ret = spi_bus_initialize(SPI2_HOST, &buscfg, SPI_DMA_CH_AUTO);
-    printf("spi_bus_initialize status: %s (%d)\n", esp_err_to_name(ret), ret);
-    if (ret != ESP_OK) {
-        ESP_LOGE(TAG, "spi_bus_initialize failed: %s", esp_err_to_name(ret));
-        // abort() 
-    }
+    CUSTUM_ERROR_CHECK(spi_bus_initialize(SPI2_HOST, &buscfg, SPI_DMA_CH_AUTO));
 
     // Add device to the bus
-    ret = spi_bus_add_device(SPI2_HOST, &devcfg, &spi);
-    printf("spi_bus_add_device status: %s (%d)\n", esp_err_to_name(ret), ret);
-    if (ret != ESP_OK) {
-        ESP_LOGE(TAG, "spi_bus_add_device failed: %s", esp_err_to_name(ret));
-        // abort() 
-    }
+    CUSTUM_ERROR_CHECK(spi_bus_add_device(SPI2_HOST, &devcfg, &spi));
 
     ESP_LOGI(TAG, "SPI Flash initialized successfully and device added.");
 }
