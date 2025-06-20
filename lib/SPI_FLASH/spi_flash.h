@@ -6,17 +6,19 @@
 #include "driver/gpio.h"
 #include "esp_err.h"
 
-#define PIN_NUM_MISO GPIO_NUM_21
-#define PIN_NUM_MOSI GPIO_NUM_0
-#define PIN_NUM_CLK  GPIO_NUM_20
-#define PIN_NUM_CS   GPIO_NUM_3
-#define PIN_NUM_WP   GPIO_NUM_1
-#define PIN_NUM_HOLD GPIO_NUM_10
+#define SPI_PIN_NUM_MOSI GPIO_NUM_21
+#define SPI_PIN_NUM_MISO GPIO_NUM_0
+#define SPI_PIN_NUM_CLK  GPIO_NUM_20
+#define SPI_PIN_NUM_CS   GPIO_NUM_3
+#define SPI_PIN_NUM_WP   GPIO_NUM_1
+#define SPI_PIN_NUM_HOLD GPIO_NUM_10
 
+#define SPI_CMD_JEDEC_ID     0x9F
+#define SPI_CMD_ENABLE_RESET 0x66
+#define SPI_CMD_RESET_DEVICE 0x99
 
-#define CMD_JEDEC_ID 0x9F
-#define CMD_ENABLE_RESET 0x66
-#define CMD_RESET_DEVICE 0x99
+#define SPI_MAX_TRANSFER_SIZE 512
+#define SPI_CLOCK_SPEED 8 * 1000 * 1000 // 8 MHz
 
 void hold_wp_setup(void);
 void init_spi_flash(void);
