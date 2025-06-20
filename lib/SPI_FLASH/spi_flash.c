@@ -9,29 +9,7 @@
 static const char *TAG = "SPI_FLASH";
 spi_device_handle_t spi;
 
-void hold_wp_setup(void) {
 
-    // Configure WP# as output high
-    gpio_config_t wp_conf = {
-        .pin_bit_mask = (1ULL << SPI_PIN_NUM_WP),
-        .mode = GPIO_MODE_OUTPUT,
-        .pull_up_en = GPIO_PULLUP_DISABLE,
-        .pull_down_en = GPIO_PULLDOWN_DISABLE,
-        .intr_type = GPIO_INTR_DISABLE,
-    };
-    gpio_config(&wp_conf);
-    gpio_set_level(SPI_PIN_NUM_WP, 1);
-
-// Configure HOLD# as output high
-    gpio_config_t hold_conf = {
-        .pin_bit_mask = (1ULL << SPI_PIN_NUM_HOLD),
-        .mode = GPIO_MODE_OUTPUT, 
-        .pull_up_en = GPIO_PULLUP_DISABLE,
-        .pull_down_en = GPIO_PULLDOWN_DISABLE,
-        .intr_type = GPIO_INTR_DISABLE,
-    };
-    gpio_config(&hold_conf);
-}
 
 void init_spi_flash(void) {
     spi_bus_config_t buscfg = {

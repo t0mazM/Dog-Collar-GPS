@@ -5,13 +5,13 @@
 #include "esp_log.h"
 #include "driver/gpio.h"
 #include "esp_err.h"
+#include "spi_gpio_config.h" // For WP and HOLD pin definitions
 
 #define SPI_PIN_NUM_MOSI GPIO_NUM_21
 #define SPI_PIN_NUM_MISO GPIO_NUM_0
 #define SPI_PIN_NUM_CLK  GPIO_NUM_20
 #define SPI_PIN_NUM_CS   GPIO_NUM_3
-#define SPI_PIN_NUM_WP   GPIO_NUM_1
-#define SPI_PIN_NUM_HOLD GPIO_NUM_10
+// WP and HOLD pins are defined in spi_gpio_config.h , since they are manually controlled
 
 #define SPI_CMD_JEDEC_ID     0x9F
 #define SPI_CMD_ENABLE_RESET 0x66
