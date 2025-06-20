@@ -50,7 +50,7 @@ void init_spi_flash(void) {
     printf("Initializing SPI Flash...\n");
 
     ret = spi_bus_initialize(SPI2_HOST, &buscfg, SPI_DMA_CH_AUTO);
-    printf("INIT IS:%d\n", ret);
+
     if (ret != ESP_OK) {
         ESP_LOGE(TAG, "spi_bus_initialize failed: %s", esp_err_to_name(ret));
         //abort();
