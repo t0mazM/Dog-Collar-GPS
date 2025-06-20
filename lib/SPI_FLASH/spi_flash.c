@@ -65,18 +65,15 @@ void spi_flash_send_reset(void) {
         .rxlength = 0, 
         .flags = 0,  
     };
-    esp_err_t ret;
 
     t.cmd = SPI_CMD_ENABLE_RESET; 
-    ret = spi_device_transmit(spi, &t);
-    if (ret != ESP_OK) { ESP_LOGE(TAG, "Enable Reset failed: %s", esp_err_to_name(ret)); return; }
+    CUSTUM_ERROR_CHECK(spi_device_transmit(spi, &t) );
+
     ESP_LOGI(TAG, "Sent Enable Reset (0x%02X)", SPI_CMD_ENABLE_RESET);
 
     t.cmd = SPI_CMD_RESET_DEVICE; 
-    ret = spi_device_transmit(spi, &t);
-    if (ret != ESP_OK) { ESP_LOGE(TAG, "Reset Device failed: %s", esp_err_to_name(ret)); return; }
+    CUSTUM_ERROR_CHECK(spi_device_transmit(spi, &t));
     ESP_LOGI(TAG, "Sent Reset Device (0x%02X)", SPI_CMD_RESET_DEVICE);
-
 }
 
 // Read JEDEC ID: returns 3 bytes

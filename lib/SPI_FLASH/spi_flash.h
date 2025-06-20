@@ -22,7 +22,7 @@
 #define SPI_MAX_TRANSFER_SIZE 512
 #define SPI_CLOCK_SPEED 8 * 1000 * 1000 // 8 MHz
 
-void hold_wp_setup(void);
+void spi_flash_send_reset(void);
 void init_spi_flash(void);
 esp_err_t spi_flash_read_jedec(uint8_t *buf);
 esp_err_t spi_flash_write(uint32_t addr, uint8_t *data, size_t len);
