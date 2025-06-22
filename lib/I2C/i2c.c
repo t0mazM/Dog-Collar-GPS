@@ -82,7 +82,7 @@ esp_err_t i2c_read_8bit(uint8_t dev_addr, uint8_t reg_addr, uint8_t *data) {
 
 //Helper functions
 
-uint16_t combine_bytes(uint8_t high_byte, uint8_t low_byte) {
-    return ((uint16_t)high_byte << 8) | low_byte;
+uint16_t combine_bytes(uint8_t low, uint8_t high) {
+    return ((uint16_t)high << 8) | low;
 }
 
