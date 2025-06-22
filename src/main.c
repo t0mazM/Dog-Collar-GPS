@@ -16,7 +16,7 @@ void app_main() {
     i2c_init();
     ext_flash_init();
 
-    battery_monitor_read();
+    battery_monitor_update_battery_data();
 
 
 

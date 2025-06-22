@@ -10,9 +10,19 @@
 #define SOC_CMD         0x1C
 #define TEMP_CMD        0x02
 
-void battery_monitor_read(void);
+typedef struct {
+    uint8_t i2c_address; // Default I2C address for BQ27441
+    float voltage; //In mili Volts
+    float soc;  //In %
+    float temperature; //In degrees Celsius
+} battery_data_t;
 
 
+void battery_monitor_update_battery_data(void);
+
+esp_err_t read_voltage(float *voltage);
+esp_err_t read_soc(float *soc);
+esp_err_t read_temperature(float *temp);
 
 
 
