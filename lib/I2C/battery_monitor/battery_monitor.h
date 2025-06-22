@@ -16,9 +16,10 @@ typedef struct {
     float soc;  //In %
     float temperature; //In degrees Celsius
 } battery_data_t;
+extern battery_data_t battery_data;
 
 
-void battery_monitor_update_battery_data(void);
+void battery_monitor_update_battery_data(battery_data_t *battery_data);
 
 esp_err_t read_voltage(float *voltage);
 esp_err_t read_soc(float *soc);

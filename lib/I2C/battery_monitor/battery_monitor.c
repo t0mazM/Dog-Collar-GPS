@@ -7,7 +7,7 @@ battery_data_t battery_data = {
     .temperature = 0.0f
 };
 
-void battery_monitor_update_battery_data(void){
+void battery_monitor_update_battery_data(battery_data_t *data) {
 
     read_temperature(&battery_data.temperature);
     read_voltage(&battery_data.voltage);
