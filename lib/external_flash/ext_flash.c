@@ -10,20 +10,20 @@ static const char *TAG = "EXT_FLASH";
 spi_device_handle_t spi;
 
 
-   spi_bus_config_t buscfg = {
-        .mosi_io_num = SPI_PIN_NUM_MOSI,
-        .miso_io_num = SPI_PIN_NUM_MISO,
-        .sclk_io_num = SPI_PIN_NUM_CLK,
-        .quadwp_io_num = -1, // WP is manually set to HIGH
-        .quadhd_io_num = -1, // HOLD is manually set to HIGH 
-        .max_transfer_sz = SPI_MAX_TRANSFER_SIZE, 
-    };
+spi_bus_config_t buscfg = {
+    .mosi_io_num = SPI_PIN_MOSI,
+    .miso_io_num = SPI_PIN_MISO,
+    .sclk_io_num = SPI_PIN_CLK,
+    .quadwp_io_num = -1, // WP is manually set to HIGH
+    .quadhd_io_num = -1, // HOLD is manually set to HIGH 
+    .max_transfer_sz = SPI_MAX_TRANSFER_SIZE, 
+};
 
 spi_bus_config_t get_spi_bus_config(void) {
     return (spi_bus_config_t) {
-        .mosi_io_num = SPI_PIN_NUM_MOSI,
-        .miso_io_num = SPI_PIN_NUM_MISO,
-        .sclk_io_num = SPI_PIN_NUM_CLK,
+        .mosi_io_num = SPI_PIN_MOSI,
+        .miso_io_num = SPI_PIN_MISO,
+        .sclk_io_num = SPI_PIN_CLK,
         .quadwp_io_num = -1,
         .quadhd_io_num = -1,
         .max_transfer_sz = SPI_MAX_TRANSFER_SIZE,
@@ -35,13 +35,13 @@ spi_device_interface_config_t get_spi_device_config(void) {
         .command_bits = 8,
         .clock_speed_hz = SPI_CLOCK_SPEED,
         .mode = 0,
-        .spics_io_num = SPI_PIN_NUM_CS,
+        .spics_io_num = SPI_PIN_CS,
         .queue_size = 1,
     };
 }
 
 
-void init_spi_flash(void) {
+void ext_flash_init(void) {
 
     SPI_set_HOLD_WP_HIGH();
     
@@ -56,10 +56,10 @@ void init_spi_flash(void) {
 
     ESP_LOGI(TAG, "SPI Flash initialized successfully and device added.");
 
-    spi_flash_send_reset(); // Wake/reset flash chip
+    ext_flash_reset_chip();// Wake/reset flash chip
 }
 
-void spi_flash_send_reset(void) {
+void ext_flash_reset_chip(void) {
     spi_transaction_t t = {
         .length = 0, 
         .rxlength = 0, 
@@ -77,7 +77,7 @@ void spi_flash_send_reset(void) {
 }
 
 // Read JEDEC ID: returns 3 bytes
-esp_err_t spi_flash_read_jedec(uint8_t *buf) {
+esp_err_t ext_flash_read_jedec_data(uint8_t *buf) {
     
     // Transaction for JEDEC ID command (0x9F) and 3 bytes of data
     spi_transaction_t t = {
@@ -101,6 +101,6 @@ esp_err_t spi_flash_read_jedec(uint8_t *buf) {
 }
 
 // Optional: provide flash handle externally
-spi_device_handle_t spi_flash_get_handle(void) {
+spi_device_handle_t ext_flash_get_handle(void) {
     return spi;
 }

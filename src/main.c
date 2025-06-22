@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <i2c.h>
 #include <uart.h>
-#include <spi_flash.h>
+#include <ext_flash.h>
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -12,12 +12,12 @@ void app_main() {
     ESP_LOGI("MAIN", "Booting application...");
 
     init_i2c();
-    init_spi_flash();
+    ext_flash_init();
 
     uint8_t jedec_id[3] = {0};
 
     // Call the function
-    esp_err_t ret = spi_flash_read_jedec(jedec_id);
+    ext_flash_read_jedec_data(jedec_id);
 
 
 }
