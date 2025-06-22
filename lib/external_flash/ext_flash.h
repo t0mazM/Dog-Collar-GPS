@@ -1,11 +1,11 @@
-#ifndef SPI_FLASH_H
-#define SPI_FLASH_H
+#ifndef EXT_FLASH_H
+#define EXT_FLASH_H
 
 #include "driver/spi_master.h"
 #include "esp_log.h"
 #include "driver/gpio.h"
 #include "esp_err.h"
-#include "spi_gpio_config.h" // For WP and HOLD pin definitions
+#include "external_flash_gpio.h" // For WP and HOLD pin definitions
 #include "error_handling.h" 
 
 
@@ -33,4 +33,4 @@ spi_device_handle_t spi_flash_get_handle(void);
 
 
 
-#endif  // SPI_FLASH_H
+#endif  // EXT_FLASH_H

@@ -1,4 +1,4 @@
-#include "spi_flash.h"
+#include "ext_flash.h"
 #include "driver/spi_master.h"
 #include "driver/gpio.h"
 #include "esp_log.h"
@@ -6,7 +6,7 @@
 #include "freertos/task.h"
 
 
-static const char *TAG = "SPI_FLASH";
+static const char *TAG = "EXT_FLASH";
 spi_device_handle_t spi;
 
 

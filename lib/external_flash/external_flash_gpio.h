@@ -1,8 +1,7 @@
-#ifndef SPI_GPIO_CONFIG_H
-#define SPI_GPIO_CONFIG_H
+#ifndef EXT_FLASH_GPIO_H
+#define EXT_FLASH_GPIO_H
 
 #include "driver/gpio.h"
-
 
 #define SPI_PIN_NUM_WP   GPIO_NUM_1
 #define SPI_PIN_NUM_HOLD GPIO_NUM_10

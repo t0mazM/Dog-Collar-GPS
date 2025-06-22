@@ -1,4 +1,4 @@
-#include "spi_gpio_config.h"
+#include "ext_flash.h"
 
 esp_err_t config_gpio_pin(gpio_num_t GPIO_pin_handle, gpio_mode_t mode) {
     gpio_config_t io_conf = {
