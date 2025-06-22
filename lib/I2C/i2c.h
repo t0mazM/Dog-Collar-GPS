@@ -10,8 +10,8 @@
 #include "esp_check.h"
 
 // Pin configuration
-#define I2C_SCL  4
-#define I2C_SDA  5
+#define I2C_SDA  GPIO_NUM_6
+#define I2C_SCL  GPIO_NUM_7
 
 // Config constants
 #define I2C_FREQ_HZ 100000
