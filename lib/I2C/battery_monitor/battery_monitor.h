@@ -1,0 +1,4 @@
+#ifndef BATTERY_MONITOR_H
+#define BATTERY_MONITOR_H
+
+#endif  // BATTERY_MONITOR_H
