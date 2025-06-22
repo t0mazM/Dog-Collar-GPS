@@ -30,6 +30,6 @@
 // Function declarations
 esp_err_t i2c_init(void);
 esp_err_t i2c_write_byte(uint8_t dev_addr, uint8_t reg_addr, uint8_t data);
-esp_err_t i2c_read_byte(uint8_t dev_addr, uint8_t reg_addr, uint8_t *data);
+esp_err_t i2c_read_bytes(uint8_t dev_addr, uint8_t reg_addr, uint8_t *data, size_t len);
 
 #endif  // I2C_H

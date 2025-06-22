@@ -36,16 +36,22 @@ esp_err_t i2c_write_byte(uint8_t dev_addr, uint8_t reg_addr, uint8_t data) {
     return ESP_OK;
 }
 
-esp_err_t i2c_read_byte(uint8_t dev_addr, uint8_t reg_addr, uint8_t *data) {
+esp_err_t i2c_read_bytes(uint8_t dev_addr, uint8_t reg_addr, uint8_t *data, size_t len) {
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
 
+    // Write register address
     RETURN_ON_ERROR_I2C(i2c_master_start(cmd), TAG, "Start failed", cmd);
     RETURN_ON_ERROR_I2C(i2c_master_write_byte(cmd, (dev_addr << 1) | I2C_MASTER_WRITE, true), TAG, "Write addr failed", cmd);
     RETURN_ON_ERROR_I2C(i2c_master_write_byte(cmd, reg_addr, true), TAG, "Write reg failed", cmd);
 
+    // Read N bytes
     RETURN_ON_ERROR_I2C(i2c_master_start(cmd), TAG, "Restart failed", cmd);
     RETURN_ON_ERROR_I2C(i2c_master_write_byte(cmd, (dev_addr << 1) | I2C_MASTER_READ, true), TAG, "Read addr failed", cmd);
-    RETURN_ON_ERROR_I2C(i2c_master_read_byte(cmd, data, I2C_MASTER_LAST_NACK), TAG, "Read data failed", cmd);
+
+    if (len > 1) {
+        RETURN_ON_ERROR_I2C(i2c_master_read(cmd, data, len - 1, I2C_MASTER_ACK), TAG, "Read failed", cmd);
+    }
+    RETURN_ON_ERROR_I2C(i2c_master_read_byte(cmd, &data[len - 1], I2C_MASTER_NACK), TAG, "Read last byte failed", cmd);
 
     RETURN_ON_ERROR_I2C(i2c_master_stop(cmd), TAG, "Stop failed", cmd);
     RETURN_ON_ERROR_I2C(i2c_master_cmd_begin(I2C_PORT, cmd, WAIT_TIME), TAG, "Command failed", cmd);
