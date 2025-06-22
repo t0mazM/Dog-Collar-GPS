@@ -32,10 +32,7 @@ void battery_monitor_update_battery_data(battery_data_t *battery_data) {
         ESP_LOGW(TAG, "Failed to read temperature");
     }
 
-    printf("Battery Data:\n");
-    printf("Voltage: %.2f V\n", battery_data->voltage);
-    printf("State of Charge: %.2f %%\n", battery_data->soc);
-    printf("Temperature: %.2f C\n", battery_data->temperature);
+ESP_LOGI(TAG, "Battery Voltage: %.2f V, SOC: %.2f %%, Temperature: %.2f C", battery_data->voltage, battery_data->soc, battery_data->temperature);
 }
 
 esp_err_t read_voltage(float *voltage) {
@@ -67,3 +64,4 @@ esp_err_t read_temperature(float *temperature) {
     *temperature = (raw * 0.1f) - 273.15f;
     return ESP_OK;
 }
+
