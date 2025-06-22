@@ -13,6 +13,8 @@
 #define I2C_SDA  GPIO_NUM_6
 #define I2C_SCL  GPIO_NUM_7
 
+#define REG_ADDR_NOT_USED -1
+
 // Config constants
 #define I2C_FREQ_HZ 100000
 #define WAIT_TIME   (1000 / portTICK_PERIOD_MS)

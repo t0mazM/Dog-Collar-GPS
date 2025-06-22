@@ -21,12 +21,15 @@ esp_err_t i2c_init(void) {
     return ESP_OK;
 }
 
-esp_err_t i2c_write_byte(uint8_t dev_addr, uint8_t reg_addr, uint8_t data) {
+esp_err_t i2c_write_byte(uint8_t dev_addr, uint8_t write_register, uint8_t data) {
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
 
     RETURN_ON_ERROR_I2C(i2c_master_start(cmd), TAG, "Start failed", cmd);
     RETURN_ON_ERROR_I2C(i2c_master_write_byte(cmd, (dev_addr << 1) | I2C_MASTER_WRITE, true), TAG, "Write addr failed", cmd);
-    RETURN_ON_ERROR_I2C(i2c_master_write_byte(cmd, reg_addr, true), TAG, "Write reg failed", cmd);
+    if(write_register != REG_ADDR_NOT_USED) {
+        RETURN_ON_ERROR_I2C(i2c_master_write_byte(cmd, write_register, true), TAG, "Write reg failed", cmd);
+    }
+    RETURN_ON_ERROR_I2C(i2c_master_write_byte(cmd, write_register, true), TAG, "Write reg failed", cmd);
     RETURN_ON_ERROR_I2C(i2c_master_write_byte(cmd, data, true), TAG, "Write data failed", cmd);
     RETURN_ON_ERROR_I2C(i2c_master_stop(cmd), TAG, "Stop failed", cmd);
 
