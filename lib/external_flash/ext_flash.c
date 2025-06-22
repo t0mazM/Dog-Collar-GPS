@@ -9,16 +9,6 @@
 static const char *TAG = "EXT_FLASH";
 spi_device_handle_t spi;
 
-
-spi_bus_config_t buscfg = {
-    .mosi_io_num = SPI_PIN_MOSI,
-    .miso_io_num = SPI_PIN_MISO,
-    .sclk_io_num = SPI_PIN_CLK,
-    .quadwp_io_num = -1, // WP is manually set to HIGH
-    .quadhd_io_num = -1, // HOLD is manually set to HIGH 
-    .max_transfer_sz = SPI_MAX_TRANSFER_SIZE, 
-};
-
 spi_bus_config_t get_spi_bus_config(void) {
     return (spi_bus_config_t) {
         .mosi_io_num = SPI_PIN_MOSI,
