@@ -11,7 +11,7 @@ void app_main() {
     esp_log_level_set("*", ESP_LOG_INFO);
     ESP_LOGI("MAIN", "Booting application...");
 
-    init_i2c();
+    i2c_init();
     ext_flash_init();
 
     uint8_t jedec_id[3] = {0};
