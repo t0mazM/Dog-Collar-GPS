@@ -11,9 +11,6 @@
 #include "freertos/task.h"
 
 void app_main() {
-    vTaskDelay(pdMS_TO_TICKS(5000)); //It takes some time for the serial monitor to start up
-    esp_log_level_set("*", ESP_LOG_INFO);
-    ESP_LOGI("MAIN", "Booting application...");
 
     i2c_init();
     ext_flash_init();
