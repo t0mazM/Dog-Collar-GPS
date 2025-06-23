@@ -36,32 +36,32 @@ ESP_LOGI(TAG, "Battery Voltage: %.2f V, SOC: %.2f %%, Temperature: %.2f C", batt
 }
 
 esp_err_t read_voltage(float *voltage) {
-    uint16_t raw;
-    esp_err_t ret = i2c_read_16bit(BQ27441_ADDRESS, VOLTAGE_CMD, &raw);
+    uint16_t raw_voltage;
+    esp_err_t ret = i2c_read_16bit(BQ27441_ADDRESS, VOLTAGE_CMD, &raw_voltage);
     if (ret != ESP_OK) {
         return ret;
     }
-    *voltage = raw / 1000.0f;
+    *voltage = raw_voltage / 1000.0f; // Convert to volts
     return ESP_OK;
 }
 
 esp_err_t read_soc(float *soc) {
-    uint8_t raw;
-    esp_err_t ret = i2c_read_8bit(BQ27441_ADDRESS, SOC_CMD, &raw);
+    uint8_t raw_soc;
+    esp_err_t ret = i2c_read_8bit(BQ27441_ADDRESS, SOC_CMD, &raw_soc);
     if (ret != ESP_OK) {
         return ret;
     }
-    *soc = (float)raw;
+    *soc = (float)raw_soc; // State of Charge is already in percentage
     return ESP_OK;
 }
 
 esp_err_t read_temperature(float *temperature) {
-    uint16_t raw;
-    esp_err_t ret = i2c_read_16bit(BQ27441_ADDRESS, TEMP_CMD, &raw);
+    uint16_t raw_tempearture;
+    esp_err_t ret = i2c_read_16bit(BQ27441_ADDRESS, TEMP_CMD, &raw_tempearture);
     if (ret != ESP_OK) {
         return ret;
     }
-    *temperature = (raw * 0.1f) - 273.15f;
+    *temperature = (raw_tempearture * 0.1f) - 273.15f; // Convert to Celsius
     return ESP_OK;
 }
 
