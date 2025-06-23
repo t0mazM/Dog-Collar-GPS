@@ -22,3 +22,9 @@ void gpio_turn_off_leds(uint8_t led_mask) {
     gpio_output_state |= led_mask; // set bits to turn OFF LEDs
     i2c_write_byte(PCF8574_ADDR, REG_ADDR_NOT_USED, gpio_output_state);
 }
+
+void gpio_read_inputs(void) {
+    uint8_t input_state = 0;
+    i2c_read_8bit(PCF8574_ADDR, REG_ADDR_NOT_USED, &input_state);
+    printf("GPIO Input State: 0x%02X\n", input_state);
+}

@@ -31,8 +31,8 @@
 
 // Function declarations
 esp_err_t i2c_init(void);
-esp_err_t i2c_write_byte(uint8_t dev_addr, uint8_t reg_addr, uint8_t data);
-esp_err_t i2c_read_16bit(uint8_t dev_addr, uint8_t reg_addr, uint16_t *data);
-esp_err_t i2c_read_8bit(uint8_t dev_addr, uint8_t reg_addr, uint8_t *data);
+esp_err_t i2c_write_byte(uint8_t dev_addr, int8_t reg_addr, uint8_t data);
+esp_err_t i2c_read_16bit(uint8_t dev_addr, int8_t reg_addr, uint16_t *data);
+esp_err_t i2c_read_8bit(uint8_t dev_addr, int8_t reg_addr, uint8_t *data);
 uint16_t combine_bytes(uint8_t low, uint8_t high);
 #endif  // I2C_H
