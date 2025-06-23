@@ -11,8 +11,8 @@ typedef enum {
     LED_YELLOW = 0b01000000, // GP6 -> Output
     LED_GREEN  = 0b00100000, // GP5 -> Output
     // GPS L96-M33 module
-    GEO_FENCE      = 0b00000001, // GP0 -> Input
-    GPS_RESET      = 0b00000010, // GP1 -> Output
+    GEO_FENCE  = 0b00000001, // GP0 -> Input
+    GPS_RESET  = 0b00000010, // GP1 -> Output
 } gpio_bit_t;
 
 

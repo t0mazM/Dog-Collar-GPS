@@ -19,6 +19,15 @@ void gpio_turn_off_leds(uint8_t led_mask) {
     i2c_write_byte(PCF8574_ADDR, REG_ADDR_NOT_USED, gpio_output_state);
 }
 
+void gpio_reset_gps(void) {
+    // Reset GPS by setting pin to 0 for 100 ms
+    gpio_output_state &= ~GPS_RESET; // Set pin to 0
+    i2c_write_byte(PCF8574_ADDR, REG_ADDR_NOT_USED, gpio_output_state);
+    vTaskDelay(100 / portTICK_PERIOD_MS); // Wait for 100 ms
+    gpio_output_state |= GPS_RESET; // Set pin back to 1
+    i2c_write_byte(PCF8574_ADDR, REG_ADDR_NOT_USED, gpio_output_state);
+}
+
 void gpio_read_inputs(void) {
     uint8_t input_state;
     i2c_read_8bit(PCF8574_ADDR, REG_ADDR_NOT_USED, &input_state);
