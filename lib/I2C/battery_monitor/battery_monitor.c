@@ -13,22 +13,22 @@ battery_data_t battery_data = {
 
 void battery_monitor_update_battery_data(battery_data_t *battery_data) {
 
-    float temp;
-    
-    if (read_voltage(&temp) == ESP_OK) {
-        battery_data->voltage = temp;
+    float temp_voltage;
+    if (read_voltage(&temp_voltage) == ESP_OK) {
+        battery_data->voltage = temp_voltage;
     } else {
         ESP_LOGW(TAG, "Failed to read voltage");
     }
-
-    if (read_soc(&temp) == ESP_OK) {
-        battery_data->soc = temp;
+    float temp_soc;
+    if (read_soc(&temp_soc) == ESP_OK) {
+        battery_data->soc = temp_soc;
     } else {
         ESP_LOGW(TAG, "Failed to read state of charge");
     }
 
-    if (read_temperature(&temp) == ESP_OK) {
-        battery_data->temperature = temp;
+    float temp_temperature;
+    if (read_temperature(&temp_temperature) == ESP_OK) {
+        battery_data->temperature = temp_temperature;
     } else {
         ESP_LOGW(TAG, "Failed to read temperature");
     }
