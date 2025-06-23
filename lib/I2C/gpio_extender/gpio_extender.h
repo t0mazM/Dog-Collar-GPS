@@ -6,10 +6,14 @@
 
 
 typedef enum {
-    LED_RED    = 0b10000000,
-    LED_YELLOW = 0b01000000, 
-    LED_GREEN  = 0b00100000,
-} led_colour_t;
+    // LEDS
+    LED_RED    = 0b10000000, // GP7 -> Output
+    LED_YELLOW = 0b01000000, // GP6 -> Output
+    LED_GREEN  = 0b00100000, // GP5 -> Output
+    // GPS L96-M33 module
+    GEO_FENCE      = 0b00000001, // GP0 -> Input
+    GPS_RESET      = 0b00000010, // GP1 -> Output
+} gpio_bit_t;
 
 
 void gpio_init(void);

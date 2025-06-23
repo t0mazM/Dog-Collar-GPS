@@ -2,8 +2,6 @@
 
 static uint8_t gpio_output_state = 0xFF; // All LEDs off initially (bits all high)
 
-
-
 // Initialize PCF8574 pins (all LEDs off)
 void gpio_init(void) {
     gpio_output_state = 0xFF;
@@ -11,20 +9,19 @@ void gpio_init(void) {
     vTaskDelay(100 / portTICK_PERIOD_MS);
 }
 
-// Turn on one or multiple LEDs by clearing bits
 void gpio_turn_on_leds(uint8_t led_mask) {
-    gpio_output_state &= ~led_mask; // clear bits to turn ON LEDs
+    gpio_output_state &= ~led_mask; 
     i2c_write_byte(PCF8574_ADDR, REG_ADDR_NOT_USED, gpio_output_state);
 }
 
-// Turn off one or multiple LEDs by setting bits
 void gpio_turn_off_leds(uint8_t led_mask) {
-    gpio_output_state |= led_mask; // set bits to turn OFF LEDs
+    gpio_output_state |= led_mask; 
     i2c_write_byte(PCF8574_ADDR, REG_ADDR_NOT_USED, gpio_output_state);
 }
 
 void gpio_read_inputs(void) {
-    uint8_t input_state = 0;
+    uint8_t input_state;
     i2c_read_8bit(PCF8574_ADDR, REG_ADDR_NOT_USED, &input_state);
-    printf("GPIO Input State: 0x%02X\n", input_state);
+    //TODO: store this bool into struct in the GPS module file
+    bool geo_fence_triggered = (input_state & GEO_FENCE) != 0; // false if bit is 1, true if bit is 0
 }
