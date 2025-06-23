@@ -18,7 +18,15 @@ void app_main() {
     ext_flash_init();
 
     battery_monitor_update_battery_data(&battery_data);
-    gpio_turn_on_led();
+    gpio_init(); 
+    vTaskDelay(1000 / portTICK_PERIOD_MS);       
+    gpio_turn_on_leds(LED_RED);
+    vTaskDelay(1000 / portTICK_PERIOD_MS);         
+    gpio_turn_on_leds(LED_YELLOW);
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    gpio_turn_on_leds(LED_GREEN);
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    gpio_turn_off_leds(LED_RED | LED_YELLOW | LED_GREEN);
 
     uint8_t jedec_id[3] = {0};
     // Call the function
