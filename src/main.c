@@ -20,6 +20,10 @@ void app_main() {
 
     battery_monitor_update_battery_data(&battery_data);
     gpio_read_inputs();
+    gpio_turn_on_leds(LED_RED | LED_YELLOW | LED_GREEN);
+    gpio_read_inputs();
+    gpio_turn_off_leds(LED_RED | LED_YELLOW | LED_GREEN);
+    gpio_read_inputs();
 
     uint8_t jedec_id[3] = {0};
     // Call the function
