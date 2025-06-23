@@ -12,6 +12,8 @@
 
 void app_main() {
 
+    vTaskDelay(3000 / portTICK_PERIOD_MS); // Delay to allow system to stabilize
+
     i2c_init();
     ext_flash_init();
 

@@ -7,7 +7,8 @@ battery_data_t battery_data = {
     .i2c_address = BQ27441_ADDRESS,
     .voltage = 0.0f,
     .soc = 0.0f,
-    .temperature = 0.0f
+    .temperature = 0.0f,
+    .flags = 0x0000 
 };
 
 void battery_monitor_update_battery_data(battery_data_t *battery_data) {
@@ -32,7 +33,14 @@ void battery_monitor_update_battery_data(battery_data_t *battery_data) {
         ESP_LOGW(TAG, "Failed to read temperature");
     }
 
-ESP_LOGI(TAG, "Battery Voltage: %.2f V, SOC: %.2f %%, Temperature: %.2f C", battery_data->voltage, battery_data->soc, battery_data->temperature);
+    uint16_t temp_flags;
+    if (read_flags(&temp_flags) == ESP_OK) {
+        battery_data->flags = temp_flags;
+    } else {
+        ESP_LOGW(TAG, "Failed to read battery flags");
+    }
+    
+ESP_LOGI(TAG, "Battery Voltage: %.2f V, SOC: %.2f %%, Temperature: %.2f C , Flags: 0x%04X\n", battery_data->voltage, battery_data->soc, battery_data->temperature, battery_data->flags);
 }
 
 esp_err_t read_voltage(float *voltage) {
@@ -65,3 +73,11 @@ esp_err_t read_temperature(float *temperature) {
     return ESP_OK;
 }
 
+esp_err_t read_flags(uint16_t *flags) {
+    esp_err_t ret = i2c_read_16bit(BQ27441_ADDRESS, FLAGS_CMD, flags);
+    if (ret != ESP_OK) {
+        return ret;
+    }
+    printf("Battery flags: 0x%04X\n", *flags);  // prints hex flags
+    return ESP_OK;
+}
