@@ -21,23 +21,29 @@ esp_err_t uart_init(void)
 }
 
 
+esp_err_t uart_send_cmd(const void *data, size_t len){
+    if (!data || len == 0) return ESP_OK;  
 
-void uart_send_data(const char* data) {
-    /*
-    Dummy implemenation->use printf insted. 
-    If you want to use it, cahnge UART_PORT_NUM to: UART_NUM_1
-    */
-    uart_write_bytes(UART_PORT_NUM, data, strlen(data));
+    /* Queue the bytes.  For short commands the internal TX FIFO is ample. */
+    int written = uart_write_bytes(UART_PORT_NUM, data, len);
+    if (written != (int)len) return ESP_FAIL; //return error if buffer full
+
+    // Block pooling until the data is sent out
+    return uart_wait_tx_done(UART_PORT_NUM,  pdMS_TO_TICKS(50));
 }
 
-uint8_t uart_receive_data(char* data, int length) {
-    /*
-    This function reads data from the UART. 
-    The 'data' parameter is a pointer to a buffer where the received data will be stored, 
-    and 'length' is the number of bytes to read.
-    */
-    uint8_t len = uart_read_bytes(UART_PORT_NUM, (uint8_t*)data, length, 10 / portTICK_PERIOD_MS);
-    data[len] = '\0';
-    return len;
-}
+esp_err_t uart_receive_cmd(uint8_t *buffer, size_t buffer_size){
+    // Read bytes from the UART RX buffer
+    int read_len = uart_read_bytes(UART_PORT_NUM, buffer, buffer_size, pdMS_TO_TICKS(50));
 
+    if (read_len < 0) {
+    ESP_LOGE(TAG, "Error reading from UART: %d", read_len);
+        return ESP_FAIL; // Or a more specific error if `read_len` indicates one
+    } else if (read_len == 0) {
+        ESP_LOGD(TAG, "No data received within timeout.");
+        return ESP_ERR_TIMEOUT;
+    } else {
+        ESP_LOGI(TAG, "Received %d bytes from UART", read_len);
+        return ESP_OK;
+    }
+}
