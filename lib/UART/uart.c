@@ -24,7 +24,6 @@ esp_err_t uart_init(void)
 esp_err_t uart_send_cmd(const void *data, size_t len){
     if (!data || len == 0) return ESP_OK;  
 
-    /* Queue the bytes.  For short commands the internal TX FIFO is ample. */
     int written = uart_write_bytes(UART_PORT_NUM, data, len);
     if (written != (int)len) return ESP_FAIL; //return error if buffer full
 

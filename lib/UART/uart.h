@@ -21,11 +21,9 @@
 #define UART_BAUD_RATE (9600)
 #define UART_PORT_NUM UART_NUM_0 
 
-esp_err_t init_uart();
-void uart_send_data(const char* data);
-uint8_t uart_receive_data(char* data, int length);
-void execute_received_data(char* data, uint8_t len);
-void handle_uart_interrupt(void);
+esp_err_t uart_init(void);
+esp_err_t uart_receive_cmd(uint8_t *buffer, size_t buffer_size);
+esp_err_t uart_send_cmd(const void *data, size_t len);
 
 
 
