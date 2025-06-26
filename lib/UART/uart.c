@@ -32,17 +32,37 @@ esp_err_t uart_send_cmd(const void *data, size_t len){
 }
 
 esp_err_t uart_receive_cmd(uint8_t *buffer, size_t buffer_size){
+
+    char sentence[128];
+    int index = 0;
     // Read bytes from the UART RX buffer
     int read_len = uart_read_bytes(UART_PORT_NUM, buffer, buffer_size, pdMS_TO_TICKS(50));
 
     if (read_len < 0) {
     ESP_LOGE(TAG, "Error reading from UART: %d", read_len);
-        return ESP_FAIL; // Or a more specific error if `read_len` indicates one
+        return ESP_FAIL; 
     } else if (read_len == 0) {
         ESP_LOGD(TAG, "No data received within timeout.");
         return ESP_ERR_TIMEOUT;
     } else {
-        ESP_LOGI(TAG, "Received %d bytes from UART", read_len);
+        //A qiuck and dirty way to parse sentences, TODO: make seperate function and make it cleaner and more readable
+        for (int i = 0; i < read_len; i++) {
+            char ch = buffer[i];
+
+            if (ch == '$') {
+                index = 0; // Start new sentence
+            }
+
+            if (index < (int)sizeof(sentence) - 1) {
+                sentence[index++] = ch;
+            }
+
+            if (ch == '\n' && index >= 2 && sentence[index - 2] == '\r') {
+                sentence[index] = '\0';
+                ESP_LOGI("main", "L96 Response: %s", sentence);
+                index = 0; // Reset for next sentence
+            }
+        }
         return ESP_OK;
     }
 }

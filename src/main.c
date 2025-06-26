@@ -9,6 +9,7 @@
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "esp_log.h"
 
 void app_main() {
 
@@ -17,6 +18,7 @@ void app_main() {
     i2c_init();
     ext_flash_init();
     gpio_init();
+    uart_init();
 
     battery_monitor_update_battery_data(&battery_data);
     gpio_read_inputs();
@@ -30,4 +32,17 @@ void app_main() {
     ext_flash_read_jedec_data(jedec_id);
 
 
+    uart_init();
+
+    
+    const char *cmd = "$PMTK605*31\r\n"; // set update rate to 1Hz
+    ESP_ERROR_CHECK(uart_send_cmd(cmd, strlen(cmd)));
+
+    uint8_t rx_buffer[128];
+
+
+    while (1) {
+        uart_receive_cmd(rx_buffer, sizeof(rx_buffer));
+
+    }
 }

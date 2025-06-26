@@ -6,7 +6,6 @@ static uint8_t gpio_output_state = 0xFF; // All LEDs off initially (bits all hig
 void gpio_init(void) {
     gpio_output_state = 0xFF;
     i2c_write_byte(PCF8574_ADDR, REG_ADDR_NOT_USED, gpio_output_state);
-    vTaskDelay(100 / portTICK_PERIOD_MS);
 }
 
 void gpio_turn_on_leds(uint8_t led_mask) {
