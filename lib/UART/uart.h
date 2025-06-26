@@ -12,13 +12,14 @@
 #include "esp_log.h"
 #include "esp_err.h"
 #include "esp_check.h"
+#include "esp_log.h"
 
 //UART SPECIFICATIONS
-#define TX_PIN GPIO_NUM_1  
-#define RX_PIN GPIO_NUM_3  
-#define BUF_SIZE 500
-#define BAUD_RATE (9600)
-#define UART_PORT_NUM UART_NUM_0 //0 is for printf, if you use uart_write_bytes(), then set it to 1
+#define UART_TX_PIN GPIO_NUM_1  
+#define UART_RX_PIN GPIO_NUM_3  
+#define UART_RX_BUF_SIZE 500
+#define UART_BAUD_RATE (9600)
+#define UART_PORT_NUM UART_NUM_0 
 
 esp_err_t init_uart();
 void uart_send_data(const char* data);

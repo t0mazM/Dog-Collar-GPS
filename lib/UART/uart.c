@@ -1,30 +1,26 @@
 #include <uart.h>
 
-static const char *TAG = "UART"; // Used for logging
+static const char *TAG = "UART";
 
-esp_err_t init_uart() {
-    uart_config_t uart_config = {
-        .baud_rate = BAUD_RATE,
-        .data_bits = UART_DATA_8_BITS,
-        .parity    = UART_PARITY_DISABLE,
-        .stop_bits = UART_STOP_BITS_1,
-        .flow_ctrl = UART_HW_FLOWCTRL_DISABLE
+
+esp_err_t uart_init(void)
+{
+    const uart_config_t cfg = {
+        .baud_rate  = UART_BAUD_RATE,
+        .data_bits  = UART_DATA_8_BITS,
+        .parity     = UART_PARITY_DISABLE,
+        .stop_bits  = UART_STOP_BITS_1,
+        .flow_ctrl  = UART_HW_FLOWCTRL_DISABLE,
     };
 
-    ESP_RETURN_ON_ERROR(uart_param_config(UART_PORT_NUM, &uart_config), TAG, "Failed to configure UART");
-    ESP_RETURN_ON_ERROR(uart_set_pin(UART_PORT_NUM, TX_PIN, RX_PIN, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE), TAG, "Failed to set UART pins");
-    ESP_RETURN_ON_ERROR(uart_driver_install(UART_PORT_NUM, BUF_SIZE * 2, 0, 0, NULL, 0), TAG, "Failed to install UART driver");
+    ESP_RETURN_ON_ERROR(uart_driver_install(UART_PORT_NUM, UART_RX_BUF_SIZE, 0, 0, NULL, 0), TAG, "driver install fail");
+    ESP_RETURN_ON_ERROR(uart_param_config(UART_PORT_NUM, &cfg), TAG, "config fail");
+    ESP_RETURN_ON_ERROR(uart_set_pin(UART_PORT_NUM, UART_TX_PIN, UART_RX_PIN, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE), TAG, "pin map fail");
+    ESP_LOGI(TAG, "UART%d ready @ %d bps", UART_PORT_NUM, UART_BAUD_RATE);
     return ESP_OK;
 }
 
 
-int _write(int file, const char* data, int len) {
-    /*
-    _write is re-written so printf redirects the data to uart
-    */
-    uart_write_bytes(UART_PORT_NUM, data, len);
-    return len;
-}
 
 void uart_send_data(const char* data) {
     /*
@@ -45,16 +41,3 @@ uint8_t uart_receive_data(char* data, int length) {
     return len;
 }
 
-
-void handle_uart_interrupt(void) {
-
-    char data[BUF_SIZE];
-
-    // Receive data from UART
-    uint8_t len = uart_receive_data(data, BUF_SIZE);
-
-    
-    // Execute command based on received data and print it 
-    execute_received_data(data, len);
-
-}
