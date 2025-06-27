@@ -21,9 +21,9 @@ esp_err_t uart_init(void)
 }
 
 
-esp_err_t uart_send_cmd(const void *data, size_t len){ 
+esp_err_t uart_send_cmd(const void *nmea_sentence, size_t len){ 
 
-    int written = uart_write_bytes(UART_PORT_NUM, data, len);
+    int written = uart_write_bytes(UART_PORT_NUM, nmea_sentence, len);
     if (written != (int)len) return ESP_FAIL; //return error if buffer full
     // Block pooling until the data is sent out
     return uart_wait_tx_done(UART_PORT_NUM,  pdMS_TO_TICKS(UART_TX_WAIT_TIME_MS));

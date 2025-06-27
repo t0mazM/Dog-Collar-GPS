@@ -23,8 +23,26 @@
 #define UART_RX_WAIT_TIME_MS 10
 #define UART_TX_WAIT_TIME_MS 50
 
+
+
+
+/**
+ * @brief Initializes UART peripheral.
+ *
+ * @return 
+ * - ESP_OK on success
+ * - ESP_FAIL if initialization fails.
+ */
 esp_err_t uart_init(void);
-esp_err_t uart_send_cmd(const void *data, size_t len);
+
+/**
+ * @brief Sends a command (nmea sentence) via UART.
+ *
+ * @param nmea_sentence Pointer to the NMEA sentence to be sent.
+ * @param len Length of the NMEA sentence to be sent.
+ * @return ESP_OK on success, ESP_FAIL if the buffer is full or transmission times out.
+ */
+esp_err_t uart_send_cmd(const void *nmea_sentence, size_t len);
 esp_err_t uart_receive_cmd(uint8_t *buffer, size_t buffer_size, size_t *out_read_len);
 
 
