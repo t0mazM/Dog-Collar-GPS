@@ -1,26 +1,42 @@
 #include "gps_l96.h"
 
+static const char *TAG = "GPS_L96";
 
 esp_err_t gps_l96_extract_and_process_nmea_sentences(const uint8_t *buffer, size_t read_len) {
-    printf("-------------------------PARSING---------------------------\n");
+
     char NMEA_sentence[255]; // Buffer to hold the sentence/command
     int sentence_idx = 0;
 
-    for (int i = 0; i < read_len; i++) {
-        char ch = buffer[i];
+    // Check if buffer is ok and it is not empty
+    if (buffer == NULL || read_len == 0) {
+        ESP_LOGE(TAG, "Invalid buffer or read length");
+        return ESP_ERR_INVALID_ARG;
+    }
+    // Loop through each byte in the buffer
+    for (size_t buf_idx = 0; buf_idx < read_len; buf_idx++) {
+        char ch = buffer[buf_idx]; 
 
+        // 1. Look for the start of a NMEA sentence
         if (ch == '$') {
-            sentence_idx = 0; // Start new sentence
+            sentence_idx = 0;
+            NMEA_sentence[sentence_idx++] = '$';
         }
 
+        // 2. Add character to the sentence buffer - only if sentence buffer is not full
         if (sentence_idx < (int)sizeof(NMEA_sentence) - 1) {
             NMEA_sentence[sentence_idx++] = ch;
+        } else { //Buffer if full
+            ESP_LOGW(TAG, "NMEA sentence buffer overflow.");
+            sentence_idx = 0; 
         }
 
+        // 3. Check for end of sentence "\n" or "\r\n"
         if (ch == '\n' && sentence_idx >= 2 && NMEA_sentence[sentence_idx - 2] == '\r') {
             NMEA_sentence[sentence_idx] = '\0';
-            ESP_LOGI("main", "L96 Response: %s", NMEA_sentence);
-            sentence_idx = 0; // Reset for next sentence
+            sentence_idx = 0; 
+            // 4. Process the complete NMEA sentence TODO
+            ESP_LOGI(TAG, "L96 Response: %s", NMEA_sentence);
+            
         }
     }
     return ESP_OK;

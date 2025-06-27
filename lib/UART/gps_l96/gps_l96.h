@@ -4,6 +4,19 @@
 
 #include <uart.h>
 
+/**
+ * @brief Extracts and processes NMEA sentences from the received buffer.
+ *
+ * This function scans the provided buffer for NMEA sentences, extracts them,
+ * and processes each complete sentence - parses it and stores it into external flash chip.
+ * Sentences should be in NMEA format- .
+ *
+ * @param buffer Pointer to the buffer containing raw data received from the GPS module via UART.
+ * @param read_len The number of bytes in the buffer that were read from the UART.
+ * @return ESP_OK on success, or an error code if processing fails.
+ *
+ * @note Function assumes that the buffer contains complete NMEA sentences: Starts with `$` and ends with `\r\n`
+ */
 esp_err_t gps_l96_extract_and_process_nmea_sentences(const uint8_t *buffer, size_t read_len);
 
 #endif // GPS_L96_H

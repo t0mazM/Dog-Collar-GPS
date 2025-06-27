@@ -29,7 +29,7 @@
 /**
  * @brief Initializes UART peripheral.
  *
- * @return 
+ * @return
  * - ESP_OK on success
  * - ESP_FAIL if initialization fails.
  */
@@ -43,6 +43,15 @@ esp_err_t uart_init(void);
  * @return ESP_OK on success, ESP_FAIL if the buffer is full or transmission times out.
  */
 esp_err_t uart_send_cmd(const void *nmea_sentence, size_t len);
+
+/**
+ * @brief Receives data from UART and stores raw it in the provided buffer.
+ *
+ * @param buffer Pointer to the buffer where received raw data will be stored.
+ * @param buffer_size Size of the buffer.
+ * @param out_read_len Pointer to a variable that will hold the number of bytes read.
+ * @return ESP_OK on success, ESP_ERR_TIMEOUT if no data is received within the timeout period, or an error code if reading fails.
+ */
 esp_err_t uart_receive_cmd(uint8_t *buffer, size_t buffer_size, size_t *out_read_len);
 
 
