@@ -29,45 +29,20 @@ esp_err_t uart_send_cmd(const void *data, size_t len){
     return uart_wait_tx_done(UART_PORT_NUM,  pdMS_TO_TICKS(50));
 }
 
-esp_err_t uart_receive_cmd(uint8_t *buffer, size_t buffer_size){
+esp_err_t uart_receive_cmd(uint8_t *buffer, size_t buffer_size, size_t *out_read_len) {
 
     // Read bytes from the UART RX buffer
-    int read_len = uart_read_bytes(UART_PORT_NUM, buffer, buffer_size, pdMS_TO_TICKS(50)); // 1 second timeout
+    int read_len = uart_read_bytes(UART_PORT_NUM, buffer, buffer_size, pdMS_TO_TICKS(100)); // 1 second timeout
 
     if (read_len < 0) {
         ESP_LOGI(TAG, "Error reading from UART: %d", read_len);
         return ESP_FAIL; 
     } 
     if (read_len == 0) {
-        ESP_LOGI(TAG, "No data received within timeout.");
+        // No data received within timeout.
         return ESP_ERR_TIMEOUT;
     } 
-    // No error and data received, we can parse it
-    ESP_RETURN_ON_ERROR(parse_uart_data(buffer, read_len), TAG, "parse data fail");
+    *out_read_len = read_len; // Return the number of bytes read to be used in parsing
     return ESP_OK;
 }
 
-esp_err_t parse_uart_data(const uint8_t *buffer, size_t read_len) {
-    char NMEA_sentence[255]; // Buffer to hold the sentence/command
-    int sentence_idx = 0;
-
-    for (int i = 0; i < read_len; i++) {
-        char ch = buffer[i];
-
-        if (ch == '$') {
-            sentence_idx = 0; // Start new sentence
-        }
-
-        if (sentence_idx < (int)sizeof(NMEA_sentence) - 1) {
-            NMEA_sentence[sentence_idx++] = ch;
-        }
-
-        if (ch == '\n' && sentence_idx >= 2 && NMEA_sentence[sentence_idx - 2] == '\r') {
-            NMEA_sentence[sentence_idx] = '\0';
-            ESP_LOGI("main", "L96 Response: %s", NMEA_sentence);
-            sentence_idx = 0; // Reset for next sentence
-        }
-    }
-    return ESP_OK;
-    
-}

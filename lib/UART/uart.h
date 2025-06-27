@@ -20,11 +20,12 @@
 #define UART_RX_BUF_SIZE 500
 #define UART_BAUD_RATE (9600)
 #define UART_PORT_NUM UART_NUM_0 
+#define UART_WAIT_TIME_MS 10
 
 esp_err_t uart_init(void);
 esp_err_t uart_send_cmd(const void *data, size_t len);
-esp_err_t uart_receive_cmd(uint8_t *buffer, size_t buffer_size);
-esp_err_t parse_uart_data(const uint8_t *buffer, size_t read_len);
+esp_err_t uart_receive_cmd(uint8_t *buffer, size_t buffer_size, size_t *out_read_len);
+
 
 
 
