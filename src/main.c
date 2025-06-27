@@ -34,8 +34,6 @@ void app_main() {
 
 
 
-const char *rate_cmd = "$PMTK220,1000*1F\r\n";
-ESP_ERROR_CHECK(uart_send_cmd(rate_cmd, strlen(rate_cmd)));
     
     const char *cmd = "$PMTK605*31\r\n"; // set update rate to 1Hz
     ESP_ERROR_CHECK(uart_send_cmd(cmd, strlen(cmd)));

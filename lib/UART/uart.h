@@ -15,8 +15,8 @@
 #include "esp_log.h"
 
 //UART SPECIFICATIONS
-#define UART_TX_PIN GPIO_NUM_1  
-#define UART_RX_PIN GPIO_NUM_3  
+#define UART_TX_PIN GPIO_NUM_3  
+#define UART_RX_PIN GPIO_NUM_4  
 #define UART_RX_BUF_SIZE 500
 #define UART_BAUD_RATE (9600)
 #define UART_PORT_NUM UART_NUM_0 

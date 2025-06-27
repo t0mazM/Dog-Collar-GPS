@@ -32,7 +32,7 @@ esp_err_t uart_send_cmd(const void *data, size_t len){
 esp_err_t uart_receive_cmd(uint8_t *buffer, size_t buffer_size){
 
     // Read bytes from the UART RX buffer
-    int read_len = uart_read_bytes(UART_PORT_NUM, buffer, buffer_size, pdMS_TO_TICKS(50));
+    int read_len = uart_read_bytes(UART_PORT_NUM, buffer, buffer_size, pdMS_TO_TICKS(50)); // 1 second timeout
 
     if (read_len < 0) {
         ESP_LOGI(TAG, "Error reading from UART: %d", read_len);
@@ -42,14 +42,12 @@ esp_err_t uart_receive_cmd(uint8_t *buffer, size_t buffer_size){
         ESP_LOGI(TAG, "No data received within timeout.");
         return ESP_ERR_TIMEOUT;
     } 
-    printf("Read %d bytes from UART\n", read_len);
     // No error and data received, we can parse it
     ESP_RETURN_ON_ERROR(parse_uart_data(buffer, read_len), TAG, "parse data fail");
     return ESP_OK;
 }
 
 esp_err_t parse_uart_data(const uint8_t *buffer, size_t read_len) {
-    printf("Parsing UART data: %.*s\n", (int)read_len, buffer);
     char NMEA_sentence[255]; // Buffer to hold the sentence/command
     int sentence_idx = 0;
 
