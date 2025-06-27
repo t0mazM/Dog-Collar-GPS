@@ -27,7 +27,6 @@ void app_main() {
     gpio_read_inputs();
 
     uint8_t jedec_id[3] = {0};
-    // Call the function
     ext_flash_read_jedec_data(jedec_id);
 
 
@@ -43,7 +42,7 @@ void app_main() {
 
     while (1) {
     uart_receive_cmd(rx_buffer, sizeof(rx_buffer), &read_len);
-    parse_uart_data(rx_buffer, read_len);
+    gps_l96_extract_and_process_nmea_sentences(rx_buffer, read_len);
 
     vTaskDelay(pdMS_TO_TICKS(10));
     }

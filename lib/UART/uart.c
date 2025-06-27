@@ -26,17 +26,16 @@ esp_err_t uart_send_cmd(const void *data, size_t len){
     int written = uart_write_bytes(UART_PORT_NUM, data, len);
     if (written != (int)len) return ESP_FAIL; //return error if buffer full
     // Block pooling until the data is sent out
-    return uart_wait_tx_done(UART_PORT_NUM,  pdMS_TO_TICKS(50));
+    return uart_wait_tx_done(UART_PORT_NUM,  pdMS_TO_TICKS(UART_TX_WAIT_TIME_MS));
 }
 
 esp_err_t uart_receive_cmd(uint8_t *buffer, size_t buffer_size, size_t *out_read_len) {
 
     // Read bytes from the UART RX buffer
-    int read_len = uart_read_bytes(UART_PORT_NUM, buffer, buffer_size, pdMS_TO_TICKS(100)); // 1 second timeout
+    int read_len = uart_read_bytes(UART_PORT_NUM, buffer, buffer_size, pdMS_TO_TICKS(UART_RX_WAIT_TIME_MS)); 
 
     if (read_len < 0) {
-        ESP_LOGI(TAG, "Error reading from UART: %d", read_len);
-        return ESP_FAIL; 
+        ESP_RETURN_ON_ERROR(read_len, TAG, "Error reading from UART");
     } 
     if (read_len == 0) {
         // No data received within timeout.

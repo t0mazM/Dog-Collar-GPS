@@ -4,6 +4,6 @@
 
 #include <uart.h>
 
-esp_err_t parse_uart_data(const uint8_t *buffer, size_t read_len);
+esp_err_t gps_l96_extract_and_process_nmea_sentences(const uint8_t *buffer, size_t read_len);
 
 #endif // GPS_L96_H

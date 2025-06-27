@@ -1,7 +1,7 @@
 #include "gps_l96.h"
 
 
-esp_err_t parse_uart_data(const uint8_t *buffer, size_t read_len) {
+esp_err_t gps_l96_extract_and_process_nmea_sentences(const uint8_t *buffer, size_t read_len) {
     printf("-------------------------PARSING---------------------------\n");
     char NMEA_sentence[255]; // Buffer to hold the sentence/command
     int sentence_idx = 0;
