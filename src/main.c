@@ -32,17 +32,18 @@ void app_main() {
     ext_flash_read_jedec_data(jedec_id);
 
 
-    uart_init();
 
+
+const char *rate_cmd = "$PMTK220,1000*1F\r\n";
+ESP_ERROR_CHECK(uart_send_cmd(rate_cmd, strlen(rate_cmd)));
     
     const char *cmd = "$PMTK605*31\r\n"; // set update rate to 1Hz
     ESP_ERROR_CHECK(uart_send_cmd(cmd, strlen(cmd)));
 
-    uint8_t rx_buffer[128];
+    uint8_t rx_buffer[255];
 
 
     while (1) {
-        uart_receive_cmd(rx_buffer, sizeof(rx_buffer));
-
+    uart_receive_cmd(rx_buffer, sizeof(rx_buffer));
     }
 }

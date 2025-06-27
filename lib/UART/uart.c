@@ -21,48 +21,55 @@ esp_err_t uart_init(void)
 }
 
 
-esp_err_t uart_send_cmd(const void *data, size_t len){
-    if (!data || len == 0) return ESP_OK;  
+esp_err_t uart_send_cmd(const void *data, size_t len){ 
 
     int written = uart_write_bytes(UART_PORT_NUM, data, len);
     if (written != (int)len) return ESP_FAIL; //return error if buffer full
-
     // Block pooling until the data is sent out
     return uart_wait_tx_done(UART_PORT_NUM,  pdMS_TO_TICKS(50));
 }
 
 esp_err_t uart_receive_cmd(uint8_t *buffer, size_t buffer_size){
 
-    char sentence[128];
-    int index = 0;
     // Read bytes from the UART RX buffer
     int read_len = uart_read_bytes(UART_PORT_NUM, buffer, buffer_size, pdMS_TO_TICKS(50));
 
     if (read_len < 0) {
-    ESP_LOGE(TAG, "Error reading from UART: %d", read_len);
+        ESP_LOGI(TAG, "Error reading from UART: %d", read_len);
         return ESP_FAIL; 
-    } else if (read_len == 0) {
-        ESP_LOGD(TAG, "No data received within timeout.");
+    } 
+    if (read_len == 0) {
+        ESP_LOGI(TAG, "No data received within timeout.");
         return ESP_ERR_TIMEOUT;
-    } else {
-        //A qiuck and dirty way to parse sentences, TODO: make seperate function and make it cleaner and more readable
-        for (int i = 0; i < read_len; i++) {
-            char ch = buffer[i];
+    } 
+    printf("Read %d bytes from UART\n", read_len);
+    // No error and data received, we can parse it
+    ESP_RETURN_ON_ERROR(parse_uart_data(buffer, read_len), TAG, "parse data fail");
+    return ESP_OK;
+}
 
-            if (ch == '$') {
-                index = 0; // Start new sentence
-            }
+esp_err_t parse_uart_data(const uint8_t *buffer, size_t read_len) {
+    printf("Parsing UART data: %.*s\n", (int)read_len, buffer);
+    char NMEA_sentence[255]; // Buffer to hold the sentence/command
+    int sentence_idx = 0;
 
-            if (index < (int)sizeof(sentence) - 1) {
-                sentence[index++] = ch;
-            }
+    for (int i = 0; i < read_len; i++) {
+        char ch = buffer[i];
 
-            if (ch == '\n' && index >= 2 && sentence[index - 2] == '\r') {
-                sentence[index] = '\0';
-                ESP_LOGI("main", "L96 Response: %s", sentence);
-                index = 0; // Reset for next sentence
-            }
+        if (ch == '$') {
+            sentence_idx = 0; // Start new sentence
         }
-        return ESP_OK;
+
+        if (sentence_idx < (int)sizeof(NMEA_sentence) - 1) {
+            NMEA_sentence[sentence_idx++] = ch;
+        }
+
+        if (ch == '\n' && sentence_idx >= 2 && NMEA_sentence[sentence_idx - 2] == '\r') {
+            NMEA_sentence[sentence_idx] = '\0';
+            ESP_LOGI("main", "L96 Response: %s", NMEA_sentence);
+            sentence_idx = 0; // Reset for next sentence
+        }
     }
+    return ESP_OK;
+    
 }
