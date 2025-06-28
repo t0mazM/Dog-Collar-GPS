@@ -31,7 +31,7 @@ void app_main() {
     uint8_t jedec_id[3] = {0};
     ext_flash_read_jedec_data(jedec_id);
 
-
+    gps_l96_start_recording();
 
     while(1){
         gps_l96_read_task();

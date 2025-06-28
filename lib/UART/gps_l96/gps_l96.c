@@ -2,13 +2,29 @@
 
 static const char *TAG = "GPS_L96";
 
-gps_state_t gps_state = GPS_STATE_IDLE;
+gps_state_t gps_state = GPS_STATE_IDLE; // Default state on power on
 
 esp_err_t gps_l96_init(void) {
-    gps_l96_send_command(GNSS_SET_UPDATE_RATE_1HZ); 
+     
     gps_l96_send_command(GNSS_MODE_GPS_GLONASS); 
-
+    gps_state = GPS_STATE_IDLE;
     return uart_init();
+}
+
+esp_err_t gps_l96_go_to_standby_mode(void) {
+
+    // Set FORCE_ON pin to high (in case we are in deep sleep mode)
+    ESP_RETURN_ON_ERROR(gpio_set_pin_force_on(), TAG, "Failed to set FORCE_ON pin"); 
+    ESP_RETURN_ON_ERROR(gps_l96_send_command(GPS_STAND_BY_MODE), TAG, "Failed to send GPS_STAND_BY_MODE command");
+    gps_state = GPS_STATE_IDLE;
+    return ESP_OK;
+}
+
+esp_err_t gps_l96_start_recording(void) {
+
+    ESP_RETURN_ON_ERROR(gps_l96_send_command(GNSS_SET_UPDATE_RATE_1HZ), TAG, "Failed to send GNSS_SET_UPDATE_RATE_1HZ command");
+    gps_state = GPS_STATE_RECORDING;
+    return ESP_OK;
 }
 
 esp_err_t gps_l96_send_command(const char *nmea_sentence) {

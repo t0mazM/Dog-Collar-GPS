@@ -1,5 +1,6 @@
 #include "gpio_extender.h"
 
+static const char *TAG = "GPIO_EXTENDER";
 static uint8_t gpio_output_state = 0xFF; // All LEDs off initially (bits all high)
 
 // Initialize PCF8574 pins (all LEDs off)
@@ -32,4 +33,10 @@ void gpio_read_inputs(void) {
     i2c_read_8bit(PCF8574_ADDR, REG_ADDR_NOT_USED, &input_state);
     //TODO: store this bool into struct in the GPS module file
     bool geo_fence_triggered = (input_state & GEO_FENCE) != 0; // false if bit is 1, true if bit is 0
+}
+
+esp_err_t gpio_set_pin_force_on(void) { //pin GP3
+    gpio_output_state &= ~GPS_FORCE_ON; // Set FORCE_ON pin to 0
+    ESP_RETURN_ON_ERROR( i2c_write_byte(PCF8574_ADDR, REG_ADDR_NOT_USED, gpio_output_state), TAG, "Failed to set FORCE_ON pin");
+    return ESP_OK;
 }
