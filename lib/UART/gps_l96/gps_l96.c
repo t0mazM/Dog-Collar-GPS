@@ -2,6 +2,24 @@
 
 static const char *TAG = "GPS_L96";
 
+esp_err_t gps_l96_init(void) {
+    gps_l96_send_command(GNSS_SET_UPDATE_RATE_1HZ); 
+    gps_l96_send_command(GNSS_MODE_GALILEO_ONLY); 
+
+    return uart_init();
+}
+
+esp_err_t gps_l96_send_command(const char *nmea_sentence) {
+    if (nmea_sentence == NULL || strlen(nmea_sentence) == 0) {
+        ESP_LOGE(TAG, "Invalid NMEA sentence");
+        return ESP_ERR_INVALID_ARG;
+    }
+    ESP_LOGI(TAG, "Sending NMEA command: %s", nmea_sentence);
+    return uart_send_cmd(nmea_sentence, strlen(nmea_sentence));
+}
+
+
+
 esp_err_t gps_l96_extract_and_process_nmea_sentences(const uint8_t *buffer, size_t read_len) {
 
     char NMEA_sentence[255]; // Buffer to hold the sentence/command
@@ -41,4 +59,15 @@ esp_err_t gps_l96_extract_and_process_nmea_sentences(const uint8_t *buffer, size
     }
     return ESP_OK;
     
+}
+
+void gps_l96_read_task(void) { //Just a dummy task to test the GPS module
+    uint8_t rx_buffer[255];
+    size_t read_len = 0;
+
+    printf("-------- UART READ ------------\n");
+    esp_err_t err = uart_receive_cmd(rx_buffer, sizeof(rx_buffer), &read_len);
+    if (err == ESP_OK && read_len > 0) {
+        gps_l96_extract_and_process_nmea_sentences(rx_buffer, read_len);
+    }
 }

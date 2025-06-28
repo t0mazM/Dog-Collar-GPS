@@ -1,8 +1,11 @@
 #ifndef GPS_L96_H
 #define GPS_L96_H
 
+#include "nmea_commands.h"
 
 #include <uart.h>
+
+esp_err_t gps_l96_init(void);
 
 /**
  * @brief Extracts and processes NMEA sentences from the received buffer.
@@ -18,5 +21,10 @@
  * @note Function assumes that the buffer contains complete NMEA sentences: Starts with `$` and ends with `\r\n`
  */
 esp_err_t gps_l96_extract_and_process_nmea_sentences(const uint8_t *buffer, size_t read_len);
+
+
+esp_err_t gps_l96_send_command(const char *nmea_sentence);
+
+void gps_l96_read_task(void);
 
 #endif // GPS_L96_H

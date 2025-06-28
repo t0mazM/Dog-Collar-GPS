@@ -5,6 +5,7 @@
 #include "battery_monitor/battery_monitor.h"
 #include "gpio_extender/gpio_extender.h"
 #include "gps_l96/gps_l96.h"
+#include "gps_l96/nmea_commands.h"
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -18,6 +19,7 @@ void app_main() {
     ext_flash_init();
     gpio_init();
     uart_init();
+    gps_l96_init();
 
     battery_monitor_update_battery_data(&battery_data);
     gpio_read_inputs();
@@ -31,19 +33,9 @@ void app_main() {
 
 
 
-
-    
-    const char *cmd = "$PMTK605*31\r\n"; // set update rate to 1Hz
-    ESP_ERROR_CHECK(uart_send_cmd(cmd, strlen(cmd)));
-
-    uint8_t rx_buffer[255];
-    size_t read_len = 0;
-
-
-    while (1) {
-    uart_receive_cmd(rx_buffer, sizeof(rx_buffer), &read_len);
-    gps_l96_extract_and_process_nmea_sentences(rx_buffer, read_len);
-
-    vTaskDelay(pdMS_TO_TICKS(10));
+    while(1){
+        gps_l96_read_task();
     }
+    
+
 }
