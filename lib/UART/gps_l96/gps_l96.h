@@ -5,6 +5,18 @@
 
 #include <uart.h>
 
+
+/**
+ * @brief Initializes the GPS L96 module.
+ *
+ * This function initializes the GPS module by sending the NMEA commands.
+ * All settings are lost after power off, so the initialization must be
+ * called every time the device is powered on.
+ *
+ * @return ESP_OK on success, or an error code if initialization fails.
+ *
+ * @note This function be called every time the device is powered on.
+ */
 esp_err_t gps_l96_init(void);
 
 /**

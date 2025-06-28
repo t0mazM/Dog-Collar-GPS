@@ -4,7 +4,7 @@ static const char *TAG = "GPS_L96";
 
 esp_err_t gps_l96_init(void) {
     gps_l96_send_command(GNSS_SET_UPDATE_RATE_1HZ); 
-    gps_l96_send_command(GNSS_MODE_GALILEO_ONLY); 
+    gps_l96_send_command(GNSS_MODE_GPS_GLONASS); 
 
     return uart_init();
 }
