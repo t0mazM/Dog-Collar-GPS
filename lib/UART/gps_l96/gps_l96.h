@@ -5,6 +5,15 @@
 
 #include <uart.h>
 
+typedef enum {
+    GPS_STATE_IDLE,
+    GPS_STATE_WAIT_FIX,
+    GPS_STATE_HAS_FIX,
+    GPS_STATE_RECORDING,
+    GPS_STATE_DEEP_SLEEP
+} gps_state_t;
+
+gps_state_t gps_state; 
 
 /**
  * @brief Initializes the GPS L96 module.
