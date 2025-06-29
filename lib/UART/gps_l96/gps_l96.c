@@ -88,9 +88,12 @@ void gps_l96_read_task(void) { //Just a dummy task to test the GPS module
     }
 }
 
-// esp_err_t gps_l96_extract_data_from_nmea_sentence(const char *nmea_sentence, gps_l96_data_t *gps_data) {
+esp_err_t gps_l96_extract_data_from_nmea_sentence(const char *nmea_sentence, gps_l96_data_t *gps_data) {
 
-//     // Example parsing logic for a GGA sentence
-//     if (strncmp(nmea_sentence, "$GPGGA", 6) == 0) {
-//         // Parse the GGA sentence and fill gps_data structure
-//     }
+    if (strncmp(nmea_sentence, "$GPRMC", 6) == 0) {
+        //TODO: Add parsing logic for GPRMC sentence (find a lib for this)
+    }
+
+    return ESP_OK;
+
+}
