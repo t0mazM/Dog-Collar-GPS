@@ -22,5 +22,6 @@ void gpio_init(void);
 void gpio_turn_on_leds(uint8_t led_mask);
 void gpio_turn_off_leds(uint8_t led_mask);
 void gpio_read_inputs(void);
+void gpio_reset_gps(void);
 esp_err_t gpio_set_pin_force(bool on);
 #endif
