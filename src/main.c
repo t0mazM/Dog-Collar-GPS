@@ -24,6 +24,7 @@ void app_main() {
     battery_monitor_update_battery_data(&battery_data);
     gpio_read_inputs();
     gpio_turn_on_leds(LED_RED | LED_YELLOW | LED_GREEN);
+    vTaskDelay(1000 / portTICK_PERIOD_MS); // Delay to allow LEDs to turn on
     gpio_read_inputs();
     gpio_turn_off_leds(LED_RED | LED_YELLOW | LED_GREEN);
     gpio_read_inputs();
@@ -32,6 +33,8 @@ void app_main() {
     ext_flash_read_jedec_data(jedec_id);
 
     gps_l96_start_recording();
+    
+    
 
     while(1){
         gps_l96_read_task();

@@ -35,8 +35,20 @@ void gpio_read_inputs(void) {
     bool geo_fence_triggered = (input_state & GEO_FENCE) != 0; // false if bit is 1, true if bit is 0
 }
 
-esp_err_t gpio_set_pin_force_on(void) { //pin GP3
-    gpio_output_state &= ~GPS_FORCE_ON; // Set FORCE_ON pin to 0
-    ESP_RETURN_ON_ERROR( i2c_write_byte(PCF8574_ADDR, REG_ADDR_NOT_USED, gpio_output_state), TAG, "Failed to set FORCE_ON pin");
+esp_err_t gpio_set_pin_force(bool on) {
+    if (on) {
+        
+        // Turn OFF: set the bit to set pin HIGH
+        gpio_output_state |= GPS_FORCE_ON;
+        
+    } else {
+        // Turn ON: clear the bit to set pin LOW (active)
+        gpio_output_state &= ~GPS_FORCE_ON;
+    }
+    ESP_RETURN_ON_ERROR(
+        i2c_write_byte(PCF8574_ADDR, REG_ADDR_NOT_USED, gpio_output_state),
+        TAG,
+        "Failed to set FORCE_ON pin"
+    );
     return ESP_OK;
 }

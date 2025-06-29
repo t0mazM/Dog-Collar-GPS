@@ -13,7 +13,9 @@ typedef enum {
     GPS_STATE_DEEP_SLEEP
 } gps_state_t;
 
-
+typedef struct {
+    uint8_t gps_point[3];
+} gps_l96_data_t;
 
 /**
  * @brief Initializes the GPS L96 module.

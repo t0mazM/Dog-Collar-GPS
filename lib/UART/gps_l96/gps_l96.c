@@ -5,16 +5,15 @@ static const char *TAG = "GPS_L96";
 gps_state_t gps_state = GPS_STATE_IDLE; // Default state on power on
 
 esp_err_t gps_l96_init(void) {
-     
-    gps_l96_send_command(GNSS_MODE_GPS_GLONASS); 
+    gps_l96_send_command(GNSS_MODE_GPS_GLONASS);
     gps_state = GPS_STATE_IDLE;
-    return uart_init();
+    return ESP_OK;
 }
 
 esp_err_t gps_l96_go_to_standby_mode(void) {
 
     // Set FORCE_ON pin to high (in case we are in deep sleep mode)
-    ESP_RETURN_ON_ERROR(gpio_set_pin_force_on(), TAG, "Failed to set FORCE_ON pin"); 
+    ESP_RETURN_ON_ERROR(gpio_set_pin_force(true), TAG, "Failed to set FORCE_ON pin"); 
     ESP_RETURN_ON_ERROR(gps_l96_send_command(GPS_STAND_BY_MODE), TAG, "Failed to send GPS_STAND_BY_MODE command");
     gps_state = GPS_STATE_IDLE;
     return ESP_OK;
@@ -22,7 +21,10 @@ esp_err_t gps_l96_go_to_standby_mode(void) {
 
 esp_err_t gps_l96_start_recording(void) {
 
+    gpio_set_pin_force(false);
+    ESP_RETURN_ON_ERROR(gps_l96_send_command(GNSS_MODE_GPS_GLONASS), TAG, "Failed to send GNSS_MODE_GPS_GLONASS command");
     ESP_RETURN_ON_ERROR(gps_l96_send_command(GNSS_SET_UPDATE_RATE_1HZ), TAG, "Failed to send GNSS_SET_UPDATE_RATE_1HZ command");
+    ESP_RETURN_ON_ERROR(gps_l96_send_command(GNSS_QUERY_UPDATE_RATE), TAG, "Failed to send GNSS_QUERY_UPDATE_RATE command");
     gps_state = GPS_STATE_RECORDING;
     return ESP_OK;
 }
@@ -89,3 +91,10 @@ void gps_l96_read_task(void) { //Just a dummy task to test the GPS module
         gps_l96_extract_and_process_nmea_sentences(rx_buffer, read_len);
     }
 }
+
+// esp_err_t gps_l96_extract_data_from_nmea_sentence(const char *nmea_sentence, gps_l96_data_t *gps_data) {
+
+//     // Example parsing logic for a GGA sentence
+//     if (strncmp(nmea_sentence, "$GPGGA", 6) == 0) {
+//         // Parse the GGA sentence and fill gps_data structure
+//     }

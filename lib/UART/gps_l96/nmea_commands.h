@@ -29,5 +29,7 @@
 // Set GPS module in sleep mode (must be woken up by setting pin FORCE_ON to HIGH)
 #define GPS_SLEEP_MODE "$PMTK225,4*2F\r\n"
 
+#define GNSS_QUERY_UPDATE_RATE "$PMTK220*2F\r\n"
+
 #endif // NMEA_COMMANDS_H
     
