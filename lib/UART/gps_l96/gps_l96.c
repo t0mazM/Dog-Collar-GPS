@@ -70,6 +70,7 @@ esp_err_t gps_l96_extract_and_process_nmea_sentences(const uint8_t *buffer, size
             sentence_idx = 0; 
             // 3. Process the complete NMEA sentence TODO
             ESP_LOGI(TAG, "L96 Response: %s", NMEA_sentence);
+            gps_l96_extract_data_from_nmea_sentence(NMEA_sentence, NULL); 
             
         }
     }
@@ -91,7 +92,6 @@ void gps_l96_read_task(void) { //Just a dummy task to test the GPS module
 esp_err_t gps_l96_extract_data_from_nmea_sentence(const char *nmea_sentence, gps_l96_data_t *gps_data) {
 
     if (strncmp(nmea_sentence, "$GPRMC", 6) == 0) {
-        //TODO: Add parsing logic for GPRMC sentence (find a lib for this)
     }
 
     return ESP_OK;

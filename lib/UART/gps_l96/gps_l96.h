@@ -4,7 +4,7 @@
 #include "nmea_commands.h"
 #include "gpio_extender/gpio_extender.h"
 #include <uart.h>
-
+#include "minmea.h"
 typedef enum {
     GPS_STATE_IDLE,
     GPS_STATE_WAIT_FIX,
@@ -84,5 +84,7 @@ esp_err_t gps_l96_send_command(const char *nmea_sentence);
  * Currently, it is a dummy task to test the GPS module.
  */
 void gps_l96_read_task(void);
+
+esp_err_t gps_l96_extract_data_from_nmea_sentence(const char *nmea_sentence, gps_l96_data_t *gps_data);
 
 #endif // GPS_L96_H
