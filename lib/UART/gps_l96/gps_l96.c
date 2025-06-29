@@ -20,11 +20,10 @@ esp_err_t gps_l96_go_to_standby_mode(void) {
 }
 
 esp_err_t gps_l96_start_recording(void) {
+
     gpio_reset_gps();
     gpio_set_pin_force(false);
-    const char *poke = "$PMTK000*32\r\n";  // Invalid command, just to wake it up
-    uart_send_cmd(poke, strlen(poke));
-    vTaskDelay(500 / portTICK_PERIOD_MS);
+
     ESP_RETURN_ON_ERROR(gps_l96_send_command(GNSS_MODE_GPS_GLONASS), TAG, "Failed to send GNSS_MODE_GPS_GLONASS command");
     ESP_RETURN_ON_ERROR(gps_l96_send_command(GNSS_SET_UPDATE_RATE_1HZ), TAG, "Failed to send GNSS_SET_UPDATE_RATE_1HZ command");
     ESP_RETURN_ON_ERROR(gps_l96_send_command(GNSS_QUERY_UPDATE_RATE), TAG, "Failed to send GNSS_QUERY_UPDATE_RATE command");
@@ -57,13 +56,7 @@ esp_err_t gps_l96_extract_and_process_nmea_sentences(const uint8_t *buffer, size
     for (size_t buf_idx = 0; buf_idx < read_len; buf_idx++) {
         char ch = buffer[buf_idx]; 
 
-        // 1. Look for the start of a NMEA sentence
-        if (ch == '$') {
-            sentence_idx = 0;
-            NMEA_sentence[sentence_idx++] = '$';
-        }
-
-        // 2. Add character to the sentence buffer - only if sentence buffer is not full
+        // 1. Add character to the sentence buffer - only if sentence buffer is not full
         if (sentence_idx < (int)sizeof(NMEA_sentence) - 1) {
             NMEA_sentence[sentence_idx++] = ch;
         } else { //Buffer if full
@@ -71,11 +64,11 @@ esp_err_t gps_l96_extract_and_process_nmea_sentences(const uint8_t *buffer, size
             sentence_idx = 0; 
         }
 
-        // 3. Check for end of sentence "\n" or "\r\n"
+        // 2. Check for end of sentence "\n" or "\r\n"
         if (ch == '\n' && sentence_idx >= 2 && NMEA_sentence[sentence_idx - 2] == '\r') {
             NMEA_sentence[sentence_idx] = '\0';
             sentence_idx = 0; 
-            // 4. Process the complete NMEA sentence TODO
+            // 3. Process the complete NMEA sentence TODO
             ESP_LOGI(TAG, "L96 Response: %s", NMEA_sentence);
             
         }
