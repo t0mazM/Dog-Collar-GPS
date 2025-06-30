@@ -111,8 +111,8 @@ esp_err_t gps_l96_extract_and_process_nmea_sentences(const uint8_t *buffer, size
 }
 
 void gps_l96_read_task(void) { //Just a dummy task to test the GPS module
-    uint8_t rx_buffer[255];
-    memset(rx_buffer, 0, sizeof(rx_buffer));
+    uint8_t rx_buffer[UART_RX_BUF_SIZE];
+    memset(rx_buffer, 0, sizeof(rx_buffer)); // Clear the buffer
     size_t read_len = 0;
 
     printf("-------- UART READ ------------\n");
