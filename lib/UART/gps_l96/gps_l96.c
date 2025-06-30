@@ -46,6 +46,7 @@ esp_err_t gps_l96_extract_and_process_nmea_sentences(const uint8_t *buffer, size
 
     char NMEA_sentence[NMEA_SENTENCE_BUF_SIZE]; // Buffer to hold the sentence/command
     int sentence_idx = 0;
+    bool reading_sentence = false; // Flag to indicate if we are currently reading a sentence
 
     // Check if buffer is ok and it is not empty
     if (buffer == NULL || read_len == 0) {
@@ -56,22 +57,33 @@ esp_err_t gps_l96_extract_and_process_nmea_sentences(const uint8_t *buffer, size
     for (size_t buf_idx = 0; buf_idx < read_len; buf_idx++) {
         char ch = buffer[buf_idx]; 
 
-        // 1. Add character to the sentence buffer - only if sentence buffer is not full
-        if (sentence_idx < (int)sizeof(NMEA_sentence) - 1) {
+        // 1. Check for $ and
+        if(ch == '$'){
+            reading_sentence = true; 
+            sentence_idx = 0; 
+        }
+
+        if(reading_sentence) {
+
+        // 2. Add character to the sentence buffer
+        if (sentence_idx < (int)sizeof(NMEA_sentence) - 1) { //- only if sentence buffer is not full
             NMEA_sentence[sentence_idx++] = ch;
         } else { //Buffer if full
             ESP_LOGW(TAG, "NMEA sentence buffer overflow.");
             sentence_idx = 0; 
         }
 
-        // 2. Check for end of sentence "\n" or "\r\n"
+        // 3. Check for end of sentence "\n" or "\r\n"
         if (ch == '\n' && sentence_idx >= 2 && NMEA_sentence[sentence_idx - 2] == '\r') {
             NMEA_sentence[sentence_idx] = '\0';
+
             sentence_idx = 0; 
+            reading_sentence = false; 
+
             // 3. Process the complete NMEA sentence TODO
             ESP_LOGI(TAG, "L96 Response: %s", NMEA_sentence);
             gps_l96_extract_data_from_nmea_sentence(NMEA_sentence, NULL); 
-            
+        }
         }
     }
     return ESP_OK;
