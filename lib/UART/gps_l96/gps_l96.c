@@ -89,7 +89,8 @@ esp_err_t gps_l96_extract_and_process_nmea_sentences(const uint8_t *buffer, size
                 NMEA_sentence[sentence_idx++] = ch;
             } else { //Buffer if full
                 ESP_LOGW(TAG, "NMEA sentence buffer overflow.");
-                sentence_idx = 0; 
+                sentence_idx = 0;
+                reading_sentence = false; 
             }
 
             // 3. Check for end of sentence "\n" or "\r\n"
@@ -111,6 +112,7 @@ esp_err_t gps_l96_extract_and_process_nmea_sentences(const uint8_t *buffer, size
 
 void gps_l96_read_task(void) { //Just a dummy task to test the GPS module
     uint8_t rx_buffer[255];
+    memset(rx_buffer, 0, sizeof(rx_buffer));
     size_t read_len = 0;
 
     printf("-------- UART READ ------------\n");
