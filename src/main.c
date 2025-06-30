@@ -33,12 +33,17 @@ void app_main() {
     ext_flash_read_jedec_data(jedec_id);
     
     //gps_l96_go_to_standby_mode();
+    
+    gps_l96_go_to_back_up_mode();
+    vTaskDelay(3000 / portTICK_PERIOD_MS); 
+    gps_l96_read_task();
     gps_l96_start_recording();
+
     
 
     while(1){
         gps_l96_read_task();
-        vTaskDelay(10 / portTICK_PERIOD_MS); 
+        vTaskDelay(1000 / portTICK_PERIOD_MS); 
     }
     
 

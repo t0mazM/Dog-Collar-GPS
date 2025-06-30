@@ -12,8 +12,7 @@ esp_err_t gps_l96_init(void) {
 
 esp_err_t gps_l96_go_to_standby_mode(void) {
 
-    // Set FORCE_ON pin to high (in case we are in deep sleep mode)
-    ESP_RETURN_ON_ERROR(gpio_set_pin_force(true), TAG, "Failed to set FORCE_ON pin"); 
+    ESP_RETURN_ON_ERROR(gps_force_on_set(true), TAG, "Failed to set FORCE_ON pin");  // Set FORCE_ON pin to high (in case we are in deep sleep mode)
     ESP_RETURN_ON_ERROR(gps_l96_send_command(GPS_STAND_BY_MODE), TAG, "Failed to send GPS_STAND_BY_MODE command");
     gps_state = GPS_STATE_IDLE;
     return ESP_OK;
@@ -22,7 +21,7 @@ esp_err_t gps_l96_go_to_standby_mode(void) {
 esp_err_t gps_l96_start_recording(void) {
 
     gpio_reset_gps();
-    gpio_set_pin_force(false);
+    gps_force_on_set(true); //Crucial to set it to 
 
     
     ESP_RETURN_ON_ERROR(gps_l96_send_command(GNSS_MODE_GPS_GLONASS), TAG, "Failed to send GNSS_MODE_GPS_GLONASS command");
@@ -30,6 +29,14 @@ esp_err_t gps_l96_start_recording(void) {
     // ESP_RETURN_ON_ERROR(gps_l96_send_command(GNSS_QUERY_UPDATE_RATE), TAG, "Failed to send GNSS_QUERY_UPDATE_RATE command");
     ESP_RETURN_ON_ERROR(gps_l96_send_command(ONLY_GNRMC), TAG, "Failed to send ONLY_GNRMC command");
     gps_state = GPS_STATE_RECORDING;
+    return ESP_OK;
+}
+
+esp_err_t gps_l96_go_to_back_up_mode(void) { // same as deep sleep mode
+    gps_force_on_set(false); 
+    ESP_RETURN_ON_ERROR(gps_l96_send_command(GPS_DEEP_SLEEP_MODE), TAG, "Failed to send GPS_DEEP_SLEEP_MODE command");
+    
+    gps_state = GPS_STATE_DEEP_SLEEP;
     return ESP_OK;
 }
 

@@ -66,6 +66,8 @@ esp_err_t gps_l96_go_to_standby_mode(void);
  */
 esp_err_t gps_l96_start_recording(void);
 
+esp_err_t gps_l96_go_to_back_up_mode(void);
+
 
 /**
  * @brief Sends a command to the GPS module.

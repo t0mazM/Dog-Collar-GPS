@@ -1,7 +1,7 @@
 #include "gpio_extender.h"
 
 static const char *TAG = "GPIO_EXTENDER";
-static uint8_t gpio_output_state = 0xFF; // All LEDs off initially (bits all high)
+static uint8_t gpio_output_state = 0xFF; //Global variable to hold the state of the GPIO pins
 
 // Initialize PCF8574 pins (all LEDs off)
 void gpio_init(void) {
@@ -37,20 +37,21 @@ void gpio_read_inputs(void) {
     bool geo_fence_triggered = (input_state & GEO_FENCE) != 0; // false if bit is 1, true if bit is 0
 }
 
-esp_err_t gpio_set_pin_force(bool on) {
-    if (on) {
-        
-        // Turn OFF: set the bit to set pin HIGH
-        gpio_output_state |= GPS_FORCE_ON;
-        
-    } else {
-        // Turn ON: clear the bit to set pin LOW (active)
-        gpio_output_state &= ~GPS_FORCE_ON;
+esp_err_t gps_force_on_set(bool enable){
+    //Calculcate the new state
+    uint8_t new_state = enable
+                        ? (gpio_output_state |  GPS_FORCE_ON)  /* set bit */
+                        : (gpio_output_state & ~GPS_FORCE_ON); /* clear bit */
+
+    // If bit is alredy in the required state, do nothing and return
+    if (new_state == gpio_output_state) {
+        return ESP_OK;
     }
-    ESP_RETURN_ON_ERROR(
-        i2c_write_byte(PCF8574_ADDR, REG_ADDR_NOT_USED, gpio_output_state),
-        TAG,
-        "Failed to set FORCE_ON pin"
-    );
+
+    // Send new state to the IO extender
+    ESP_RETURN_ON_ERROR(i2c_write_byte(PCF8574_ADDR, REG_ADDR_NOT_USED, new_state), TAG, "Failed to set FORCE_ON pin state");
+
+    // Add the new state to the global variable only if the write was successful
+    gpio_output_state = new_state;
     return ESP_OK;
 }
