@@ -5,6 +5,8 @@
 #include "gpio_extender/gpio_extender.h"
 #include <uart.h>
 #include "minmea.h"
+
+#define NMEA_SENTENCE_BUF_SIZE 1024 
 typedef enum {
     GPS_STATE_IDLE,
     GPS_STATE_WAIT_FIX,

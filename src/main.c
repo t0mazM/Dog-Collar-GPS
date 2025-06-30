@@ -38,6 +38,7 @@ void app_main() {
 
     while(1){
         gps_l96_read_task();
+        vTaskDelay(10 / portTICK_PERIOD_MS); 
     }
     
 

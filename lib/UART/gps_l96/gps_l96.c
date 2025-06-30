@@ -44,7 +44,7 @@ esp_err_t gps_l96_send_command(const char *nmea_sentence) {
 
 esp_err_t gps_l96_extract_and_process_nmea_sentences(const uint8_t *buffer, size_t read_len) {
 
-    char NMEA_sentence[255]; // Buffer to hold the sentence/command
+    char NMEA_sentence[NMEA_SENTENCE_BUF_SIZE]; // Buffer to hold the sentence/command
     int sentence_idx = 0;
 
     // Check if buffer is ok and it is not empty
@@ -91,9 +91,27 @@ void gps_l96_read_task(void) { //Just a dummy task to test the GPS module
 
 esp_err_t gps_l96_extract_data_from_nmea_sentence(const char *nmea_sentence, gps_l96_data_t *gps_data) {
 
-    if (strncmp(nmea_sentence, "$GPRMC", 6) == 0) {
+
+    struct minmea_sentence_rmc frame;
+    if (minmea_check(nmea_sentence, false)) {
+        printf( "NMEA ID: %d \n",  minmea_sentence_id(nmea_sentence, false)  );
+    }
+    if (minmea_sentence_id(nmea_sentence, false) == MINMEA_SENTENCE_RMC) {
+        // parse RMC
+    } else if (minmea_sentence_id(nmea_sentence, false) == MINMEA_SENTENCE_VTG) {
+        // parse VTG
     }
 
+    if (minmea_parse_rmc(&frame, nmea_sentence)) {
+        printf("Time: %02d:%02d:%02d\n", frame.time.hours, frame.time.minutes, frame.time.seconds);
+        printf("Validity: %c\n", frame.valid ? 'A' : 'V');
+        printf("Latitude: %f\n", minmea_tocoord(&frame.latitude));
+        printf("Longitude: %f\n", minmea_tocoord(&frame.longitude));
+        printf("Speed (knots): %f\n", minmea_tofloat(&frame.speed));
+        printf("Date: %02d/%02d/%04d\n", frame.date.day, frame.date.month, frame.date.year + 2000);
+    } else {
+        printf("Failed to parse RMC sentence.\n");
+    }
     return ESP_OK;
 
 }
