@@ -20,8 +20,6 @@
 // Enable GPS + GLONASS + Galileo
 #define GNSS_MODE_GPS_GLONASS_GALILEO "$PMTK353,1,1,1,0,0*2A\r\n"
 
-// Set update rate for GPS to 1Hz
-#define GNSS_SET_UPDATE_RATE_1HZ "$PMTK220,1000*1F\r\n"
 
 // Set GPS module in standby  mode
 #define GPS_STAND_BY_MODE "$PMTK161,0*28\r\n"
@@ -29,7 +27,8 @@
 // Set GPS module in sleep mode (must be woken up by setting pin FORCE_ON to HIGH)
 #define GPS_SLEEP_MODE "$PMTK225,4*2F\r\n"
 
-#define GNSS_QUERY_UPDATE_RATE "$PMTK220*2F\r\n"
+
+#define ONLY_GNRMC "$PMTK314,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0*29\r\n"
 
 #endif // NMEA_COMMANDS_H
     

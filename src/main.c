@@ -32,7 +32,7 @@ void app_main() {
     uint8_t jedec_id[3] = {0};
     ext_flash_read_jedec_data(jedec_id);
     
-    gps_l96_go_to_standby_mode();
+    //gps_l96_go_to_standby_mode();
     gps_l96_start_recording();
     
 

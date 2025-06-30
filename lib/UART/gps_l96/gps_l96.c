@@ -24,9 +24,11 @@ esp_err_t gps_l96_start_recording(void) {
     gpio_reset_gps();
     gpio_set_pin_force(false);
 
+    
     ESP_RETURN_ON_ERROR(gps_l96_send_command(GNSS_MODE_GPS_GLONASS), TAG, "Failed to send GNSS_MODE_GPS_GLONASS command");
-    ESP_RETURN_ON_ERROR(gps_l96_send_command(GNSS_SET_UPDATE_RATE_1HZ), TAG, "Failed to send GNSS_SET_UPDATE_RATE_1HZ command");
-    ESP_RETURN_ON_ERROR(gps_l96_send_command(GNSS_QUERY_UPDATE_RATE), TAG, "Failed to send GNSS_QUERY_UPDATE_RATE command");
+    // ESP_RETURN_ON_ERROR(gps_l96_send_command(GNSS_SET_UPDATE_RATE_1HZ), TAG, "Failed to send GNSS_SET_UPDATE_RATE_1HZ command");
+    // ESP_RETURN_ON_ERROR(gps_l96_send_command(GNSS_QUERY_UPDATE_RATE), TAG, "Failed to send GNSS_QUERY_UPDATE_RATE command");
+    ESP_RETURN_ON_ERROR(gps_l96_send_command(ONLY_GNRMC), TAG, "Failed to send ONLY_GNRMC command");
     gps_state = GPS_STATE_RECORDING;
     return ESP_OK;
 }
