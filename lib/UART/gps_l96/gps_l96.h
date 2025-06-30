@@ -45,6 +45,16 @@ esp_err_t gps_l96_init(void);
  *
  * @note Function assumes that the buffer contains complete NMEA sentences: Starts with `$` and ends with `\r\n`
  */
+
+/**
+ * @brief Checks if the geo-fence has been triggered.
+ *
+ * This function checks the state of the geo-fence pin from L96 GPS module.
+ *
+ * @return true if the geo-fence is triggered, false otherwise.
+ */
+bool gps_l96_is_geo_fence_triggered(void);
+
 esp_err_t gps_l96_extract_and_process_nmea_sentences(const uint8_t *buffer, size_t read_len);
 
 /**
