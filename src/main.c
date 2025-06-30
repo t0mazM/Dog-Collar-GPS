@@ -35,9 +35,9 @@ void app_main() {
     //gps_l96_go_to_standby_mode();
     
     gps_l96_go_to_back_up_mode();
-    vTaskDelay(3000 / portTICK_PERIOD_MS); 
-    gps_l96_read_task();
-    gps_l96_start_recording();
+    // vTaskDelay(3000 / portTICK_PERIOD_MS); 
+    // gps_l96_read_task();
+    // gps_l96_start_recording();
 
     
 
