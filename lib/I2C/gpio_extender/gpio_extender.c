@@ -30,11 +30,9 @@ void gpio_reset_gps(void) {
     ESP_LOGI(TAG, "GPS reset done");
 }
 
-void gpio_read_inputs(void) {
-    uint8_t input_state;
-    i2c_read_8bit(PCF8574_ADDR, REG_ADDR_NOT_USED, &input_state);
-    //TODO: store this bool into struct in the GPS module file
-    bool geo_fence_triggered = (input_state & GEO_FENCE) != 0; // false if bit is 1, true if bit is 0
+esp_err_t gpio_read_inputs(uint8_t *input_state) {
+    ESP_RETURN_ON_ERROR(i2c_read_8bit(PCF8574_ADDR, REG_ADDR_NOT_USED, input_state), TAG, "Failed to read GPIO inputs");
+    return ESP_OK;
 }
 
 esp_err_t gps_force_on_set(bool enable){
