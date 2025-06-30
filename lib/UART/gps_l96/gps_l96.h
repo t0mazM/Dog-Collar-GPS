@@ -89,6 +89,18 @@ esp_err_t gps_l96_send_command(const char *nmea_sentence);
  */
 void gps_l96_read_task(void);
 
-esp_err_t gps_l96_extract_data_from_nmea_sentence(const char *nmea_sentence, gps_l96_data_t *gps_data);
+
+/**
+ * @brief Extracts-parses GPS data from a NMEA sentence.
+ *
+ * This function extracts-parses GPS data from NMEA sentence and stores struct gps_rcm_data.
+ *
+ * @param nmea_sentence Pointer to the NMEA sentence to be processed.
+ * @return ESP_OK on success, or an error code if extraction fails.
+ */
+esp_err_t gps_l96_extract_data_from_nmea_sentence(const char *nmea_sentence);
+
+
+void gps_l96_print_data(void);
 
 #endif // GPS_L96_H

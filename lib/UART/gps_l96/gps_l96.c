@@ -2,7 +2,8 @@
 
 static const char *TAG = "GPS_L96";
 
-gps_state_t gps_state = GPS_STATE_IDLE; // Default state on power on
+gps_state_t gps_state = GPS_STATE_IDLE;  // Default state on power on
+struct minmea_sentence_rmc gps_rcm_data; // GPS RMC data structure to hold parsed data
 
 esp_err_t gps_l96_init(void) {
     gps_l96_send_command(GNSS_MODE_GPS_GLONASS);
@@ -21,7 +22,7 @@ esp_err_t gps_l96_go_to_standby_mode(void) {
 esp_err_t gps_l96_start_recording(void) {
 
     gpio_reset_gps();
-    gps_force_on_set(true); //Crucial to set it to 
+    gps_force_on_set(true); //Crucial to set it to HIGH
 
     
     ESP_RETURN_ON_ERROR(gps_l96_send_command(GNSS_MODE_GPS_GLONASS), TAG, "Failed to send GNSS_MODE_GPS_GLONASS command");
@@ -74,25 +75,25 @@ esp_err_t gps_l96_extract_and_process_nmea_sentences(const uint8_t *buffer, size
 
         if(reading_sentence) {
 
-        // 2. Add character to the sentence buffer
-        if (sentence_idx < (int)sizeof(NMEA_sentence) - 1) { //- only if sentence buffer is not full
-            NMEA_sentence[sentence_idx++] = ch;
-        } else { //Buffer if full
-            ESP_LOGW(TAG, "NMEA sentence buffer overflow.");
-            sentence_idx = 0; 
-        }
+            // 2. Add character to the sentence buffer
+            if (sentence_idx < (int)sizeof(NMEA_sentence) - 1) { //- only if sentence buffer is not full
+                NMEA_sentence[sentence_idx++] = ch;
+            } else { //Buffer if full
+                ESP_LOGW(TAG, "NMEA sentence buffer overflow.");
+                sentence_idx = 0; 
+            }
 
-        // 3. Check for end of sentence "\n" or "\r\n"
-        if (ch == '\n' && sentence_idx >= 2 && NMEA_sentence[sentence_idx - 2] == '\r') {
-            NMEA_sentence[sentence_idx] = '\0';
+            // 3. Check for end of sentence "\n" or "\r\n"
+            if (ch == '\n' && sentence_idx >= 2 && NMEA_sentence[sentence_idx - 2] == '\r') {
+                NMEA_sentence[sentence_idx] = '\0';
 
-            sentence_idx = 0; 
-            reading_sentence = false; 
+                sentence_idx = 0; 
+                reading_sentence = false; 
 
-            // 3. Process the complete NMEA sentence TODO
-            ESP_LOGI(TAG, "L96 Response: %s", NMEA_sentence);
-            gps_l96_extract_data_from_nmea_sentence(NMEA_sentence, NULL); 
-        }
+                // 3. Process the complete NMEA sentence TODO
+                ESP_LOGI(TAG, "L96 Response: %s", NMEA_sentence);
+                gps_l96_extract_data_from_nmea_sentence(NMEA_sentence); 
+            }
         }
     }
     return ESP_OK;
@@ -110,27 +111,33 @@ void gps_l96_read_task(void) { //Just a dummy task to test the GPS module
     }
 }
 
-esp_err_t gps_l96_extract_data_from_nmea_sentence(const char *nmea_sentence, gps_l96_data_t *gps_data) {
+esp_err_t gps_l96_extract_data_from_nmea_sentence(const char *nmea_sentence) {
 
-    struct minmea_sentence_rmc frame;
+    
     enum minmea_sentence_id nmea_id = minmea_sentence_id(nmea_sentence, false);
 
-    if (nmea_id == MINMEA_SENTENCE_RMC) {
-        if (minmea_parse_rmc(&frame, nmea_sentence)) {
-            printf("Time: %02d:%02d:%02d\n", frame.time.hours, frame.time.minutes, frame.time.seconds);
-            printf("Validity: %c\n", frame.valid ? 'A' : 'V');
-            printf("Latitude: %f\n", minmea_tocoord(&frame.latitude));
-            printf("Longitude: %f\n", minmea_tocoord(&frame.longitude));
-            printf("Speed (knots): %f\n", minmea_tofloat(&frame.speed));
-            printf("Date: %02d/%02d/%04d\n", frame.date.day, frame.date.month, frame.date.year + 2000);
-        } else {
-            printf("Failed to parse RMC sentence.\n");
-        }
-    } else if (nmea_id == MINMEA_SENTENCE_VTG) {
-        // parse VTG
+    switch(nmea_id) {
+        case MINMEA_SENTENCE_RMC:
+            minmea_parse_rmc(&gps_rcm_data, nmea_sentence);
+            gps_l96_print_data();
+            break;
+        case MINMEA_SENTENCE_VTG:
+            /*TODO: add parsing for all other sentences types
+            Currently I need only RMC sentence*/
+            break;
+        default:
+            ESP_LOGW(TAG, "Unknown NMEA sentence ID: %d", nmea_id);
+            return ESP_ERR_NOT_SUPPORTED;
     }
-
-
     return ESP_OK;
+}
+
+void gps_l96_print_data(void){ // a DEBUG function to print GPS data
+            printf("Time: %02d:%02d:%02d\n", gps_rcm_data.time.hours, gps_rcm_data.time.minutes, gps_rcm_data.time.seconds);
+            printf("Validity: %c\n", gps_rcm_data.valid ? 'A' : 'V');
+            printf("Latitude: %f\n", minmea_tocoord(&gps_rcm_data.latitude));
+            printf("Longitude: %f\n", minmea_tocoord(&gps_rcm_data.longitude));
+            printf("Speed (knots): %f\n", minmea_tofloat(&gps_rcm_data.speed));
+            printf("Date: %02d/%02d/%04d\n", gps_rcm_data.date.day, gps_rcm_data.date.month, gps_rcm_data.date.year + 2000);
 
 }
