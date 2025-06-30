@@ -11,6 +11,13 @@ esp_err_t gps_l96_init(void) {
     return ESP_OK;
 }
 
+bool gps_l96_is_geo_fence_triggered(void) {
+    uint8_t input_state = 0;
+
+    gpio_read_inputs(&input_state);
+    return (input_state & GEO_FENCE) != 0;
+}
+
 esp_err_t gps_l96_go_to_standby_mode(void) {
 
     ESP_RETURN_ON_ERROR(gps_force_on_set(true), TAG, "Failed to set FORCE_ON pin");  // Set FORCE_ON pin to high (in case we are in deep sleep mode)
