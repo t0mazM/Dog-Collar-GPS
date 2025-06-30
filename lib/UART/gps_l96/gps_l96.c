@@ -36,7 +36,8 @@ esp_err_t gps_l96_start_recording(void) {
 
 esp_err_t gps_l96_go_to_back_up_mode(void) { // same as deep sleep mode
     gps_force_on_set(false); 
-    ESP_RETURN_ON_ERROR(gps_l96_send_command(GPS_DEEP_SLEEP_MODE), TAG, "Failed to send GPS_DEEP_SLEEP_MODE command");
+    //note: we can't check if if was send succesfull becouse gps modeule goes into ddepsleep and it does not respond to any commands
+    gps_l96_send_command(GPS_DEEP_SLEEP_MODE); 
     
     gps_state = GPS_STATE_DEEP_SLEEP;
     return ESP_OK;

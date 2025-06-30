@@ -29,7 +29,7 @@
 
 #define GPS_DEEP_SLEEP_MODE "$PMTK225,4*2F\r\n"
 
-#define ONLY_GNRMC "$PMTK314,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0*29\r\n"
+#define ONLY_GNRMC "$PMTK314,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0*29\r\n"
 
 #endif // NMEA_COMMANDS_H
     

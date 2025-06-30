@@ -61,7 +61,7 @@ esp_err_t gps_l96_go_to_standby_mode(void);
  * @brief Starts recording GPS data.
  *
  * This function sends the command to start recording GPS data at a rate of 1Hz.
- *
+ * @note We cannot check if it was successful, because the GPS module does not respond to any commands after we send it in deep sleep mode.
  * @return ESP_OK on success, or an error code if the command fails.
  */
 esp_err_t gps_l96_start_recording(void);
