@@ -103,27 +103,25 @@ void gps_l96_read_task(void) { //Just a dummy task to test the GPS module
 
 esp_err_t gps_l96_extract_data_from_nmea_sentence(const char *nmea_sentence, gps_l96_data_t *gps_data) {
 
-
     struct minmea_sentence_rmc frame;
-    if (minmea_check(nmea_sentence, false)) {
-        printf( "NMEA ID: %d \n",  minmea_sentence_id(nmea_sentence, false)  );
-    }
-    if (minmea_sentence_id(nmea_sentence, false) == MINMEA_SENTENCE_RMC) {
-        // parse RMC
-    } else if (minmea_sentence_id(nmea_sentence, false) == MINMEA_SENTENCE_VTG) {
+    enum minmea_sentence_id nmea_id = minmea_sentence_id(nmea_sentence, false);
+
+    if (nmea_id == MINMEA_SENTENCE_RMC) {
+        if (minmea_parse_rmc(&frame, nmea_sentence)) {
+            printf("Time: %02d:%02d:%02d\n", frame.time.hours, frame.time.minutes, frame.time.seconds);
+            printf("Validity: %c\n", frame.valid ? 'A' : 'V');
+            printf("Latitude: %f\n", minmea_tocoord(&frame.latitude));
+            printf("Longitude: %f\n", minmea_tocoord(&frame.longitude));
+            printf("Speed (knots): %f\n", minmea_tofloat(&frame.speed));
+            printf("Date: %02d/%02d/%04d\n", frame.date.day, frame.date.month, frame.date.year + 2000);
+        } else {
+            printf("Failed to parse RMC sentence.\n");
+        }
+    } else if (nmea_id == MINMEA_SENTENCE_VTG) {
         // parse VTG
     }
 
-    if (minmea_parse_rmc(&frame, nmea_sentence)) {
-        printf("Time: %02d:%02d:%02d\n", frame.time.hours, frame.time.minutes, frame.time.seconds);
-        printf("Validity: %c\n", frame.valid ? 'A' : 'V');
-        printf("Latitude: %f\n", minmea_tocoord(&frame.latitude));
-        printf("Longitude: %f\n", minmea_tocoord(&frame.longitude));
-        printf("Speed (knots): %f\n", minmea_tofloat(&frame.speed));
-        printf("Date: %02d/%02d/%04d\n", frame.date.day, frame.date.month, frame.date.year + 2000);
-    } else {
-        printf("Failed to parse RMC sentence.\n");
-    }
+
     return ESP_OK;
 
 }
