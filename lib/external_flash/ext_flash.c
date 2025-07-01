@@ -94,3 +94,199 @@ esp_err_t ext_flash_read_jedec_data(uint8_t *buf) {
 spi_device_handle_t ext_flash_get_handle(void) {
     return spi;
 }
+
+esp_err_t ext_flash_write_enable(void) {
+    spi_transaction_t t = {
+        .length = 0,
+        .cmd = SPI_CMD_WRITE_ENABLE,
+    };
+    esp_err_t ret = spi_device_transmit(spi, &t);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to send Write Enable: %s", esp_err_to_name(ret));
+    }
+    return ret;
+}
+
+/**
+ * @brief Reads Status Register-1 (0x05) from the flash chip.
+ * @param status Pointer to a uint8_t to store the status register value.
+ * @return esp_err_t ESP_OK on success, error otherwise.
+ */
+esp_err_t ext_flash_read_status_register(uint8_t *status) {
+    spi_transaction_t t = {
+        .length = 1 * 8, // 1 byte to receive
+        .rxlength = 1 * 8,
+        .cmd = SPI_CMD_READ_STATUS_REG1,
+        .rx_buffer = status,
+    };
+    esp_err_t ret = spi_device_transmit(spi, &t);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to read Status Register: %s", esp_err_to_name(ret));
+    }
+    return ret;
+}
+
+/**
+ * @brief Waits for the flash chip to become idle (BUSY bit in Status Register-1 is 0).
+ * @return esp_err_t ESP_OK if chip becomes idle, error if timeout or communication issue.
+ */
+esp_err_t ext_flash_wait_for_idle(void) {
+    uint8_t status;
+    int timeout_ms = 1000; // Max timeout for operations (e.g., chip erase can take seconds)
+    int elapsed_ms = 0;
+    const int delay_ms = 1; // Check every 1ms
+
+    do {
+        esp_err_t ret = ext_flash_read_status_register(&status);
+        if (ret != ESP_OK) {
+            ESP_LOGE(TAG, "Failed to read status while waiting for idle.");
+            return ret;
+        }
+        // Check the BUSY bit (S0)
+        if (! (status & 0x01)) { // If BUSY bit is 0
+            return ESP_OK;
+        }
+        vTaskDelay(pdMS_TO_TICKS(delay_ms));
+        elapsed_ms += delay_ms;
+    } while (elapsed_ms < timeout_ms);
+
+    ESP_LOGE(TAG, "Flash chip busy timeout!");
+    return ESP_ERR_TIMEOUT;
+}
+
+/**
+ * @brief Reads data from the external flash chip.
+ * @param address Starting address to read from.
+ * @param buffer Pointer to the buffer to store read data.
+ * @param size Number of bytes to read.
+ * @return esp_err_t ESP_OK on success, error otherwise.
+ */
+esp_err_t ext_flash_read(uint32_t address, uint8_t *buffer, uint32_t size) {
+    if (size == 0) return ESP_OK; // Nothing to read
+
+    spi_transaction_t t = {
+        .cmd = SPI_CMD_READ_DATA,
+        .addr = address,
+        .length = size * 8, // Data length in bits
+        .rxlength = size * 8,
+        .rx_buffer = buffer,
+        .flags = 0,
+    };
+
+    esp_err_t ret = spi_device_transmit(spi, &t);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to read data from 0x%06X, size %u: %s", address, size, esp_err_to_name(ret));
+    }
+    return ret;
+}
+
+
+esp_err_t ext_flash_write(uint32_t address, const uint8_t *buffer, uint32_t size) {
+    if (size == 0) return ESP_OK; // Nothing to write
+
+    uint32_t current_address = address;
+    uint32_t bytes_remaining = size;
+    const uint8_t *current_buffer = buffer;
+
+    while (bytes_remaining > 0) {
+        // Calculate bytes to write in current page
+        uint32_t page_offset = current_address % W25Q128JV_PAGE_SIZE;
+        uint32_t bytes_to_program_in_page = W25Q128JV_PAGE_SIZE - page_offset;
+        if (bytes_to_program_in_page > bytes_remaining) {
+            bytes_to_program_in_page = bytes_remaining;
+        }
+
+        // 1. Send Write Enable
+        CUSTUM_ERROR_CHECK(ext_flash_write_enable());
+        
+        // 2. Prepare transaction for Page Program
+        spi_transaction_t t = {
+            .cmd = SPI_CMD_PAGE_PROGRAM,
+            .addr = current_address,
+            .length = bytes_to_program_in_page * 8, // Data length in bits
+            .tx_buffer = current_buffer,
+            .flags = 0,
+        };
+
+        // 3. Transmit Page Program command and data
+        esp_err_t ret = spi_device_transmit(spi, &t);
+        if (ret != ESP_OK) {
+            ESP_LOGE(TAG, "Failed to program page at 0x%06X, size %u: %s", current_address, bytes_to_program_in_page, esp_err_to_name(ret));
+            return ret;
+        }
+
+        // 4. Wait for the chip to become idle after programming
+        CUSTUM_ERROR_CHECK(ext_flash_wait_for_idle());
+
+        current_address += bytes_to_program_in_page;
+        current_buffer += bytes_to_program_in_page;
+        bytes_remaining -= bytes_to_program_in_page;
+    }
+    ESP_LOGD(TAG, "Successfully wrote %u bytes to 0x%06X", size, address);
+    return ESP_OK;
+}
+
+/**
+ * @brief Erases a 4KB sector on the external flash chip.
+ * @param address Starting address of the sector to erase. Must be 4KB aligned.
+ * @return esp_err_t ESP_OK on success, error otherwise.
+ */
+esp_err_t ext_flash_erase_sector(uint32_t address) {
+    if (address % W25Q128JV_SECTOR_SIZE != 0) {
+        ESP_LOGE(TAG, "Erase address 0x%06X is not 4KB aligned!", address);
+        return ESP_ERR_INVALID_ARG;
+    }
+
+    // 1. Send Write Enable
+    CUSTUM_ERROR_CHECK(ext_flash_write_enable());
+
+    // 2. Prepare transaction for Sector Erase
+    spi_transaction_t t = {
+        .cmd = SPI_CMD_SECTOR_ERASE,
+        .addr = address,
+        .length = 0, // No data to send
+        .flags = 0,
+    };
+
+    // 3. Transmit Sector Erase command
+    esp_err_t ret = spi_device_transmit(spi, &t);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to erase sector at 0x%06X: %s", address, esp_err_to_name(ret));
+        return ret;
+    }
+
+    // 4. Wait for the chip to become idle after erasing
+    CUSTUM_ERROR_CHECK(ext_flash_wait_for_idle());
+    ESP_LOGD(TAG, "Successfully erased sector at 0x%06X", address);
+    return ESP_OK;
+}
+
+/**
+ * @brief Erases the entire external flash chip.
+ * @return esp_err_t ESP_OK on success, error otherwise.
+ */
+esp_err_t ext_flash_chip_erase(void) {
+    ESP_LOGW(TAG, "Performing full chip erase. This will take some time...");
+
+    // 1. Send Write Enable
+    CUSTUM_ERROR_CHECK(ext_flash_write_enable());
+
+    // 2. Prepare transaction for Chip Erase
+    spi_transaction_t t = {
+        .cmd = SPI_CMD_CHIP_ERASE,
+        .length = 0, // No data to send
+        .flags = 0,
+    };
+
+    // 3. Transmit Chip Erase command
+    esp_err_t ret = spi_device_transmit(spi, &t);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to chip erase: %s", esp_err_to_name(ret));
+        return ret;
+    }
+
+    // 4. Wait for the chip to become idle after erasing
+    CUSTUM_ERROR_CHECK(ext_flash_wait_for_idle());
+    ESP_LOGI(TAG, "Chip erase completed successfully.");
+    return ESP_OK;
+}
