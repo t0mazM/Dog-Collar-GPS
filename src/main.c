@@ -28,9 +28,15 @@ void app_main() {
 
     uint8_t jedec_id[3] = {0};
     ext_flash_read_jedec_data(jedec_id);
+
+    uint8_t status_reg = 0;
+    ext_flash_read_status_register(&status_reg);
+    ext_flash_write_enable();
+    ext_flash_read_status_register(&status_reg);
+
+
     
     //gps_l96_go_to_standby_mode();
-    
     // gps_l96_go_to_back_up_mode();
     // vTaskDelay(5000 / portTICK_PERIOD_MS); 
     // gps_l96_read_task();
