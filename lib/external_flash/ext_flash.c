@@ -94,3 +94,39 @@ esp_err_t ext_flash_read_jedec_data(uint8_t *buf) {
 spi_device_handle_t ext_flash_get_handle(void) {
     return spi;
 }
+
+esp_err_t ext_flash_write_enable(void) {
+    spi_transaction_t t = {
+        .length = 0,
+        .cmd = SPI_CMD_WRITE_ENABLE,
+    };
+    esp_err_t ret = spi_device_transmit(spi, &t);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to send Write Enable: %s", esp_err_to_name(ret));
+    }
+    ESP_LOGI(TAG, "Write Enable command sent (0x%02X)", SPI_CMD_WRITE_ENABLE);
+    return ret;
+}
+
+esp_err_t ext_flash_read_status_register(uint8_t *status_reg_value) {
+    spi_transaction_t t = {
+        .length = 8, // dummy bits
+        .rxlength = 8, // Expect 1 byte (8 bits) back
+        .cmd = SPI_CMD_READ_STATUS_REG1, // Command: Read Status Register-1 (0x05)
+        .flags = 0,
+    };
+
+    uint8_t received_status;
+    t.rx_buffer = &received_status;
+
+    esp_err_t ret = spi_device_transmit(spi, &t);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to read Status Register-1: %s", esp_err_to_name(ret));
+    } else {
+        *status_reg_value = received_status;
+        ESP_LOGI(TAG, "Read Status Register-1: 0x%02X", *status_reg_value);
+    }
+    return ret;
+}
+
+
