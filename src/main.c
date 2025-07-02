@@ -33,6 +33,7 @@ void app_main() {
     ext_flash_read_status_register(&status_reg);
     ext_flash_write_enable();
     ext_flash_read_status_register(&status_reg);
+    ext_flash_wait_for_idle(2000);
 
 
     

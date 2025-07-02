@@ -54,7 +54,7 @@ spi_device_handle_t ext_flash_get_spi_handle(void);
 // New functions for LittleFS integration
 esp_err_t ext_flash_write_enable(void);
 esp_err_t ext_flash_read_status_register(uint8_t *status);
-esp_err_t ext_flash_wait_for_idle(void);
+esp_err_t ext_flash_wait_for_idle(int timeout_ms);
 esp_err_t ext_flash_read(uint32_t address, uint8_t *buffer, uint32_t size);
 esp_err_t ext_flash_write(uint32_t address, const uint8_t *buffer, uint32_t size);
 esp_err_t ext_flash_erase_sector(uint32_t address);

@@ -4,6 +4,7 @@
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "esp_check.h"
 
 
 static const char *TAG = "EXT_FLASH";
@@ -129,4 +130,30 @@ esp_err_t ext_flash_read_status_register(uint8_t *status_reg_value) {
     return ret;
 }
 
+esp_err_t ext_flash_wait_for_idle(int timeout_ms) {
+    uint8_t status_reg;
 
+    // Start time for timeout calculation
+    TickType_t start_time = xTaskGetTickCount();
+
+    do {
+        ESP_RETURN_ON_ERROR(
+            ext_flash_read_status_register(&status_reg),
+            TAG, "Failed to read status register while waiting for flash operation to complete");
+
+        // Check the BUSY bit (LSB of status register)
+        if (!(status_reg & (1 << 0))) { 
+            ESP_LOGI(TAG, "Flash operation completed.");
+            return ESP_OK;
+        }
+
+        vTaskDelay(pdMS_TO_TICKS(1)); // Wait 1ms before polling again
+
+        if ((xTaskGetTickCount() - start_time) * portTICK_PERIOD_MS > timeout_ms) {
+            ESP_LOGE(TAG, "Timeout waiting for flash operation to complete. Status: 0x%02X", status_reg);
+            return ESP_ERR_TIMEOUT;
+        }
+    } while (true); 
+
+    return ESP_OK; 
+}
