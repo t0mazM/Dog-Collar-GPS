@@ -1,34 +1,35 @@
 #include "ext_flash.h"
-#include "driver/spi_master.h"
-#include "driver/gpio.h"
-#include "esp_log.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "esp_check.h"
+
 
 
 static const char *TAG = "EXT_FLASH";
 spi_device_handle_t spi;
 
 spi_bus_config_t get_spi_bus_config(void) {
-    return (spi_bus_config_t) {
-        .mosi_io_num = SPI_PIN_MOSI,
-        .miso_io_num = SPI_PIN_MISO,
-        .sclk_io_num = SPI_PIN_CLK,
-        .quadwp_io_num = -1,
-        .quadhd_io_num = -1,
-        .max_transfer_sz = SPI_MAX_TRANSFER_SIZE,
-    };
+    spi_bus_config_t spi_bus_config;
+    memset(&spi_bus_config, 0, sizeof(spi_bus_config)); // Clear all
+
+    spi_bus_config.mosi_io_num = SPI_PIN_MOSI;
+    spi_bus_config.miso_io_num = SPI_PIN_MISO;
+    spi_bus_config.sclk_io_num = SPI_PIN_CLK;
+    spi_bus_config.quadwp_io_num = -1;
+    spi_bus_config.quadhd_io_num = -1;
+    spi_bus_config.max_transfer_sz = SPI_MAX_TRANSFER_SIZE;
+
+    return spi_bus_config;
 }
 
 spi_device_interface_config_t get_spi_device_config(void) {
-    return (spi_device_interface_config_t) {
-        .command_bits = 8,
-        .clock_speed_hz = SPI_CLOCK_SPEED,
-        .mode = 0,
-        .spics_io_num = SPI_PIN_CS,
-        .queue_size = 1,
-    };
+    spi_device_interface_config_t devcfg;
+    memset(&devcfg, 0, sizeof(devcfg)); // Clear all fields to 0
+
+    devcfg.command_bits = 8;
+    devcfg.clock_speed_hz = SPI_CLOCK_SPEED;
+    devcfg.mode = 0;
+    devcfg.spics_io_num = SPI_PIN_CS;
+    devcfg.queue_size = 1;
+
+    return devcfg;
 }
 
 
@@ -51,11 +52,8 @@ void ext_flash_init(void) {
 }
 
 void ext_flash_reset_chip(void) {
-    spi_transaction_t t = {
-        .length = 0, 
-        .rxlength = 0, 
-        .flags = 0,  
-    };
+    spi_transaction_t t;
+    memset(&t, 0, sizeof(t)); // we only send command
 
     t.cmd = SPI_CMD_ENABLE_RESET; 
     CUSTUM_ERROR_CHECK(spi_device_transmit(spi, &t) );
@@ -69,14 +67,13 @@ void ext_flash_reset_chip(void) {
 
 // Read JEDEC ID: returns 3 bytes
 esp_err_t ext_flash_read_jedec_data(uint8_t *buf) {
-    
+    spi_transaction_t t;
+    memset(&t, 0, sizeof(t)); // Clear all fields to 0
+
     // Transaction for JEDEC ID command (0x9F) and 3 bytes of data
-    spi_transaction_t t = {
-        .length = SPI_JEDEC_DATA_BITS, 
-        .rxlength = SPI_JEDEC_DATA_BITS, 
-        .cmd = SPI_CMD_JEDEC_ID, 
-        .flags = 0,  
-    };
+    t.length = SPI_JEDEC_DATA_BITS;
+    t.rxlength = SPI_JEDEC_DATA_BITS;
+    t.cmd = SPI_CMD_JEDEC_ID;
 
     uint8_t recived_data[3]; // Buffer to hold the 3 received bytes from the flash chip
     t.rx_buffer = recived_data;
@@ -143,7 +140,7 @@ esp_err_t ext_flash_wait_for_idle(int timeout_ms) {
 
         // Check the BUSY bit (LSB of status register)
         if (!(status_reg & (1 << 0))) { 
-            ESP_LOGI(TAG, "Flash operation completed.");
+            ESP_LOGI(TAG, "Flash is not bussy.");
             return ESP_OK;
         }
 

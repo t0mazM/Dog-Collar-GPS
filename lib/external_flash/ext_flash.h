@@ -7,7 +7,14 @@
 #include "esp_err.h"
 #include "external_flash_gpio.h" // For WP and HOLD pin definitions
 #include "error_handling.h" 
+#include "driver/spi_master.h"
+#include "driver/gpio.h"
+#include "esp_log.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "esp_check.h"
 
+#include <string.h>
 
 #define SPI_PIN_MOSI GPIO_NUM_21
 #define SPI_PIN_MISO GPIO_NUM_0
