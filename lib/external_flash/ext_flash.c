@@ -249,3 +249,93 @@ esp_err_t ext_flash_write(uint32_t address, const uint8_t *buffer, uint32_t size
     }
     return ret;
 }
+
+esp_err_t ext_flash_erase_sector(uint32_t address) {
+    // Ensure the address is sector-aligned
+    if (address % W25Q128JV_SECTOR_SIZE != 0) {
+        ESP_LOGE(TAG, "Erase address 0x%06lX is not sector-aligned (4KB).", address);
+        return ESP_ERR_INVALID_ARG;
+    }
+
+    esp_err_t ret;
+
+    // 1. Send Write Enable command
+    ret = ext_flash_write_enable();
+    if (ret != ESP_OK) {
+        return ret;
+    }
+
+    // --- FIX: Wait for idle after Write Enable and before Sector Erase ---
+    ret = ext_flash_wait_for_idle(5000);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Flash not idle after Write Enable for erase operation.");
+        return ret;
+    }
+
+    spi_transaction_t t;
+    memset(&t, 0, sizeof(t)); // Clear all fields to 0
+
+    t.cmd = SPI_CMD_SECTOR_ERASE; // Command: Sector Erase (0x20)
+    t.addr = address;             // 24-bit address of the sector. address_bits is set in dev config.
+    // Dummy bits are 0 for Sector Erase, correctly handled by dev config default.
+
+    t.length = 0;    // No data to transmit
+    t.rxlength = 0;  // No data to receive
+
+    ret = spi_device_transmit(spi, &t);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to send Sector Erase command for 0x%06lX: %s", address, esp_err_to_name(ret));
+        return ret;
+    } else {
+        ESP_LOGI(TAG, "Sent Sector Erase command for 0x%06lX", address);
+    }
+
+    // 2. Wait for the erase operation to complete
+    ret = ext_flash_wait_for_idle(5000);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Flash not idle after sector erase operation.");
+    }
+    return ret;
+}
+
+
+esp_err_t ext_flash_chip_erase(void) {
+    esp_err_t ret;
+
+    // 1. Send Write Enable command
+    ret = ext_flash_write_enable();
+    if (ret != ESP_OK) {
+        return ret;
+    }
+
+    // --- FIX: Wait for idle after Write Enable and before Chip Erase ---
+    ret = ext_flash_wait_for_idle(5000);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Flash not idle after Write Enable for chip erase operation.");
+        return ret;
+    }
+
+    spi_transaction_t t;
+    memset(&t, 0, sizeof(t)); // Clear all fields to 0
+
+    t.cmd = SPI_CMD_CHIP_ERASE; // Command: Chip Erase (0xC7)
+    // No address or dummy bits for Chip Erase.
+
+    t.length = 0;    // No data to transmit
+    t.rxlength = 0;  // No data to receive
+
+    ret = spi_device_transmit(spi, &t);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to send Chip Erase command: %s", esp_err_to_name(ret));
+        return ret;
+    } else {
+        ESP_LOGI(TAG, "Sent Chip Erase command.");
+    }
+
+    // 2. Wait for the erase operation to complete
+    ret = ext_flash_wait_for_idle(5000);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Flash not idle after chip erase operation.");
+    }
+    return ret;
+}
