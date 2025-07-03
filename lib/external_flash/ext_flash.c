@@ -191,3 +191,61 @@ esp_err_t ext_flash_read(uint32_t address, uint8_t *buffer, uint32_t size) {
     }
     return ret;
 }
+esp_err_t ext_flash_write(uint32_t address, const uint8_t *buffer, uint32_t size) {
+    if (size == 0) {
+        return ESP_OK; // Nothing to write
+    }
+    if (size > W25Q128JV_PAGE_SIZE) {
+        ESP_LOGE(TAG, "Write size (%lu) exceeds page size (%d). Use multiple calls for larger data.", size, W25Q128JV_PAGE_SIZE);
+        return ESP_ERR_INVALID_SIZE;
+    }
+    // Ensure address is page-aligned if strictness is desired, though chip handles misaligned writes within page.
+    if (address % W25Q128JV_PAGE_SIZE != 0) {
+        ESP_LOGW(TAG, "Write address 0x%06lX is not page-aligned. Data will be written within the page.", address);
+    }
+
+    esp_err_t ret;
+
+    // 1. Send Write Enable command
+    ret = ext_flash_write_enable();
+    if (ret != ESP_OK) {
+        return ret;
+    }
+
+    // --- FIX: Wait for idle after Write Enable and before Page Program ---
+    ret = ext_flash_wait_for_idle(5000);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Flash not idle after Write Enable for write operation.");
+        return ret;
+    }
+
+    spi_transaction_t t;
+    memset(&t, 0, sizeof(t)); // Clear all fields to 0
+
+    t.cmd = SPI_CMD_PAGE_PROGRAM; // Command: Page Program (0x02)
+    t.addr = address;             // 24-bit address. address_bits is set in dev config.
+    // Dummy bits are 0 for Page Program, correctly handled by dev config default.
+
+    t.tx_buffer = (void *)buffer; // Data to transmit
+    t.length = size * 8;          // Total bits to transmit
+    t.rxlength = 0;               // No data received
+
+    // No specific flags like SPI_TRANS_USE_TXDATA needed when using tx_buffer
+    // unless size is <= 4 bytes and you want to use tx_data directly.
+    // For general purpose, tx_buffer is used.
+
+    ret = spi_device_transmit(spi, &t);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to write %lu bytes to 0x%06lX: %s", size, address, esp_err_to_name(ret));
+        return ret;
+    } else {
+        ESP_LOGD(TAG, "Sent Page Program command for %lu bytes to 0x%06lX", size, address);
+    }
+
+    // 2. Wait for the write operation to complete
+    ret = ext_flash_wait_for_idle(5000);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Flash not idle after write operation.");
+    }
+    return ret;
+}
