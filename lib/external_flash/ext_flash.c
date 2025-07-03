@@ -154,3 +154,40 @@ esp_err_t ext_flash_wait_for_idle(int timeout_ms) {
 
     return ESP_OK; 
 }
+
+
+/**
+ * @brief Reads data from the flash chip at a specified address.
+ * Uses the Fast Read (0x0B) command for efficiency.
+ * @param address The 24-bit address to start reading from.
+ * @param buffer Pointer to the buffer to store the read data.
+ * @param size The number of bytes to read.
+ * @return ESP_OK on success, or an error code on failure.
+ */
+esp_err_t ext_flash_read(uint32_t address, uint8_t *buffer, uint32_t size) {
+    if (size == 0) {
+        return ESP_OK; // Nothing to read
+    }
+    if (size > SPI_MAX_TRANSFER_SIZE) {
+        ESP_LOGE(TAG, "Read size (%lu) exceeds max transfer size (%d). Consider breaking into smaller reads.", size, SPI_MAX_TRANSFER_SIZE);
+        return ESP_ERR_INVALID_SIZE;
+    }
+
+    spi_transaction_t t;
+    memset(&t, 0, sizeof(t)); // Clear all fields to 0
+
+    t.cmd = SPI_CMD_FAST_READ; // Command: Fast Read (0x0B)
+    t.addr = address;          // 24-bit address. address_bits and dummy_bits are now set in dev config.
+
+    t.rx_buffer = buffer;      // Buffer to receive data
+    t.rxlength = size * 8;     // Total bits to receive
+    t.length = size * 8;       // <--- FIX: Set length equal to rxlength for full-duplex read
+
+    esp_err_t ret = spi_device_transmit(spi, &t);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to read %lu bytes from 0x%06lX: %s", size, address, esp_err_to_name(ret));
+    } else {
+        ESP_LOGD(TAG, "Read %lu bytes from 0x%06lX", size, address);
+    }
+    return ret;
+}
