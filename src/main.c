@@ -11,6 +11,8 @@
 #include "freertos/task.h"
 #include "esp_log.h"
 
+static const char *MAIN_TAG = "MAIN";
+
 void app_main() {
 
     vTaskDelay(3000 / portTICK_PERIOD_MS); // Delay to allow system to stabilize

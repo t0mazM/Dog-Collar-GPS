@@ -23,11 +23,14 @@ spi_device_interface_config_t get_spi_device_config(void) {
     spi_device_interface_config_t devcfg;
     memset(&devcfg, 0, sizeof(devcfg)); // Clear all fields to 0
 
-    devcfg.command_bits = 8;
-    devcfg.clock_speed_hz = SPI_CLOCK_SPEED;
-    devcfg.mode = 0;
+    devcfg.command_bits = 8; // 8-bit command
+    devcfg.address_bits = 24; // Set default address bits to 24 for W25Q128JV for commands that use addresses
+    devcfg.dummy_bits = 8;   // Set default dummy bits to 8 for Fast Read (0x0B)
+    devcfg.clock_speed_hz = SPI_CLOCK_SPEED,
+    devcfg.mode = 0; 
     devcfg.spics_io_num = SPI_PIN_CS;
     devcfg.queue_size = 1;
+
 
     return devcfg;
 }
@@ -52,39 +55,61 @@ void ext_flash_init(void) {
 }
 
 void ext_flash_reset_chip(void) {
-    spi_transaction_t t;
-    memset(&t, 0, sizeof(t)); // we only send command
+    spi_transaction_ext_t t;
+    memset(&t, 0, sizeof(t));
+    
+    // Reset commands have NO address, NO dummy bits, and NO data
+    t.base.length = 0;
+    t.base.rxlength = 0;
+    t.base.flags = SPI_TRANS_VARIABLE_ADDR | SPI_TRANS_VARIABLE_DUMMY;
+    t.address_bits = 0;
+    t.dummy_bits = 0;
 
-    t.cmd = SPI_CMD_ENABLE_RESET; 
-    CUSTUM_ERROR_CHECK(spi_device_transmit(spi, &t) );
-
+    // Send Enable Reset command
+    t.base.cmd = SPI_CMD_ENABLE_RESET;
+    CUSTUM_ERROR_CHECK(spi_device_transmit(spi, (spi_transaction_t*)&t));
     ESP_LOGI(TAG, "Sent Enable Reset (0x%02X)", SPI_CMD_ENABLE_RESET);
 
-    t.cmd = SPI_CMD_RESET_DEVICE; 
-    CUSTUM_ERROR_CHECK(spi_device_transmit(spi, &t));
+    // Send Reset Device command
+    t.base.cmd = SPI_CMD_RESET_DEVICE;
+    CUSTUM_ERROR_CHECK(spi_device_transmit(spi, (spi_transaction_t*)&t));
     ESP_LOGI(TAG, "Sent Reset Device (0x%02X)", SPI_CMD_RESET_DEVICE);
 }
 
-// Read JEDEC ID: returns 3 bytes
 esp_err_t ext_flash_read_jedec_data(uint8_t *buf) {
-    spi_transaction_t t;
+    spi_transaction_ext_t t; // Use spi_transaction_ext_t for per-transaction config
     memset(&t, 0, sizeof(t)); // Clear all fields to 0
 
-    // Transaction for JEDEC ID command (0x9F) and 3 bytes of data
-    t.length = SPI_JEDEC_DATA_BITS;
-    t.rxlength = SPI_JEDEC_DATA_BITS;
-    t.cmd = SPI_CMD_JEDEC_ID;
+    // JEDEC ID command has NO address and NO dummy bits
+    t.base.cmd = SPI_CMD_JEDEC_ID;
+    t.base.length = SPI_JEDEC_DATA_BITS;
+    t.base.rxlength = SPI_JEDEC_DATA_BITS;
+    // Set flags to enable per-transaction override for address and dummy bits
+    t.base.flags = SPI_TRANS_VARIABLE_ADDR | SPI_TRANS_VARIABLE_DUMMY | SPI_TRANS_USE_TXDATA; 
+    t.base.tx_data[0] = 0x00; // Dummy byte (or bytes) to clock out
+    t.base.tx_data[1] = 0x00;
+    t.base.tx_data[2] = 0x00;
+    
+    // Override device defaults for this specific transaction
+    t.address_bits = 0;  // No address phase for JEDEC ID
+    t.dummy_bits = 0;    // No dummy bits for JEDEC ID
 
-    uint8_t recived_data[3]; // Buffer to hold the 3 received bytes from the flash chip
-    t.rx_buffer = recived_data;
+    uint8_t received_data[3]; // Buffer to hold the 3 received bytes
+    t.base.rx_buffer = received_data;
 
-    CUSTUM_ERROR_CHECK( spi_device_transmit(spi, &t));
+    // Cast to spi_transaction_t* when transmitting
+    esp_err_t ret = spi_device_transmit(spi, (spi_transaction_t*)&t);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to transmit JEDEC ID command: %s", esp_err_to_name(ret));
+        return ret;
+    }
 
-    buf[0] = recived_data[0]; // Manufacturer ID
-    buf[1] = recived_data[1]; // Memory Type
-    buf[2] = recived_data[2]; // Capacity
+    buf[0] = received_data[0]; // Manufacturer ID
+    buf[1] = received_data[1]; // Memory Type
+    buf[2] = received_data[2]; // Capacity
 
-    ESP_LOGI(TAG, "JEDEC ID: %02X %02X %02X", buf[0], buf[1], buf[2]);
+    ESP_LOGI(TAG, "JEDEC ID: Manufacturer: 0x%02X, Memory Type: 0x%02X, Capacity: 0x%02X",
+             buf[0], buf[1], buf[2]);
     return ESP_OK;
 }
 
@@ -94,11 +119,20 @@ spi_device_handle_t ext_flash_get_handle(void) {
 }
 
 esp_err_t ext_flash_write_enable(void) {
-    spi_transaction_t t = {
-        .length = 0,
-        .cmd = SPI_CMD_WRITE_ENABLE,
-    };
-    esp_err_t ret = spi_device_transmit(spi, &t);
+    spi_transaction_ext_t t;
+    memset(&t, 0, sizeof(t));
+    
+    // Write Enable command has NO address, NO dummy bits, and NO data
+    t.base.cmd = SPI_CMD_WRITE_ENABLE;
+    t.base.length = 0;       // No data to transmit
+    t.base.rxlength = 0;     // No data to receive
+    t.base.flags = SPI_TRANS_VARIABLE_ADDR | SPI_TRANS_VARIABLE_DUMMY;
+    
+    // Override device defaults for this transaction
+    t.address_bits = 0;      // No address phase for Write Enable
+    t.dummy_bits = 0;        // No dummy bits for Write Enable
+
+    esp_err_t ret = spi_device_transmit(spi, (spi_transaction_t*)&t);
     if (ret != ESP_OK) {
         ESP_LOGE(TAG, "Failed to send Write Enable: %s", esp_err_to_name(ret));
     }
@@ -107,17 +141,23 @@ esp_err_t ext_flash_write_enable(void) {
 }
 
 esp_err_t ext_flash_read_status_register(uint8_t *status_reg_value) {
-    spi_transaction_t t = {
-        .length = 8, // dummy bits
-        .rxlength = 8, // Expect 1 byte (8 bits) back
-        .cmd = SPI_CMD_READ_STATUS_REG1, // Command: Read Status Register-1 (0x05)
-        .flags = 0,
-    };
+    spi_transaction_ext_t t;
+    memset(&t, 0, sizeof(t));
+    
+    // Status Register Read command has NO address and NO dummy bits
+    t.base.cmd = SPI_CMD_READ_STATUS_REG1;
+    t.base.length = 8;       // 1 byte (8 bits) to receive
+    t.base.rxlength = 8;     // 1 byte (8 bits) to receive
+    t.base.flags = SPI_TRANS_VARIABLE_ADDR | SPI_TRANS_VARIABLE_DUMMY;
+    
+    // Override device defaults for this transaction
+    t.address_bits = 0;      // No address phase for Status Register Read
+    t.dummy_bits = 0;        // No dummy bits for Status Register Read
 
     uint8_t received_status;
-    t.rx_buffer = &received_status;
+    t.base.rx_buffer = &received_status;
 
-    esp_err_t ret = spi_device_transmit(spi, &t);
+    esp_err_t ret = spi_device_transmit(spi, (spi_transaction_t*)&t);
     if (ret != ESP_OK) {
         ESP_LOGE(TAG, "Failed to read Status Register-1: %s", esp_err_to_name(ret));
     } else {
