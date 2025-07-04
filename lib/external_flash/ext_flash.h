@@ -67,4 +67,7 @@ esp_err_t ext_flash_write(uint32_t address, const uint8_t *buffer, uint32_t size
 esp_err_t ext_flash_erase_sector(uint32_t address);
 esp_err_t ext_flash_chip_erase(void);
 
+
+void ext_flash_complete_test(void); //Just a quick test function to check if the flash is working correctly
+
 #endif  // EXT_FLASH_H

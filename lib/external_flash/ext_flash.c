@@ -223,6 +223,7 @@ esp_err_t ext_flash_read(uint32_t address, uint8_t *buffer, uint32_t size) {
     t.rxlength = size * 8;     // Total bits to receive
     t.length = size * 8;       // <--- FIX: Set length equal to rxlength for full-duplex read
 
+    vTaskDelay(pdMS_TO_TICKS(10)); 
     esp_err_t ret = spi_device_transmit(spi, &t);
     if (ret != ESP_OK) {
         ESP_LOGE(TAG, "Failed to read %lu bytes from 0x%06lX: %s", size, address, esp_err_to_name(ret));
@@ -251,6 +252,7 @@ esp_err_t ext_flash_write(uint32_t address, const uint8_t *buffer, uint32_t size
     if (ret != ESP_OK) {
         return ret;
     }
+    printf("Write enable set to 1 for writeing \n");
 
     // --- FIX: Wait for idle after Write Enable and before Page Program ---
     ret = ext_flash_wait_for_idle(5000);
@@ -258,6 +260,13 @@ esp_err_t ext_flash_write(uint32_t address, const uint8_t *buffer, uint32_t size
         ESP_LOGE(TAG, "Flash not idle after Write Enable for write operation.");
         return ret;
     }
+    ret = ext_flash_write_enable();
+    if (ret != ESP_OK) {
+        return ret;
+    }
+    uint8_t status = 0;
+    ext_flash_read_status_register(&status);
+    printf("Write enable status, we will write now: %x \n", status);
 
     spi_transaction_t t;
     memset(&t, 0, sizeof(t)); // Clear all fields to 0
@@ -268,11 +277,9 @@ esp_err_t ext_flash_write(uint32_t address, const uint8_t *buffer, uint32_t size
 
     t.tx_buffer = (void *)buffer; // Data to transmit
     t.length = size * 8;          // Total bits to transmit
-    t.rxlength = 0;               // No data received
+    t.rxlength = 0;               // No data received for write operations
 
-    // No specific flags like SPI_TRANS_USE_TXDATA needed when using tx_buffer
-    // unless size is <= 4 bytes and you want to use tx_data directly.
-    // For general purpose, tx_buffer is used.
+    vTaskDelay(pdMS_TO_TICKS(10)); 
 
     ret = spi_device_transmit(spi, &t);
     if (ret != ESP_OK) {
@@ -378,4 +385,63 @@ esp_err_t ext_flash_chip_erase(void) {
         ESP_LOGE(TAG, "Flash not idle after chip erase operation.");
     }
     return ret;
+}
+
+void ext_flash_complete_test(void) {
+
+    uint32_t test_address = 0x000000; 
+    uint8_t write_data[W25Q128JV_PAGE_SIZE]; 
+    uint8_t read_buffer[W25Q128JV_PAGE_SIZE]; 
+
+    // Fill the write_data buffer with some data 
+    for (int i = 0; i < W25Q128JV_PAGE_SIZE; i++) {
+        write_data[i] =  4; 
+    }
+
+    //1. Erase the target sector
+    ESP_LOGI(TAG, "Erasing sector at 0x%06lX...", test_address);
+    if (ext_flash_erase_sector(test_address) != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to erase sector at 0x%06lX. Aborting test.", test_address);
+        return;
+    }
+    ESP_LOGI(TAG, "Sector at 0x%06lX erased successfully.", test_address);
+
+    // 2. Write data to the flash
+    ESP_LOGI(TAG, "Writing %d bytes to 0x%06lX...", W25Q128JV_PAGE_SIZE, test_address);
+    if (ext_flash_write(test_address, write_data, W25Q128JV_PAGE_SIZE) != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to write data to 0x%06lX. Aborting test.", test_address);
+        return;
+    }
+    ESP_LOGI(TAG, "Data written successfully to 0x%06lX.", test_address);
+
+    // 3. Read data back from the flash
+    ESP_LOGI(TAG, "Reading %d bytes from 0x%06lX...", W25Q128JV_PAGE_SIZE, test_address);
+    memset(read_buffer, 0, sizeof(read_buffer)); // Clear the read buffer to ensure no old data interferes
+    if (ext_flash_read(test_address, read_buffer, W25Q128JV_PAGE_SIZE) != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to read data from 0x%06lX. Aborting test.", test_address);
+        return;
+    }
+    ESP_LOGI(TAG, "Data read successfully from 0x%06lX.", test_address);
+    
+    // Print write buffer
+    ESP_LOGI(TAG, "Write Buffer:");
+    for (int i = 0; i < 32; i += 16) {
+        char hex_line[64] = {0};
+        char *ptr = hex_line;
+        for (int j = 0; j < 16 && (i + j) < 32; j++) {
+            ptr += sprintf(ptr, "%02X ", write_data[i + j]);
+        }
+        ESP_LOGI(TAG, "[%02d-%02d]: %s", i, i + 15, hex_line);
+    }
+    
+    // Print read buffer
+    ESP_LOGI(TAG, "Read Buffer:");
+    for (int i = 0; i < 32; i += 16) {
+        char hex_line[64] = {0};
+        char *ptr = hex_line;
+        for (int j = 0; j < 16 && (i + j) < 32; j++) {
+            ptr += sprintf(ptr, "%02X ", read_buffer[i + j]);
+        }
+        ESP_LOGI(TAG, "[%02d-%02d]: %s", i, i + 15, hex_line);
+    }
 }
