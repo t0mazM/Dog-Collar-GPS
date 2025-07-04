@@ -46,14 +46,14 @@
 #define SPI_CMD_JEDEC_ID            0x9F // Read JEDEC ID
 #define SPI_CMD_ENABLE_RESET        0x66 // Enable Reset
 #define SPI_CMD_RESET_DEVICE        0x99 // Reset Device
-
+#define SPI_CMD_GLOBAL_BLOCK_UNLOCK 0x98 // Global Block Unlock (W25Q128JV specific)
 // --- W25Q128JV Flash Parameters ---
 #define W25Q128JV_PAGE_SIZE         256      // Bytes per page
 #define W25Q128JV_SECTOR_SIZE       4096     // Bytes per 4KB sector
 #define W25Q128JV_TOTAL_SIZE_BYTES  (16 * 1024 * 1024) // 128M-bit = 16M-byte
 
 
-void ext_flash_reset_chip(void);
+esp_err_t ext_flash_reset_chip(void);
 void ext_flash_init(void);
 esp_err_t ext_flash_read_jedec_data(uint8_t *buf);
 spi_device_handle_t ext_flash_get_spi_handle(void);
@@ -66,6 +66,7 @@ esp_err_t ext_flash_read(uint32_t address, uint8_t *buffer, uint32_t size);
 esp_err_t ext_flash_write(uint32_t address, const uint8_t *buffer, uint32_t size);
 esp_err_t ext_flash_erase_sector(uint32_t address);
 esp_err_t ext_flash_chip_erase(void);
+esp_err_t ext_flash_global_block_unlock(void);
 
 
 void ext_flash_complete_test(void); //Just a quick test function to check if the flash is working correctly
