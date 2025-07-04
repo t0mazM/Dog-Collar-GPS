@@ -155,3 +155,84 @@ void lfs_list_directory(const char *path) {
     lfs_dir_close(&lfs, &dir);
 }
 
+void file_system_test(void){
+// Mount LittleFS. Set 'true' to format if mounting fails (e.g., first boot)
+    if (lfs_mount_filesystem(true) != ESP_OK) {
+        ESP_LOGE(LFS_TAG, "Failed to mount LittleFS. Aborting application.");
+        return;
+    }
+
+
+    lfs_file_t file;
+    int err;
+
+    const char *test_filename = "data.txt";
+    const char *write_data_1 = "This is the first line.\n";
+    const char *write_data_2 = "This is the second line.";
+    char read_buffer[100];
+    memset(read_buffer, 0, sizeof(read_buffer));
+
+    // 1. Write to a file
+    ESP_LOGI(LFS_TAG, "Attempting to create and write to file: %s", test_filename);
+    err = lfs_file_open(&lfs, &file, test_filename, LFS_O_WRONLY | LFS_O_CREAT | LFS_O_TRUNC);
+    if (err) {
+        ESP_LOGE(LFS_TAG, "Failed to open file %s for writing (%d)", test_filename, err);
+    } else {
+        lfs_ssize_t bytes_written = lfs_file_write(&lfs, &file, write_data_1, strlen(write_data_1));
+        if (bytes_written < 0) {
+            ESP_LOGE(LFS_TAG, "Failed to write data_1 to file %s (%d)", test_filename, (int)bytes_written);
+        } else {
+            ESP_LOGI(LFS_TAG, "Successfully wrote %ld bytes of data_1 to %s", bytes_written, test_filename);
+        }
+        lfs_file_close(&lfs, &file); // Close the file
+    }
+
+    // 2. Append to the same file
+    ESP_LOGI(LFS_TAG, "Attempting to append to file: %s", test_filename);
+    err = lfs_file_open(&lfs, &file, test_filename, LFS_O_WRONLY | LFS_O_APPEND);
+    if (err) {
+        ESP_LOGE(LFS_TAG, "Failed to open file %s for appending (%d)", test_filename, err);
+    } else {
+        lfs_ssize_t bytes_written = lfs_file_write(&lfs, &file, write_data_2, strlen(write_data_2));
+        if (bytes_written < 0) {
+            ESP_LOGE(LFS_TAG, "Failed to write data_2 to file %s (%d)", test_filename, (int)bytes_written);
+        } else {
+            ESP_LOGI(LFS_TAG, "Successfully appended %ld bytes of data_2 to %s", bytes_written, test_filename);
+        }
+        lfs_file_close(&lfs, &file); // Close the file
+    }
+
+    // 3. Read the file back
+    ESP_LOGI(LFS_TAG, "Attempting to read from file: %s", test_filename);
+    err = lfs_file_open(&lfs, &file, test_filename, LFS_O_RDONLY);
+    if (err) {
+        ESP_LOGE(LFS_TAG, "Failed to open file %s for reading (%d)", test_filename, err);
+    } else {
+        lfs_ssize_t bytes_read = lfs_file_read(&lfs, &file, read_buffer, sizeof(read_buffer) - 1);
+        if (bytes_read < 0) {
+            ESP_LOGE(LFS_TAG, "Failed to read from file %s (%d)", test_filename, (int)bytes_read);
+        } else {
+            read_buffer[bytes_read] = '\0'; // Null-terminate the string
+            ESP_LOGI(LFS_TAG, "Content of %s: '%s'", test_filename, read_buffer);
+        }
+        lfs_file_close(&lfs, &file); // Close the file
+    }
+
+    // 4. List directory contents
+    lfs_list_directory("/"); // List root directory
+
+    // 5. Example of removing a file
+    ESP_LOGI(LFS_TAG, "Attempting to remove file: %s", test_filename);
+    err = lfs_remove(&lfs, test_filename);
+    if (err) {
+        ESP_LOGE(LFS_TAG, "Failed to remove file %s (%d)", test_filename, err);
+    } else {
+        ESP_LOGI(LFS_TAG, "Successfully removed file %s", test_filename);
+    }
+    
+    lfs_list_directory("/"); // Should show an empty directory if no other files exist
+
+    // Unmount LittleFS when done
+    //lfs_unmount_filesystem();
+    ESP_LOGI(LFS_TAG, "Application finished.");
+}
