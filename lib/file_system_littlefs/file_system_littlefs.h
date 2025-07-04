@@ -15,7 +15,7 @@
 #define LFS_BLOCK_SIZE          W25Q128JV_SECTOR_SIZE // 4KB sector for W25Q128JV
 #define LFS_BLOCK_COUNT         (W25Q128JV_TOTAL_SIZE_BYTES / LFS_BLOCK_SIZE) // Total number of 4KB blocks
 #define LFS_BLOCK_CYCLES        500     // Number of erase cycles before moving block (wear leveling)
-#define LFS_CACHE_SIZE          512     // Cache size for read/write/erase operations (multiple of LFS_PROG_SIZE)
+#define LFS_CACHE_SIZE          256     // Cache size for read/write/erase operations (multiple of LFS_PROG_SIZE)
 #define LFS_LOOKAHEAD_SIZE      16      // Size of the lookahead buffer (in bytes), multiple of 8
 
 // Public functions for LittleFS integration
