@@ -1,7 +1,5 @@
 #include "file_system_littlefs.h"
-#include "ext_flash.h" // Your existing flash driver header
-#include "esp_log.h"
-#include <string.h>
+
 
 static const char *LFS_TAG = "LFS_INTEGRATION";
 
@@ -232,7 +230,25 @@ void file_system_test(void){
     
     lfs_list_directory("/"); // Should show an empty directory if no other files exist
 
-    // Unmount LittleFS when done
-    //lfs_unmount_filesystem();
     ESP_LOGI(LFS_TAG, "Application finished.");
+}
+
+esp_err_t lfs_append_to_file(const char* data, const char* filename){
+    lfs_file_t file;
+
+    ESP_LOGI(LFS_TAG, "Attempting to append to file: %s", filename);
+
+    ESP_RETURN_ON_ERROR(lfs_file_open(&lfs, &file, filename, LFS_O_WRONLY | LFS_O_APPEND), 
+                        LFS_TAG,
+                        "Failed to open file %s for appending", filename);
+
+    lfs_ssize_t bytes_written = lfs_file_write(&lfs, &file, data, strlen(data));
+    if (bytes_written < 0) {
+        ESP_LOGE(LFS_TAG, "Failed to write data to file %s (%d)", filename, (int)bytes_written);
+    } else {
+        ESP_LOGI(LFS_TAG, "Successfully appended %ld bytes to %s", bytes_written, filename);
+    }
+
+    lfs_file_close(&lfs, &file);
+    return ESP_OK;
 }

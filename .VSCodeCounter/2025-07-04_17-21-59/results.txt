@@ -1,0 +1,71 @@
+Date : 2025-07-04 17:21:59
+Directory : c:\Users\tomaz.miklavcic\Documents\Code\Dog-Collar-GPS
+Total : 30 files,  7357 codes, 1379 comments, 1601 blanks, all 10337 lines
+
+Languages
++----------+------------+------------+------------+------------+------------+
+| language | files      | code       | comment    | blank      | total      |
++----------+------------+------------+------------+------------+------------+
+| C        |         22 |      7,082 |      1,304 |      1,537 |      9,923 |
+| C++      |          4 |        262 |         66 |         58 |        386 |
+| CMake    |          3 |          7 |          0 |          5 |         12 |
+| Ini      |          1 |          6 |          9 |          1 |         16 |
++----------+------------+------------+------------+------------+------------+
+
+Directories
++--------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                                   | files      | code       | comment    | blank      | total      |
++--------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                                      |         30 |      7,357 |      1,379 |      1,601 |     10,337 |
+| . (Files)                                                                                              |          2 |          9 |          9 |          2 |         20 |
+| lib                                                                                                    |         26 |      7,310 |      1,361 |      1,586 |     10,257 |
+| lib\ERROR_HANDLING                                                                                     |          2 |         13 |          2 |          4 |         19 |
+| lib\I2C                                                                                                |          6 |        245 |         16 |         68 |        329 |
+| lib\I2C (Files)                                                                                        |          2 |         93 |          7 |         33 |        133 |
+| lib\I2C\battery_monitor                                                                                |          2 |         93 |          1 |         20 |        114 |
+| lib\I2C\gpio_extender                                                                                  |          2 |         59 |          8 |         15 |         82 |
+| lib\UART                                                                                               |          7 |        952 |        222 |        237 |      1,411 |
+| lib\UART (Files)                                                                                       |          2 |         58 |         26 |         26 |        110 |
+| lib\UART\gps_l96                                                                                       |          5 |        894 |        196 |        211 |      1,301 |
+| lib\external_flash                                                                                     |          4 |        425 |         34 |        108 |        567 |
+| lib\file_system_littlefs                                                                               |          3 |        202 |         25 |         44 |        271 |
+| lib\littlefs                                                                                           |          4 |      5,473 |      1,062 |      1,125 |      7,660 |
+| src                                                                                                    |          2 |         38 |          9 |         13 |         60 |
++--------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++--------------------------------------------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| filename                                                                                               | language | code       | comment    | blank      | total      |
++--------------------------------------------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| c:\Users\tomaz.miklavcic\Documents\Code\Dog-Collar-GPS\CMakeLists.txt                                  | CMake    |          3 |          0 |          1 |          4 |
+| c:\Users\tomaz.miklavcic\Documents\Code\Dog-Collar-GPS\lib\ERROR_HANDLING\error_handling.h             | C++      |         12 |          2 |          4 |         18 |
+| c:\Users\tomaz.miklavcic\Documents\Code\Dog-Collar-GPS\lib\ERROR_HANDLING\errror_handling.c            | C        |          1 |          0 |          0 |          1 |
+| c:\Users\tomaz.miklavcic\Documents\Code\Dog-Collar-GPS\lib\I2C\battery_monitor\battery_monitor.c       | C        |         71 |          0 |         12 |         83 |
+| c:\Users\tomaz.miklavcic\Documents\Code\Dog-Collar-GPS\lib\I2C\battery_monitor\battery_monitor.h       | C++      |         22 |          1 |          8 |         31 |
+| c:\Users\tomaz.miklavcic\Documents\Code\Dog-Collar-GPS\lib\I2C\gpio_extender\gpio_extender.c           | C        |         39 |          6 |         10 |         55 |
+| c:\Users\tomaz.miklavcic\Documents\Code\Dog-Collar-GPS\lib\I2C\gpio_extender\gpio_extender.h           | C        |         20 |          2 |          5 |         27 |
+| c:\Users\tomaz.miklavcic\Documents\Code\Dog-Collar-GPS\lib\I2C\i2c.c                                   | C        |         65 |          3 |         26 |         94 |
+| c:\Users\tomaz.miklavcic\Documents\Code\Dog-Collar-GPS\lib\I2C\i2c.h                                   | C++      |         28 |          4 |          7 |         39 |
+| c:\Users\tomaz.miklavcic\Documents\Code\Dog-Collar-GPS\lib\UART\gps_l96\gps_l96.c                      | C        |        109 |         11 |         35 |        155 |
+| c:\Users\tomaz.miklavcic\Documents\Code\Dog-Collar-GPS\lib\UART\gps_l96\gps_l96.h                      | C        |         28 |         70 |         18 |        116 |
+| c:\Users\tomaz.miklavcic\Documents\Code\Dog-Collar-GPS\lib\UART\gps_l96\minmea.c                       | C        |        544 |         48 |        105 |        697 |
+| c:\Users\tomaz.miklavcic\Documents\Code\Dog-Collar-GPS\lib\UART\gps_l96\minmea.h                       | C++      |        200 |         59 |         39 |        298 |
+| c:\Users\tomaz.miklavcic\Documents\Code\Dog-Collar-GPS\lib\UART\gps_l96\nmea_commands.h                | C        |         13 |          8 |         14 |         35 |
+| c:\Users\tomaz.miklavcic\Documents\Code\Dog-Collar-GPS\lib\UART\uart.c                                 | C        |         33 |          3 |         12 |         48 |
+| c:\Users\tomaz.miklavcic\Documents\Code\Dog-Collar-GPS\lib\UART\uart.h                                 | C        |         25 |         23 |         14 |         62 |
+| c:\Users\tomaz.miklavcic\Documents\Code\Dog-Collar-GPS\lib\external_flash\ext_flash.c                  | C        |        345 |         20 |         84 |        449 |
+| c:\Users\tomaz.miklavcic\Documents\Code\Dog-Collar-GPS\lib\external_flash\ext_flash.h                  | C        |         56 |          4 |         14 |         74 |
+| c:\Users\tomaz.miklavcic\Documents\Code\Dog-Collar-GPS\lib\external_flash\external_flash_gpio.c        | C        |         17 |          2 |          6 |         25 |
+| c:\Users\tomaz.miklavcic\Documents\Code\Dog-Collar-GPS\lib\external_flash\external_flash_gpio.h        | C        |          7 |          8 |          4 |         19 |
+| c:\Users\tomaz.miklavcic\Documents\Code\Dog-Collar-GPS\lib\file_system_littlefs\CMakeLists.txt         | CMake    |          0 |          0 |          1 |          1 |
+| c:\Users\tomaz.miklavcic\Documents\Code\Dog-Collar-GPS\lib\file_system_littlefs\file_system_littlefs.c | C        |        183 |         19 |         36 |        238 |
+| c:\Users\tomaz.miklavcic\Documents\Code\Dog-Collar-GPS\lib\file_system_littlefs\file_system_littlefs.h | C        |         19 |          6 |          7 |         32 |
+| c:\Users\tomaz.miklavcic\Documents\Code\Dog-Collar-GPS\lib\littlefs\lfs.c                              | C        |      4,958 |        634 |        954 |      6,546 |
+| c:\Users\tomaz.miklavcic\Documents\Code\Dog-Collar-GPS\lib\littlefs\lfs.h                              | C        |        307 |        368 |        127 |        802 |
+| c:\Users\tomaz.miklavcic\Documents\Code\Dog-Collar-GPS\lib\littlefs\lfs_util.c                         | C        |         19 |         10 |          9 |         38 |
+| c:\Users\tomaz.miklavcic\Documents\Code\Dog-Collar-GPS\lib\littlefs\lfs_util.h                         | C        |        189 |         50 |         35 |        274 |
+| c:\Users\tomaz.miklavcic\Documents\Code\Dog-Collar-GPS\platformio.ini                                  | Ini      |          6 |          9 |          1 |         16 |
+| c:\Users\tomaz.miklavcic\Documents\Code\Dog-Collar-GPS\src\CMakeLists.txt                              | CMake    |          4 |          0 |          3 |          7 |
+| c:\Users\tomaz.miklavcic\Documents\Code\Dog-Collar-GPS\src\main.c                                      | C        |         34 |          9 |         10 |         53 |
+| Total                                                                                                  |          |      7,357 |      1,379 |      1,601 |     10,337 |
++--------------------------------------------------------------------------------------------------------+----------+------------+------------+------------+------------+
