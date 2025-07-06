@@ -255,3 +255,22 @@ esp_err_t lfs_append_to_file(const char* data, const char* filename){
     lfs_file_close(&lfs, &file);
     return ESP_OK;
 }
+
+static esp_err_t lfs_create_new_file_name(const char* prefix, const char* suffix, char* filename, size_t filename_size) {
+
+    time_t current_time = time(NULL);
+    // Format: prefix + current_time(for randomness) + suffix (.csv)
+    int err = snprintf(filename, filename_size, "%s_%lu%s", prefix, (unsigned long)current_time, suffix);
+
+    /* 
+    Check if snprintf was successful
+    it returns the number of characters written, or a negative value on error
+    But all that matters (to me) is that it returns a value less than buffer_size
+    */
+    if(err < 0) {
+        ESP_LOGE(LFS_TAG, "Failed to create new file name");
+        return ESP_FAIL;
+    }
+
+    return ESP_OK;
+}
