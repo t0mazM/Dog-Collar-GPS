@@ -9,6 +9,8 @@
 #include "esp_check.h"
 #include "esp_log.h"
 
+#include "esp_log.h"
+#include <string.h>
 
 // LittleFS specific defines (adjust these based on your flash characteristics and desired LittleFS configuration)
 // These are crucial for defining how LittleFS sees your flash memory.
@@ -27,6 +29,7 @@ esp_err_t lfs_mount_filesystem(bool format_if_fail);
 esp_err_t lfs_unmount_filesystem(void);
 void lfs_list_directory(const char *path);
 void file_system_test(void);
+esp_err_t lfs_append_to_file(const char* data, const char* filename);
 
 
 extern lfs_t lfs;

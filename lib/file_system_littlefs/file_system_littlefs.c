@@ -243,12 +243,15 @@ esp_err_t lfs_append_to_file(const char* data, const char* filename){
                         "Failed to open file %s for appending", filename);
 
     lfs_ssize_t bytes_written = lfs_file_write(&lfs, &file, data, strlen(data));
+
+    // Check if the write operation was successful (NEG values indicate an error)
     if (bytes_written < 0) {
         ESP_LOGE(LFS_TAG, "Failed to write data to file %s (%d)", filename, (int)bytes_written);
-    } else {
-        ESP_LOGI(LFS_TAG, "Successfully appended %ld bytes to %s", bytes_written, filename);
+        return ESP_FAIL;
     }
 
+    ESP_LOGI(LFS_TAG, "Successfully appended %ld bytes to %s", bytes_written, filename);
+    
     lfs_file_close(&lfs, &file);
     return ESP_OK;
 }
