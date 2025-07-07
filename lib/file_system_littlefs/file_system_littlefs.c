@@ -348,3 +348,15 @@ esp_err_t lfs_create_new_csv_file(void) {
     
     return ESP_OK;
 }
+
+esp_err_t lfs_delete_file(const char* filename) {
+    ESP_LOGI(LFS_TAG, "Attempting to delete file: %s", filename);
+    
+    ESP_RETURN_ON_ERROR(
+        lfs_remove(&lfs, filename), 
+        LFS_TAG, "Failed to remove file %s", filename
+    );
+    
+    ESP_LOGI(LFS_TAG, "Successfully removed file %s", filename);
+    return ESP_OK;
+}

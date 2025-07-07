@@ -32,6 +32,7 @@ void lfs_list_directory(const char *path);
 void file_system_test(void);
 esp_err_t lfs_append_to_file(const char* data, const char* filename);
 esp_err_t lfs_create_new_csv_file(void);
+esp_err_t lfs_delete_file(const char* filename);
 
 
 extern lfs_t lfs;
