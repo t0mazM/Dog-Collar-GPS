@@ -335,7 +335,7 @@ esp_err_t lfs_create_new_csv_file(void) {
     );
 
     // 4) Write the header to the file
-    lfs_size_t bytes_written = lfs_file_write(&lfs, &file, header, strlen(header));
+    lfs_ssize_t bytes_written = lfs_file_write(&lfs, &file, header, strlen(header));
     if (bytes_written < 0) {
         ESP_LOGE(LFS_TAG, "Failed to write header to file %s (%d)", filename, (int)bytes_written);
         lfs_file_close(&lfs, &file);
