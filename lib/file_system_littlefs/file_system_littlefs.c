@@ -274,3 +274,19 @@ static esp_err_t lfs_create_new_file_name(const char* prefix, const char* suffix
 
     return ESP_OK;
 }
+
+static bool lfs_file_exsists(const char* filename) {
+    // Check if file already exists
+    struct lfs_info info;
+    int stat_result = lfs_stat(&lfs, filename, &info);
+    
+    if (stat_result == LFS_ERR_OK) {
+        ESP_LOGE(LFS_TAG, "File %s already exists. Cannot create.", filename);
+        return true;  // File exists
+    } else if (stat_result != LFS_ERR_NOENT) {
+        ESP_LOGE(LFS_TAG, "Error checking file %s existence (%d)", filename, stat_result);
+        return false;
+    }
+    ESP_LOGI(LFS_TAG, "File %s does not exist", filename);
+    return false;
+}
