@@ -23,6 +23,7 @@ void app_main() {
     gpio_init();
     uart_init();
     gps_l96_init();
+    lfs_mount_filesystem(true);
 
     battery_monitor_update_battery_data(&battery_data);
     gpio_turn_on_leds(LED_RED | LED_YELLOW | LED_GREEN);
@@ -40,6 +41,7 @@ void app_main() {
 
 
     lfs_create_new_csv_file();
+    lfs_list_directory("/");
     //gps_l96_go_to_standby_mode();
     // gps_l96_go_to_back_up_mode();
     // vTaskDelay(5000 / portTICK_PERIOD_MS); 

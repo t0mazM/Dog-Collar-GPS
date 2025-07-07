@@ -258,6 +258,8 @@ esp_err_t lfs_append_to_file(const char* data, const char* filename){
 
 static esp_err_t lfs_create_new_file_name(const char* prefix, const char* suffix, char* filename, size_t filename_size) {
 
+    //Time from with the eps32 system started (in seconds)
+    // TODO: get current date from gps module. Save it somwhere in flash
     time_t current_time = time(NULL);
     // Format: prefix + current_time(for randomness) + suffix (.csv)
     int err = snprintf(filename, filename_size, "%s_%lu%s", prefix, (unsigned long)current_time, suffix);
@@ -271,7 +273,7 @@ static esp_err_t lfs_create_new_file_name(const char* prefix, const char* suffix
         ESP_LOGE(LFS_TAG, "Failed to create new file name");
         return ESP_FAIL;
     }
-
+    ESP_LOGI(LFS_TAG, "Generated filename: '%s' , from prefix: %s , current time: %lu , suffix: %s ", filename, prefix, (unsigned long)current_time, suffix);
     return ESP_OK;
 }
 
@@ -294,9 +296,10 @@ static bool lfs_file_exsists(const char* filename) {
 esp_err_t lfs_create_new_csv_file(void) {
     lfs_file_t file;
     char filename[LFS_MAX_FILE_NAME_SIZE]; // Buffer for the new file name
-    const char* file_prefix = "dog_run_";
+    const char* file_prefix = "dog_run";
     const char* file_suffix = ".csv";
     const char* header = "timestamp,latitude,longitude,altitude,speed\n";
+    int counter = 0;
 
     // 1) Create a new file name with the current time
     ESP_RETURN_ON_ERROR(
@@ -307,8 +310,8 @@ esp_err_t lfs_create_new_csv_file(void) {
 
     // 2) Check if the file already exists, add _1, _2 if it does
     while(lfs_file_exsists(filename) ) {
+        counter++;
         // If file already exists add _1, _2 to the file name (normally you should not have to do this)
-        int counter = 1; 
         char modified_prefix[LFS_MAX_FILE_NAME_SIZE]; 
 
         // Create new prefix with counter: "dog_run_" becomes "dog_run_1_", "dog_run_2_", etc.
@@ -320,7 +323,7 @@ esp_err_t lfs_create_new_csv_file(void) {
             LFS_TAG,
             "Failed to create new file name"
         );
-        counter++;
+        
         if(counter > 1000) { // Safety limit: prevent infinite loop if filesystem has issues
             ESP_LOGE(LFS_TAG, "Too many files with the same name (%s).", filename);
             return ESP_FAIL;
