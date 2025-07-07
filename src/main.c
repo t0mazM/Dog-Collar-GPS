@@ -38,8 +38,8 @@ void app_main() {
     ext_flash_read_status_register(&status_reg);
     ext_flash_wait_for_idle(2000);
 
-   ext_flash_complete_test();
-    file_system_test();
+
+    lfs_create_new_csv_file();
     //gps_l96_go_to_standby_mode();
     // gps_l96_go_to_back_up_mode();
     // vTaskDelay(5000 / portTICK_PERIOD_MS); 
