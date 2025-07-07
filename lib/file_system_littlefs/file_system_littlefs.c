@@ -290,3 +290,61 @@ static bool lfs_file_exsists(const char* filename) {
     ESP_LOGI(LFS_TAG, "File %s does not exist", filename);
     return false;
 }
+
+esp_err_t lfs_create_new_csv_file(void) {
+    lfs_file_t file;
+    char filename[LFS_MAX_FILE_NAME_SIZE]; // Buffer for the new file name
+    const char* file_prefix = "dog_run_";
+    const char* file_suffix = ".csv";
+    const char* header = "timestamp,latitude,longitude,altitude,speed\n";
+
+    // 1) Create a new file name with the current time
+    ESP_RETURN_ON_ERROR(
+        lfs_create_new_file_name(file_prefix, file_suffix, filename, sizeof(filename)),
+        LFS_TAG,
+        "Failed to create new file name"
+    );
+
+    // 2) Check if the file already exists, add _1, _2 if it does
+    while(lfs_file_exsists(filename) ) {
+        // If file already exists add _1, _2 to the file name (normally you should not have to do this)
+        int counter = 1; 
+        char modified_prefix[LFS_MAX_FILE_NAME_SIZE]; 
+
+        // Create new prefix with counter: "dog_run_" becomes "dog_run_1_", "dog_run_2_", etc.
+        snprintf(modified_prefix, sizeof(modified_prefix), "%s%d_", file_prefix, counter);
+
+        // Create new file name
+        ESP_RETURN_ON_ERROR(
+            lfs_create_new_file_name(modified_prefix, file_suffix, filename, sizeof(filename)),
+            LFS_TAG,
+            "Failed to create new file name"
+        );
+        counter++;
+        if(counter > 1000) { // Safety limit: prevent infinite loop if filesystem has issues
+            ESP_LOGE(LFS_TAG, "Too many files with the same name (%s).", filename);
+            return ESP_FAIL;
+        }
+    }
+    // 3) Create new file
+
+    ESP_RETURN_ON_ERROR(
+    lfs_file_open(&lfs, &file, filename, LFS_O_WRONLY | LFS_O_CREAT | LFS_O_TRUNC),
+        LFS_TAG,
+        "Failed to open/create file %s ", filename
+    );
+
+    // 4) Write the header to the file
+    lfs_size_t bytes_written = lfs_file_write(&lfs, &file, header, strlen(header));
+    if (bytes_written < 0) {
+        ESP_LOGE(LFS_TAG, "Failed to write header to file %s (%d)", filename, (int)bytes_written);
+        lfs_file_close(&lfs, &file);
+        return ESP_FAIL;
+    }
+
+    // 5) Close the file
+    lfs_file_close(&lfs, &file);
+    ESP_LOGI(LFS_TAG, "Successfully created CSV file %s with header '%s'", filename, header);
+    
+    return ESP_OK;
+}

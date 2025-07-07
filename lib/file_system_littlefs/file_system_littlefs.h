@@ -23,6 +23,7 @@
 #define LFS_BLOCK_CYCLES        500     // LittleFS will prioritize blocks with fewer erase cycles for wear leveling (not a hard limit, more like a differential wear leveling strategy)
 #define LFS_CACHE_SIZE          256     // Cache size for read/write/erase operations (multiple of LFS_PROG_SIZE). For me program crashes if I even try to multiply it, but since my writes are not so frequent and only a couple of bytes the min value of 256 is more than enough sufficient
 #define LFS_LOOKAHEAD_SIZE      16      // Size of the lookahead buffer (in bytes), multiple of 8. 32 is widely used, but 16 is sufficient for my use case
+#define LFS_MAX_FILE_NAME_SIZE      64      // Maximum file name size 
 
 // Public functions for LittleFS integration
 esp_err_t lfs_mount_filesystem(bool format_if_fail);
