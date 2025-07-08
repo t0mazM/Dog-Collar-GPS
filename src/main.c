@@ -7,10 +7,12 @@
 #include "gps_l96/gps_l96.h"
 #include "gps_l96/nmea_commands.h"
 #include "file_system_littlefs.h"
+#include "wifi.h"
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "esp_log.h"
+#include "nvs_flash.h"
 
 static const char *MAIN_TAG = "MAIN";
 
@@ -24,6 +26,8 @@ void app_main() {
     uart_init();
     gps_l96_init();
     lfs_mount_filesystem(true);
+    nvs_flash_init();
+    wifi_init_sta();
 
     battery_monitor_update_battery_data(&battery_data);
     gpio_turn_on_leds(LED_RED | LED_YELLOW | LED_GREEN);
@@ -40,8 +44,8 @@ void app_main() {
     ext_flash_wait_for_idle(2000);
 
 
-    lfs_delete_file("/dog_run__353.csv");
-    lfs_list_directory("/");
+    //lfs_delete_file("/dog_run__353.csv");
+    //lfs_list_directory("/");
     //gps_l96_go_to_standby_mode();
     // gps_l96_go_to_back_up_mode();
     // vTaskDelay(5000 / portTICK_PERIOD_MS); 
