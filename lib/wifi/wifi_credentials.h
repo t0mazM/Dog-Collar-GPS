@@ -1,9 +1,0 @@
-#ifndef WIFI_CREDENTIALS_H
-#define WIFI_CREDENTIALS_H
-
-
-
-
-
-
-#endif // WIFI_CREDENTIALS_H
