@@ -88,6 +88,7 @@ void wifi_init_sta() {
 
     if (bits & WIFI_CONNECTED_BIT) {
         ESP_LOGI(TAG, "Connected to SSID:%s", ssid);
+        start_mdns_service();
     } else if (bits & WIFI_FAIL_BIT) {
         ESP_LOGE(TAG, "Failed to connect to SSID:%s", ssid);
     } else {
@@ -101,7 +102,18 @@ void wifi_init_sta() {
 }
 
 
-
+void start_mdns_service(void) {
+    // Initialize mDNS
+    ESP_ERROR_CHECK(mdns_init());
+    
+    // Set hostname
+    ESP_ERROR_CHECK(mdns_hostname_set("dogcollar"));
+    
+    // Set default instance name
+    ESP_ERROR_CHECK(mdns_instance_name_set("Dog Collar GPS Device"));
+    
+    ESP_LOGI(TAG, "mDNS responder started - hostname: dogcollar.local");
+}
 
 
 

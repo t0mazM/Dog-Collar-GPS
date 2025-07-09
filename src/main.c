@@ -28,6 +28,7 @@ void app_main() {
     lfs_mount_filesystem(true);
     nvs_flash_init();
     wifi_init_sta();
+    start_mdns_service();
 
     battery_monitor_update_battery_data(&battery_data);
     gpio_turn_on_leds(LED_RED | LED_YELLOW | LED_GREEN);

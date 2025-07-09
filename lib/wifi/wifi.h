@@ -15,6 +15,7 @@
 #define WIFI_RECONNECT_RETRIES_NUM 10
 
 void wifi_init_sta(void);
+void start_mdns_service(void);
 
 
 #endif // WIFI_H
