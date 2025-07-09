@@ -1,7 +1,6 @@
 #ifndef WIFI_H
 #define WIFI_H
 
-#include <WiFi.h>
 #include <stdio.h>
 #include <string.h>
 #include "freertos/FreeRTOS.h"
@@ -11,7 +10,7 @@
 #include "esp_wifi.h"
 #include "esp_event.h"
 #include "esp_log.h"
-
+#include "mdns.h"
 
 #define WIFI_RECONNECT_RETRIES_NUM 10
 
