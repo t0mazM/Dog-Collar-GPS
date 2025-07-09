@@ -11,11 +11,12 @@
 #include "esp_event.h"
 #include "esp_log.h"
 #include "mdns.h"
+#include "esp_http_server.h"
 
 #define WIFI_RECONNECT_RETRIES_NUM 10
 
 void wifi_init_sta(void);
 void start_mdns_service(void);
-
+void start_http_server(void);
 
 #endif // WIFI_H

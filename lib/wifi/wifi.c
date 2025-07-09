@@ -39,6 +39,10 @@ static void wifi_event_handler(void* arg, esp_event_base_t event_base,
         ESP_LOGI(TAG, "Got IP address: " IPSTR, IP2STR(&event->ip_info.ip));
         s_retry_num = 0;
         xEventGroupSetBits(s_wifi_event_group, WIFI_CONNECTED_BIT);
+
+
+        start_mdns_service();
+        start_http_server();  
     }
 }
 
@@ -88,7 +92,7 @@ void wifi_init_sta() {
 
     if (bits & WIFI_CONNECTED_BIT) {
         ESP_LOGI(TAG, "Connected to SSID:%s", ssid);
-        start_mdns_service();
+        
     } else if (bits & WIFI_FAIL_BIT) {
         ESP_LOGE(TAG, "Failed to connect to SSID:%s", ssid);
     } else {
@@ -117,3 +121,35 @@ void start_mdns_service(void) {
 
 
 
+// Simple HTTP handler
+static esp_err_t hello_get_handler(httpd_req_t *req) {
+    const char* resp_str = "<html>\n"
+                           "    <body><h1>Dog Collar GPS test for mDNS</h1>\n"
+                           "    <p>mDNS test, I guess it is working :)</p></body>\n"
+                           "</html>";
+    httpd_resp_send(req, resp_str, HTTPD_RESP_USE_STRLEN);
+    return ESP_OK;
+}
+
+// Start HTTP server
+void start_http_server(void) {
+    httpd_config_t config = HTTPD_DEFAULT_CONFIG();
+    config.server_port = 80;
+    
+    httpd_handle_t server = NULL;
+    
+    if (httpd_start(&server, &config) == ESP_OK) {
+        // Register URI handler
+        httpd_uri_t hello = {
+            .uri       = "/",
+            .method    = HTTP_GET,
+            .handler   = hello_get_handler,
+            .user_ctx  = NULL
+        };
+        httpd_register_uri_handler(server, &hello);
+        
+        ESP_LOGI(TAG, "HTTP server started on port %d", config.server_port);
+    } else {
+        ESP_LOGE(TAG, "Failed to start HTTP server");
+    }
+}
