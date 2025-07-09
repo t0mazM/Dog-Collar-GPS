@@ -28,7 +28,7 @@
 // Public functions for LittleFS integration
 esp_err_t lfs_mount_filesystem(bool format_if_fail);
 esp_err_t lfs_unmount_filesystem(void);
-void lfs_list_directory(const char *path);
+esp_err_t lfs_list_directory(const char *path, char *file_name_buffer, size_t buffer_size);
 void file_system_test(void);
 esp_err_t lfs_append_to_file(const char* data, const char* filename);
 esp_err_t lfs_create_new_csv_file(void);

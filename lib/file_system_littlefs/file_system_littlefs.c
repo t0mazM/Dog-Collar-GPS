@@ -129,28 +129,33 @@ esp_err_t lfs_mount_filesystem(bool format_if_fail) {
 }
 
 // Helper function to print directory contents
-void lfs_list_directory(const char *path) {
+esp_err_t lfs_list_directory(const char *path, char *file_name_buffer, size_t buffer_size) {
     lfs_dir_t dir;
     struct lfs_info info;
 
-    int err = lfs_dir_open(&lfs, &dir, path);
-    if (err) {
-        ESP_LOGE(LFS_TAG, "Failed to open directory %s (%d)", path, err);
-        return;
-    }
-
+    ESP_RETURN_ON_ERROR(
+                        lfs_dir_open(&lfs, &dir, path),
+                        LFS_TAG,
+                        "Failed to open directory %s", path);
+    int error = 0;
     ESP_LOGI(LFS_TAG, "Listing directory: %s", path);
-    while ((err = lfs_dir_read(&lfs, &dir, &info)) != 0 && info.name[0] != '\0') {
+    while ((error != 0 && info.name[0] != '\0')) {
+        error = lfs_dir_read(&lfs, &dir, &info);
         if (info.type == LFS_TYPE_REG) {
             ESP_LOGI(LFS_TAG, "  File: %s, Size: %lu bytes", info.name, info.size);
+            strlcpy(file_name_buffer, info.name, buffer_size);
         } else if (info.type == LFS_TYPE_DIR) {
             ESP_LOGI(LFS_TAG, "  Dir: %s", info.name);
         }
     }
-    if (err < 0) {
-        ESP_LOGE(LFS_TAG, "Error reading directory: %d", err);
+    if (error < 0) {
+        ESP_LOGE(LFS_TAG, "Error reading directory: %d", error);
+        return ESP_FAIL;
     }
-    lfs_dir_close(&lfs, &dir);
+    ESP_RETURN_ON_ERROR(lfs_dir_close(&lfs, &dir), 
+                        LFS_TAG, 
+                        "Failed to close directory %s", path);
+    return ESP_OK;
 }
 
 void file_system_test(void){
@@ -217,7 +222,7 @@ void file_system_test(void){
     }
 
     // 4. List directory contents
-    lfs_list_directory("/"); // List root directory
+    lfs_list_directory("/", NULL, 0); // List root directory
 
     // 5. Example of removing a file
     ESP_LOGI(LFS_TAG, "Attempting to remove file: %s", test_filename);
@@ -228,7 +233,7 @@ void file_system_test(void){
         ESP_LOGI(LFS_TAG, "Successfully removed file %s", test_filename);
     }
     
-    lfs_list_directory("/"); // Should show an empty directory if no other files exist
+    lfs_list_directory("/", NULL, 0); // Should show an empty directory if no other files exist
 
     ESP_LOGI(LFS_TAG, "Application finished.");
 }
