@@ -14,7 +14,6 @@
 #include "esp_log.h"
 #include "nvs_flash.h"
 
-static const char *MAIN_TAG = "MAIN";
 
 void app_main() {
 
@@ -46,7 +45,7 @@ void app_main() {
 
 
     //lfs_delete_file("/dog_run__353.csv");
-    //lfs_list_directory("/");
+    lfs_list_directory("/", NULL, 0); 
     //gps_l96_go_to_standby_mode();
     // gps_l96_go_to_back_up_mode();
     // vTaskDelay(5000 / portTICK_PERIOD_MS); 

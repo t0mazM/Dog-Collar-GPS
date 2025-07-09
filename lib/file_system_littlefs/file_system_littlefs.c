@@ -133,29 +133,54 @@ esp_err_t lfs_list_directory(const char *path, char *file_name_buffer, size_t bu
     lfs_dir_t dir;
     struct lfs_info info;
 
+
+    // Clear the buffer
+    memset(file_name_buffer, 0, buffer_size);
+
     ESP_RETURN_ON_ERROR(
                         lfs_dir_open(&lfs, &dir, path),
                         LFS_TAG,
                         "Failed to open directory %s", path);
     int error = 0;
     ESP_LOGI(LFS_TAG, "Listing directory: %s", path);
-    while ((error != 0 && info.name[0] != '\0')) {
-        error = lfs_dir_read(&lfs, &dir, &info);
-        if (info.type == LFS_TYPE_REG) {
-            ESP_LOGI(LFS_TAG, "  File: %s, Size: %lu bytes", info.name, info.size);
-            strlcpy(file_name_buffer, info.name, buffer_size);
-        } else if (info.type == LFS_TYPE_DIR) {
-            ESP_LOGI(LFS_TAG, "  Dir: %s", info.name);
+
+    while (true) {
+            error = lfs_dir_read(&lfs, &dir, &info);
+            if (error <= 0 || info.name[0] == '\0') {
+                break; // End of directory or error
+            }
+            
+            if (info.type == LFS_TYPE_REG) {
+                ESP_LOGI(LFS_TAG, "  File: %s, Size: %lu bytes", info.name, info.size);
+                
+                // Append file name to buffer if buffer is provided
+                if (file_name_buffer && buffer_size > 0) {
+                    size_t current_len = strlen(file_name_buffer);
+                    size_t remaining = buffer_size - current_len - 1;
+                    
+                    if (remaining > strlen(info.name) + 1) { // +1 for newline /n
+                        if (current_len > 0) {
+                            strncat(file_name_buffer, "\n", remaining);
+                            remaining--;
+                        }
+                        strncat(file_name_buffer, info.name, remaining);
+                    }
+                }
+            } else if (info.type == LFS_TYPE_DIR) {
+                ESP_LOGI(LFS_TAG, "  Dir: %s", info.name);
+            }
         }
-    }
-    if (error < 0) {
-        ESP_LOGE(LFS_TAG, "Error reading directory: %d", error);
-        return ESP_FAIL;
-    }
-    ESP_RETURN_ON_ERROR(lfs_dir_close(&lfs, &dir), 
-                        LFS_TAG, 
-                        "Failed to close directory %s", path);
-    return ESP_OK;
+        
+        if (error < 0) {
+            ESP_LOGE(LFS_TAG, "Error reading directory: %d", error);
+            lfs_dir_close(&lfs, &dir);
+            return ESP_FAIL;
+        }
+        
+        ESP_RETURN_ON_ERROR(lfs_dir_close(&lfs, &dir), 
+                            LFS_TAG, 
+                            "Failed to close directory %s", path);
+        return ESP_OK;
 }
 
 void file_system_test(void){
