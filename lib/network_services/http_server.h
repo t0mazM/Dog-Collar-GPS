@@ -1,0 +1,16 @@
+#ifndef HTTP_SERVER_H
+#define HTTP_SERVER_H
+
+#include "esp_http_server.h"
+#include "esp_log.h"
+#include "esp_err.h"
+
+#include "file_system_littlefs.h"
+
+
+
+#define HTTP_SERVER_PORT_NUM 80
+
+esp_err_t http_server_start(void);
+
+#endif // HTTP_SERVER_H

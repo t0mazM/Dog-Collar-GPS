@@ -2,7 +2,7 @@
 
 const char *TAG = "MDNS_SERVICE";
 
-esp_err_t start_mdns_service(void) {
+esp_err_t mdns_service_start(void) {
 
     // Initialize mDNS service
     ESP_RETURN_ON_ERROR(mdns_init(),

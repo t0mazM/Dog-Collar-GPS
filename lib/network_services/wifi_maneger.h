@@ -10,17 +10,15 @@
 #include "esp_wifi.h"
 #include "esp_event.h"
 #include "esp_log.h"
-#include "mdns.h"
-#include "esp_http_server.h"
 #include "esp_err.h" 
 #include "esp_check.h"
 #include "esp_log.h"
 #include "file_system_littlefs.h"
+#include "mdns_service.h"
+#include "http_server.h"
 
 #define WIFI_RECONNECT_RETRIES_NUM 10
 
 void wifi_init_sta(void);
-void start_mdns_service(void);
-void start_http_server(void);
 
 #endif // WIFI_MANAGER_H
