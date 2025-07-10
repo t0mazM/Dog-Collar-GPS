@@ -3,6 +3,39 @@
 static const char *TAG = "HTTP_SERVER";
 
 
+esp_err_t http_server_start(void) {
+    httpd_config_t config = HTTPD_DEFAULT_CONFIG();
+    config.server_port = HTTP_SERVER_PORT_NUM;
+    
+    httpd_handle_t server = NULL;
+
+    // root URI handler
+    if (httpd_start(&server, &config) == ESP_OK) {
+        httpd_uri_t hello = {
+            .uri       = "/",
+            .method    = HTTP_GET,
+            .handler   = hello_get_handler,
+            .user_ctx  = NULL
+        };
+        httpd_register_uri_handler(server, &hello);
+
+        // files URI handler
+        httpd_uri_t files_uri = {
+            .uri        = "/files",
+            .method     = HTTP_GET,
+            .handler    = list_files_get_handler, 
+            .user_ctx   = NULL
+        };
+        httpd_register_uri_handler(server, &files_uri);
+
+        ESP_LOGI(TAG, "HTTP server started on port %d", config.server_port);
+        return ESP_OK;
+    } 
+
+    ESP_LOGE(TAG, "Failed to start HTTP server");
+    return ESP_FAIL;
+}
+
 // Simple HTTP handler
 static esp_err_t hello_get_handler(httpd_req_t *req) {
     const char* resp_str = "<html>\n"
@@ -52,38 +85,3 @@ static esp_err_t list_files_get_handler(httpd_req_t *req) {
     free(response_buffer); 
     return ESP_OK;
 }
-
-
-esp_err_t http_server_start(void) {
-    httpd_config_t config = HTTPD_DEFAULT_CONFIG();
-    config.server_port = HTTP_SERVER_PORT_NUM;
-    
-    httpd_handle_t server = NULL;
-
-    // root URI handler
-    if (httpd_start(&server, &config) == ESP_OK) {
-        httpd_uri_t hello = {
-            .uri       = "/",
-            .method    = HTTP_GET,
-            .handler   = hello_get_handler,
-            .user_ctx  = NULL
-        };
-        httpd_register_uri_handler(server, &hello);
-
-        // files URI handler
-        httpd_uri_t files_uri = {
-            .uri        = "/files",
-            .method     = HTTP_GET,
-            .handler    = list_files_get_handler, 
-            .user_ctx   = NULL
-        };
-        httpd_register_uri_handler(server, &files_uri);
-
-        ESP_LOGI(TAG, "HTTP server started on port %d", config.server_port);
-        return ESP_OK;
-    } 
-
-    ESP_LOGE(TAG, "Failed to start HTTP server");
-    return ESP_FAIL;
-}
-
