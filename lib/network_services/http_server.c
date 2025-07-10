@@ -80,9 +80,10 @@ esp_err_t http_server_start(void) {
         httpd_register_uri_handler(server, &files_uri);
 
         ESP_LOGI(TAG, "HTTP server started on port %d", config.server_port);
-    } else {
-        ESP_LOGE(TAG, "Failed to start HTTP server");
-    }
-    return ESP_OK;
+        return ESP_OK;
+    } 
+
+    ESP_LOGE(TAG, "Failed to start HTTP server");
+    return ESP_FAIL;
 }
 
