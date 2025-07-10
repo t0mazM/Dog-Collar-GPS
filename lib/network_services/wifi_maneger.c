@@ -1,4 +1,4 @@
-#include "wifi_manager.h"
+#include "wifi_maneger.h"
 #include "wifi_credentials.h"
 
 static const char *TAG = "WIFI_APP";
@@ -102,21 +102,6 @@ void wifi_init_sta() {
     }
 
 }
-
-
-void start_mdns_service(void) {
-    // Initialize mDNS
-    ESP_ERROR_CHECK(mdns_init());
-    
-    // Set hostname
-    ESP_ERROR_CHECK(mdns_hostname_set("dogcollar"));
-    
-    // Set default instance name
-    ESP_ERROR_CHECK(mdns_instance_name_set("Dog Collar GPS Device"));
-    
-    ESP_LOGI(TAG, "mDNS responder started - hostname: dogcollar.local");
-}
-
 
 
 // Simple HTTP handler
