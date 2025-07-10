@@ -4,4 +4,4 @@
 .vscode/launch.json
 .vscode/ipch
 .VSCodeCounter
-lib/wifi/wifi_credentials.h
+lib/network_services/wifi_credentials.h
