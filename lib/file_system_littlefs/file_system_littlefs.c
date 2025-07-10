@@ -286,6 +286,65 @@ esp_err_t lfs_append_to_file(const char* data, const char* filename){
     return ESP_OK;
 }
 
+esp_err_t wifi_get_file_list_as_html(char *buffer, size_t buffer_size) {
+    lfs_dir_t dir;
+    struct lfs_info info;
+    int err;
+    size_t current_len = 0;
+
+    // Start HTML structure for the response
+    current_len += snprintf(buffer + current_len, buffer_size - current_len, "<html><body><h1>Files on Dog Collar GPS</h1><ul>\n");
+
+    err = lfs_dir_open(&lfs, &dir, "/"); // Open root directory
+    if (err) {
+        ESP_LOGE(LFS_TAG, "Failed to open directory / (%d)", err);
+        current_len += snprintf(buffer + current_len, buffer_size - current_len, "<li>Error: Could not open filesystem root.</li>\n");
+        current_len += snprintf(buffer + current_len, buffer_size - current_len, "</ul></body></html>");
+        return ESP_FAIL;
+    }
+
+    // Read directory entries
+    while (true) {
+        err = lfs_dir_read(&lfs, &dir, &info);
+        if (err < 0) {
+            ESP_LOGE(LFS_TAG, "Error reading directory: %d", err);
+            break; // Exit loop on error
+        }
+        if (info.name[0] == '\0') {
+            break; // No more entries
+        }
+
+        // Calculate space needed for the next entry
+        // Example: <li><a href="/download/FILENAME">FILENAME</a> (Size: 1234 bytes)</li>\n
+        size_t entry_len_estimate = 60 + (2 * strlen(info.name)) + 10;
+
+        if (current_len + entry_len_estimate >= buffer_size) {
+            ESP_LOGW(LFS_TAG, "File list HTML buffer full. Not sending all file names");
+            break; 
+        }
+
+        if (info.type == LFS_TYPE_REG) {
+            current_len += snprintf(buffer + current_len, buffer_size - current_len,
+                                    "<li><a href=\"/download/%s\">%s</a> (Size: %lu bytes)</li>\n",
+                                    info.name, info.name, info.size);
+        } else if (info.type == LFS_TYPE_DIR) {
+            current_len += snprintf(buffer + current_len, buffer_size - current_len,
+                                    "<li>[DIR] %s</li>\n", info.name);
+        }
+    }
+
+    lfs_dir_close(&lfs, &dir); 
+
+    // End HTML structure
+    current_len += snprintf(buffer + current_len, buffer_size - current_len, "</ul></body></html>\n");
+
+    if (err < 0) {
+        return ESP_FAIL; // Indicate an error occurred during directory read
+    }
+
+    return ESP_OK;
+}
+
 static esp_err_t lfs_create_new_file_name(const char* prefix, const char* suffix, char* filename, size_t filename_size) {
 
     //Time from with the eps32 system started (in seconds)

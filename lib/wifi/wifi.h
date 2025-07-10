@@ -12,6 +12,10 @@
 #include "esp_log.h"
 #include "mdns.h"
 #include "esp_http_server.h"
+#include "esp_err.h" 
+#include "esp_check.h"
+#include "esp_log.h"
+#include "file_system_littlefs.h"
 
 #define WIFI_RECONNECT_RETRIES_NUM 10
 

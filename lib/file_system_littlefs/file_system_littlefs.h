@@ -4,10 +4,8 @@
 
 #include "lfs.h"  
 #include "ext_flash.h"    
-#include "esp_check.h"
 #include "esp_err.h" 
 #include "esp_check.h"
-#include "esp_log.h"
 #include "esp_log.h"
 #include <string.h>
 #include <time.h>
@@ -29,6 +27,7 @@
 esp_err_t lfs_mount_filesystem(bool format_if_fail);
 esp_err_t lfs_unmount_filesystem(void);
 esp_err_t lfs_list_directory(const char *path, char *file_name_buffer, size_t buffer_size);
+esp_err_t wifi_get_file_list_as_html(char *buffer, size_t buffer_size);
 void file_system_test(void);
 esp_err_t lfs_append_to_file(const char* data, const char* filename);
 esp_err_t lfs_create_new_csv_file(void);
