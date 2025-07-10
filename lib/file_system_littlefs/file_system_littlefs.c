@@ -322,11 +322,13 @@ esp_err_t wifi_get_file_list_as_html(char *buffer, size_t buffer_size) {
             ESP_LOGW(LFS_TAG, "File list HTML buffer full. Not sending all file names");
             break; 
         }
-
+        // Append filename and size to the HTML buffer
+        // If the file is clicked, download?file= will be sent so the server (ESP32) can handle the download
         if (info.type == LFS_TYPE_REG) {
             current_len += snprintf(buffer + current_len, buffer_size - current_len,
-                                    "<li><a href=\"/download/%s\">%s</a> (Size: %lu bytes)</li>\n",
-                                    info.name, info.name, info.size);
+                                            "<li><a href=\"/download?file=%s\">%s</a> (Size: %lu bytes)</li>\n",
+                                            info.name, info.name, info.size);
+
         } else if (info.type == LFS_TYPE_DIR) {
             current_len += snprintf(buffer + current_len, buffer_size - current_len,
                                     "<li>[DIR] %s</li>\n", info.name);

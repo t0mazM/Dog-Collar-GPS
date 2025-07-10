@@ -102,18 +102,34 @@ static esp_err_t list_files_get_handler(httpd_req_t *req) {
 static esp_err_t download_file_get_handler(httpd_req_t *req) {
     char filepath[256]; 
     char filename[128]; 
+    
 
-    // 1. Get the filename from the query parameter "file"
+    // Check if the request URI contains the 'file' parameter
     // URI will look like /download?file=your_filename.csv
-    if (httpd_query_key_value(req->uri, "file", filename, sizeof(filename)) != ESP_OK) {
-        ESP_LOGE(TAG, "File parameter 'file' not found in URI query: %s", req->uri);
+    char *query_string = strchr(req->uri, '?');
+    if (query_string == NULL) {
+        ESP_LOGE(TAG, "No query string found in URI");
         httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "Missing 'file' parameter");
-        //return ESP_FAIL;
+        return ESP_FAIL;
     }
+    
+    ESP_LOGI(TAG, "Query string found: %s", query_string);
+    query_string++;
 
-    // 2. Construct the full path on the file system
-    //snprintf(filepath, sizeof(filepath), "/littlefs/%s", filename);
-    ESP_LOGI(TAG, "Attempting to download file: %s", filepath);
+    ESP_LOGI(TAG, "Filename extracted: %s", filename);
+
+    // For now, just send a success response
+    const char* resp = "File found, well not really but yeah!";
+    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+
+
+
+
+
+
+
+
+
 
   return ESP_OK;
 }
