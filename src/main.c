@@ -7,7 +7,7 @@
 #include "gps_l96/gps_l96.h"
 #include "gps_l96/nmea_commands.h"
 #include "file_system_littlefs.h"
-#include "wifi.h"
+#include "wifi_maneger.h"
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"

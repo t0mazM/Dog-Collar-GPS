@@ -1,5 +1,5 @@
-#ifndef WIFI_H
-#define WIFI_H
+#ifndef WIFI_MANAGER_H
+#define WIFI_MANAGER_H
 
 #include <stdio.h>
 #include <string.h>
@@ -23,4 +23,4 @@ void wifi_init_sta(void);
 void start_mdns_service(void);
 void start_http_server(void);
 
-#endif // WIFI_H
+#endif // WIFI_MANAGER_H
