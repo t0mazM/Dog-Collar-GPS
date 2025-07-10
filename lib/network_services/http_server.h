@@ -12,8 +12,5 @@
 
 esp_err_t http_server_start(void);
 
-// Handlers
-static esp_err_t hello_get_handler(httpd_req_t *req);
-static esp_err_t list_files_get_handler(httpd_req_t *req);
 
 #endif // HTTP_SERVER_H
