@@ -14,36 +14,44 @@ static esp_err_t hello_get_handler(httpd_req_t *req) {
 }
 
 static esp_err_t list_files_get_handler(httpd_req_t *req) {
-
-    const size_t RESPONSE_BUFFER_SIZE = 4096;
     char *response_buffer = (char *)malloc(RESPONSE_BUFFER_SIZE);
 
     if (response_buffer == NULL) {
         ESP_LOGE(TAG, "Failed to allocate memory for file list response.");
-        httpd_resp_send_500(req); // Send 500 Internal Server Error
+        httpd_resp_send_500(req);
         return ESP_FAIL; 
     }
-    // Call your filesystem function to get HTML file list
+
+    // Get file list from filesystem in html format
     esp_err_t result = wifi_get_file_list_as_html(response_buffer, RESPONSE_BUFFER_SIZE);
     
     if (result != ESP_OK) {
         ESP_LOGE(TAG, "Failed to get file list from filesystem");
-        free(response_buffer);
+        free(response_buffer); 
         httpd_resp_send_500(req);
         return ESP_FAIL;
     }
 
-    // Set content type to HTML
-    httpd_resp_set_type(req, "text/html");
-    
-    // Send the response
-    httpd_resp_send(req, response_buffer, HTTPD_RESP_USE_STRLEN);
-    
-    // Clean up
-    free(response_buffer);
+    // Set content type to HTML - check error but don't return yet
+    esp_err_t err = httpd_resp_set_type(req, "text/html");
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to set response type");
+        free(response_buffer); 
+        httpd_resp_send_500(req);
+        return err;
+    }
+
+    // Send the response - check error but don't return yet
+    err = httpd_resp_send(req, response_buffer, HTTPD_RESP_USE_STRLEN);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to send response");
+        free(response_buffer); 
+        return err;
+    }
+    ESP_LOGI(TAG, "File list sent successfully");
+    free(response_buffer); 
     return ESP_OK;
 }
-
 
 
 esp_err_t http_server_start(void) {

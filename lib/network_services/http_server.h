@@ -7,8 +7,7 @@
 
 #include "file_system_littlefs.h"
 
-
-
+#define RESPONSE_BUFFER_SIZE 4096
 #define HTTP_SERVER_PORT_NUM 80
 
 esp_err_t http_server_start(void);
