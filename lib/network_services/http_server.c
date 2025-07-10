@@ -100,9 +100,6 @@ static esp_err_t list_files_get_handler(httpd_req_t *req) {
 }
 
 static esp_err_t download_file_get_handler(httpd_req_t *req) {
-    char filepath[256]; 
-    char filename[128]; 
-    
 
     // Check if the request URI contains the 'file' parameter
     // URI will look like /download?file=your_filename.csv
@@ -112,11 +109,13 @@ static esp_err_t download_file_get_handler(httpd_req_t *req) {
         httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "Missing 'file' parameter");
         return ESP_FAIL;
     }
-    
+    query_string++; // Move pointer past the '?' character
     ESP_LOGI(TAG, "Query string found: %s", query_string);
-    query_string++;
 
-    ESP_LOGI(TAG, "Filename extracted: %s", filename);
+
+    query_string = query_string + 5; // Skip "file=" part
+    
+    ESP_LOGI(TAG, "Filename extracted: %s", query_string);
 
     // For now, just send a success response
     const char* resp = "File found, well not really but yeah!";
