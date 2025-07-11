@@ -100,6 +100,9 @@ static esp_err_t list_files_get_handler(httpd_req_t *req) {
 }
 
 static esp_err_t download_file_get_handler(httpd_req_t *req) {
+
+    char read_buffer[1024]; // Buffer to read file content. The read will fill it to the full so size should be the leng off packet to transfer over wifi
+    lfs_file_t file;
  
     // Check if the request URI contains the 'file' parameter
     // URI will look like /download?file=your_filename.csv
@@ -117,10 +120,44 @@ static esp_err_t download_file_get_handler(httpd_req_t *req) {
 
     ESP_LOGI(TAG, "Filename extracted: %s", query_string);
 
-    // For now, just send a success response
-    const char* resp = "File found, well not really but yeah!";
-    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+    // Read file (read only mode)
+    esp_err_t err = lfs_file_open(&lfs, &file, query_string, LFS_O_RDONLY); //lfs is global extern variable from file_system_littlefs.c
+    if (err) {
+        ESP_LOGE(TAG, "Failed to open file %s for reading (%d)", query_string, err);
+        httpd_resp_send(req, "Failed to open file you requested", HTTPD_RESP_USE_STRLEN);
+        lfs_file_close(&lfs, &file);
+        return ESP_FAIL;
+    }
 
+    // Set content disposition to download the file directly
+    char content_disposition[LFS_NAME_MAX + 64]; // Add extra space for disposition header
+    snprintf(content_disposition, sizeof(content_disposition), "attachment; filename=\"%s\"", query_string);
+    httpd_resp_set_hdr(req, "Content-Disposition", content_disposition);
 
-  return ESP_OK;
+    // Loop to read and send file in chunks
+    lfs_ssize_t bytes_read = 0;
+    do {
+        bytes_read = lfs_file_read(&lfs, &file, read_buffer, sizeof(read_buffer));
+        if (bytes_read < 0) {
+            
+            ESP_LOGE(TAG, "Failed to read from file %s (%d)", query_string, (int)bytes_read);
+            lfs_file_close(&lfs, &file);
+            return ESP_FAIL;
+
+        } else if (bytes_read > 0) {
+            // Send the chunk
+            if (httpd_resp_send_chunk(req, read_buffer, bytes_read) != ESP_OK) {
+                ESP_LOGE(TAG, "Failed to send file chunk");
+                lfs_file_close(&lfs, &file);
+                return ESP_FAIL; // Client disconnected or error
+            }
+        }
+    } while (bytes_read > 0);
+
+    // After sending all data, send an empty chunk to signify end of transfer
+    httpd_resp_send_chunk(req, NULL, 0); // This signals end of data for chunked transfer
+
+    lfs_file_close(&lfs, &file);
+    ESP_LOGI(TAG, "File %s sent successfully", query_string);
+    return ESP_OK;
 }

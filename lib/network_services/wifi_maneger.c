@@ -44,7 +44,7 @@ static void wifi_event_handler(void* arg, esp_event_base_t event_base,
     }
 }
 
-void wifi_init_sta() {
+void wifi_init_sta() { //TODO HANDLE ERRORS - return error
     s_wifi_event_group = xEventGroupCreate();
 
     // Initialize TCP/IP stack
