@@ -100,7 +100,7 @@ static esp_err_t list_files_get_handler(httpd_req_t *req) {
 }
 
 static esp_err_t download_file_get_handler(httpd_req_t *req) {
-
+ 
     // Check if the request URI contains the 'file' parameter
     // URI will look like /download?file=your_filename.csv
     char *query_string = strchr(req->uri, '?');
@@ -114,20 +114,12 @@ static esp_err_t download_file_get_handler(httpd_req_t *req) {
 
 
     query_string = query_string + 5; // Skip "file=" part
-    
+
     ESP_LOGI(TAG, "Filename extracted: %s", query_string);
 
     // For now, just send a success response
     const char* resp = "File found, well not really but yeah!";
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
-
-
-
-
-
-
-
-
 
 
   return ESP_OK;

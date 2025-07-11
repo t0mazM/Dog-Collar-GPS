@@ -96,9 +96,4 @@ void wifi_init_sta() {
     } else {
         ESP_LOGE(TAG, "Unexpected event occurred while connecting to SSID:%s", ssid);
     }
-    while(1) {
-        // Keep the task running to maintain Wi-Fi connection
-        vTaskDelay(pdMS_TO_TICKS(1000));
-    }
-
 }

@@ -28,10 +28,7 @@ void app_main() {
     nvs_flash_init();
     wifi_init_sta();
 
-    battery_monitor_update_battery_data(&battery_data);
-    gpio_turn_on_leds(LED_RED | LED_YELLOW | LED_GREEN);
-    vTaskDelay(1000 / portTICK_PERIOD_MS); 
-    gpio_turn_off_leds(LED_RED | LED_YELLOW | LED_GREEN);
+
 
     uint8_t jedec_id[3] = {0};
     ext_flash_read_jedec_data(jedec_id);
@@ -41,6 +38,16 @@ void app_main() {
     ext_flash_write_enable();
     ext_flash_read_status_register(&status_reg);
     ext_flash_wait_for_idle(2000);
+
+
+
+    while(1) {
+        battery_monitor_update_battery_data(&battery_data);
+        gpio_turn_on_leds(LED_RED | LED_YELLOW | LED_GREEN);
+        vTaskDelay(1000 / portTICK_PERIOD_MS); 
+        gpio_turn_off_leds(LED_RED | LED_YELLOW | LED_GREEN);
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
 
 
     //lfs_delete_file("/dog_run__353.csv");
