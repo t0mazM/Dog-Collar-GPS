@@ -125,58 +125,60 @@ esp_err_t wifi_connect_and_start_services(void) { //TODO HANDLE ERRORS - return 
 
 }
 
+
 esp_err_t wifi_stop_all_services(void) {
     
     bool any_errors = false;
-    esp_err_t error;
 
-    // 1. FIRST: Unregister/stop wifi event handlers that are running in the background/tas
+    // 1. Unregister/stop wifi event handlers that are running in the background/tas
     esp_event_handler_unregister(WIFI_EVENT, ESP_EVENT_ANY_ID, wifi_event_handler);
     esp_event_handler_unregister(IP_EVENT, IP_EVENT_STA_GOT_IP, wifi_event_handler);
     
-    // 1. Stop application services first
-    error =  http_server_stop();
-    mdns_free(); //No return values
+    // 1. Stop http server
+    if(http_server_stop() != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to stop HTTP server");
+        any_errors = true;
+    }
 
-    // 2. Disconnect from network
-    error = esp_wifi_disconnect();
-    if (error != ESP_OK && error != ESP_ERR_WIFI_NOT_CONNECT) {  // Not connected is OK
-        ESP_LOGW(TAG, "WiFi disconnect failed: %s", esp_err_to_name(error));
+    mdns_free(); //No return values
+    ESP_LOGI(TAG, "mDNS service stopped");
+
+    // 3. Disconnect from network
+    if (esp_wifi_disconnect() != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to disconnect from WiFi");
         any_errors = true;
     }
     
     // Wait for clean disconnection
     vTaskDelay(pdMS_TO_TICKS(2000));
 
-    // 3. Stop WiFi driver
-    error = esp_wifi_stop();
-    if (error != ESP_OK) {
-        ESP_LOGE(TAG, "WiFi stop failed: %s", esp_err_to_name(error));
-        // Continue anyway - try to clean up what we can
+    // 4. Stop WiFi driver
+    if (esp_wifi_stop() != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to stop WiFi");
         any_errors = true;
     }
     
     vTaskDelay(pdMS_TO_TICKS(1000));
 
-    // 4. Deinitialize WiFi driver
-    error = esp_wifi_deinit();
-    if (error != ESP_OK) {
-        ESP_LOGE(TAG, "WiFi deinit failed: %s", esp_err_to_name(error));
+    // 5. Deinitialize WiFi driver
+    if (esp_wifi_deinit() != ESP_OK) {
+        ESP_LOGE(TAG, "WiFi deinit failed");
         any_errors = true;
     }
 
-    // 5. Clean up event group
+    // 6. Clean up event group
     if (s_wifi_event_group != NULL) {
         vEventGroupDelete(s_wifi_event_group);
         s_wifi_event_group = NULL;
     }
 
-    // Reset retry counter for next connection
+    // 7. Reset retry counter for next wifi connection
     s_retry_num = 0;
 
+    // 8. Display final status
     if (any_errors) {
         ESP_LOGW(TAG, "WiFi shutdown completed with some errors");
-        return ESP_ERR_INVALID_STATE;  // Indicate partial failure
+        return ESP_FAIL;
     }
 
     ESP_LOGI(TAG, "WiFi services shutdown completed successfully");

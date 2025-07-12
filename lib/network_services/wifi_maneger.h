@@ -21,6 +21,22 @@
 #define WIFI_MAX_CONNECTION_TIMEOUT_MS 10000
 
 esp_err_t wifi_connect_and_start_services(void);
+
+/**
+ * @brief Stops all Wi-Fi services and cleans up resources.
+ *
+ * This function stops all Wi-Fi related services in order:
+ * 1. Unregisters event handlers.
+ * 2. Stops the HTTP server.
+ * 3. Disconnects from the Wi-Fi network.
+ * 4. Stops the Wi-Fi driver.
+ * 5. Deinitializes the Wi-Fi driver.
+ * 6. Cleans up the event group.
+ * 7. Resets the retry counter for the next connection attempt.
+ * 8. Logs the final status of the shutdown process.
+ *
+ * @return esp_err_t ESP_OK on success, or an error code on failure.
+ */
 esp_err_t wifi_stop_all_services(void);
 
 #endif // WIFI_MANAGER_H
