@@ -136,10 +136,11 @@ static esp_err_t download_file_get_handler(httpd_req_t *req) {
 
     // Loop to read and send file in chunks
     lfs_ssize_t bytes_read = 0;
+    int i=0;
     do {
         bytes_read = lfs_file_read(&lfs, &file, read_buffer, sizeof(read_buffer));
         if (bytes_read < 0) {
-            
+
             ESP_LOGE(TAG, "Failed to read from file %s (%d)", query_string, (int)bytes_read);
             lfs_file_close(&lfs, &file);
             return ESP_FAIL;
@@ -151,6 +152,7 @@ static esp_err_t download_file_get_handler(httpd_req_t *req) {
                 lfs_file_close(&lfs, &file);
                 return ESP_FAIL; // Client disconnected or error
             }
+            printf("Sended chunk number %d \n ", i++);
         }
     } while (bytes_read > 0);
 
