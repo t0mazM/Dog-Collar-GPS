@@ -26,7 +26,7 @@ void app_main() {
     gps_l96_init();
     lfs_mount_filesystem(true);
     nvs_flash_init();
-    wifi_init_sta();
+    wifi_connect_and_start_services();
 
 
 

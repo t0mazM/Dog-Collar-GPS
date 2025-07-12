@@ -18,7 +18,8 @@
 #include "http_server.h"
 
 #define WIFI_RECONNECT_RETRIES_NUM 10
+#define WIFI_MAX_CONNECTION_TIMEOUT_MS 10000
 
-void wifi_init_sta(void);
+esp_err_t wifi_connect_and_start_services(void);
 
 #endif // WIFI_MANAGER_H
