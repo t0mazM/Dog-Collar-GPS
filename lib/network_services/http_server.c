@@ -101,7 +101,9 @@ static esp_err_t list_files_get_handler(httpd_req_t *req) {
 
 static esp_err_t download_file_get_handler(httpd_req_t *req) {
 
-    char read_buffer[1024]; // Buffer to read file content. The read will fill it to the full so size should be the leng off packet to transfer over wifi
+    char read_buffer[10]; // TODO: Have DOWLOAD_BUFFER_SIZE be 4096, , and then send that in chunks off 1460
+    lfs_ssize_t bytes_read = 0;
+    uint16_t num_off_chunks = 1;
     lfs_file_t file;
  
     // Check if the request URI contains the 'file' parameter
@@ -135,8 +137,6 @@ static esp_err_t download_file_get_handler(httpd_req_t *req) {
     httpd_resp_set_hdr(req, "Content-Disposition", content_disposition);
 
     // Loop to read and send file in chunks
-    lfs_ssize_t bytes_read = 0;
-    int i=0;
     do {
         bytes_read = lfs_file_read(&lfs, &file, read_buffer, sizeof(read_buffer));
         if (bytes_read < 0) {
@@ -152,7 +152,7 @@ static esp_err_t download_file_get_handler(httpd_req_t *req) {
                 lfs_file_close(&lfs, &file);
                 return ESP_FAIL; // Client disconnected or error
             }
-            printf("Sended chunk number %d \n ", i++);
+            printf("Sended chunk number %d \n ", ++num_off_chunks);
         }
     } while (bytes_read > 0);
 
