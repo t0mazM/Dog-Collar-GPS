@@ -57,7 +57,7 @@ esp_err_t wifi_connect_and_start_services(void) { //TODO HANDLE ERRORS - return 
                         TAG,
                         "Failed to create default event loop");
 
-    esp_netif_t* sta_netif = esp_netif_create_default_wifi_sta();
+    esp_netif_t* sta_netif = esp_netif_create_default_wifi_sta(); // My/your wifi newtwork info/iterface
     if (sta_netif == NULL) {
         ESP_LOGE(TAG, "Failed to create default Wi-Fi station network interface");
         return ESP_FAIL;
@@ -123,4 +123,60 @@ esp_err_t wifi_connect_and_start_services(void) { //TODO HANDLE ERRORS - return 
     ESP_LOGE(TAG, "Connection timeout for SSID:%s", ssid);
     return ESP_ERR_TIMEOUT;
 
+}
+
+esp_err_t wifi_stop_all_services(void) {
+    
+    bool any_errors = false;
+    esp_err_t error;
+    
+    // 1. Stop application services first
+    
+    error =  http_server_stop();
+
+    mdns_free(); //No return values
+
+    // 2. Disconnect from network
+    error = esp_wifi_disconnect();
+    if (error != ESP_OK && error != ESP_ERR_WIFI_NOT_CONNECT) {  // Not connected is OK
+        ESP_LOGW(TAG, "WiFi disconnect failed: %s", esp_err_to_name(error));
+        any_errors = true;
+    }
+    
+    // Wait for clean disconnection
+    vTaskDelay(pdMS_TO_TICKS(2000));
+
+    // 3. Stop WiFi driver
+    error = esp_wifi_stop();
+    if (error != ESP_OK) {
+        ESP_LOGE(TAG, "WiFi stop failed: %s", esp_err_to_name(error));
+        // Continue anyway - try to clean up what we can
+        any_errors = true;
+    }
+    
+    vTaskDelay(pdMS_TO_TICKS(1000));
+
+    // 4. Deinitialize WiFi driver
+    error = esp_wifi_deinit();
+    if (error != ESP_OK) {
+        ESP_LOGE(TAG, "WiFi deinit failed: %s", esp_err_to_name(error));
+        any_errors = true;
+    }
+
+    // 5. Clean up event group
+    if (s_wifi_event_group != NULL) {
+        vEventGroupDelete(s_wifi_event_group);
+        s_wifi_event_group = NULL;
+    }
+
+    // Reset retry counter for next connection
+    s_retry_num = 0;
+
+    if (any_errors) {
+        ESP_LOGW(TAG, "WiFi shutdown completed with some errors");
+        return ESP_ERR_INVALID_STATE;  // Indicate partial failure
+    }
+
+    ESP_LOGI(TAG, "WiFi services shutdown completed successfully");
+    return ESP_OK;
 }

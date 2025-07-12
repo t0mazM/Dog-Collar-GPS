@@ -1,6 +1,7 @@
 #include "http_server.h"
 
 static const char *TAG = "HTTP_SERVER";
+httpd_handle_t server = NULL; //
 
 // Handlers prototypes
 static esp_err_t hello_get_handler(httpd_req_t *req);
@@ -11,7 +12,7 @@ esp_err_t http_server_start(void) {
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
     config.server_port = HTTP_SERVER_PORT_NUM;
     
-    httpd_handle_t server = NULL;
+    server = NULL;
 
     // root URI handler
     if (httpd_start(&server, &config) == ESP_OK) {
@@ -163,4 +164,21 @@ static esp_err_t download_file_get_handler(httpd_req_t *req) {
     lfs_file_close(&lfs, &file);
     ESP_LOGI(TAG, "File %s sent successfully", query_string);
     return ESP_OK;
+}
+
+esp_err_t http_server_stop(void) {
+    if (server != NULL) {
+        ESP_LOGI(TAG, "Stopping HTTP server");
+        esp_err_t err = httpd_stop(server);
+        if (err == ESP_OK) {
+            server = NULL;  // Clear the server handle
+            ESP_LOGI(TAG, "HTTP server stopped successfully");
+        } else {
+            ESP_LOGE(TAG, "Failed to stop HTTP server: %s", esp_err_to_name(err));
+        }
+        return err;
+    } else {
+        ESP_LOGW(TAG, "HTTP server is not running");
+        return ESP_OK;  // Not an error if already stopped
+    }
 }

@@ -10,7 +10,10 @@
 #define RESPONSE_BUFFER_SIZE 4096
 #define HTTP_SERVER_PORT_NUM 80
 #define CHUNK_BUFFER_SIZE 1460 // TCP MSS (Maximum Segment Size) for ESP32
-esp_err_t http_server_start(void);
 
+
+
+esp_err_t http_server_start(void);
+esp_err_t http_server_stop(void);
 
 #endif // HTTP_SERVER_H

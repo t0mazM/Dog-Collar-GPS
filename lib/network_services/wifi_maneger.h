@@ -21,5 +21,6 @@
 #define WIFI_MAX_CONNECTION_TIMEOUT_MS 10000
 
 esp_err_t wifi_connect_and_start_services(void);
+esp_err_t wifi_stop_all_services(void);
 
 #endif // WIFI_MANAGER_H

@@ -40,6 +40,9 @@ void app_main() {
     ext_flash_wait_for_idle(2000);
     //file_system_test();
 
+    vTaskDelay(15000 / portTICK_PERIOD_MS); 
+    wifi_stop_all_services();
+
 
     while(1) {
         battery_monitor_update_battery_data(&battery_data);
