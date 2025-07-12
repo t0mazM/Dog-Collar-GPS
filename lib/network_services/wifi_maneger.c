@@ -184,3 +184,20 @@ esp_err_t wifi_stop_all_services(void) {
     ESP_LOGI(TAG, "WiFi services shutdown completed successfully");
     return ESP_OK;
 }
+
+esp_err_t wifi_stop_all_services_retry(uint16_t _max_retry_count) {
+
+esp_err_t error;
+uint16_t retry_count = 0;;
+
+do{
+  error = wifi_stop_all_services();
+  retry_count++;
+  if (error == ESP_OK) {
+      return ESP_OK;
+  }
+  ESP_LOGI(TAG, "Retrying WiFi shutdown (%d/%d)", retry_count, _max_retry_count);
+}while(error != ESP_OK && retry_count < _max_retry_count);
+
+return error;
+}

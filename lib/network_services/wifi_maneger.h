@@ -39,4 +39,15 @@ esp_err_t wifi_connect_and_start_services(void);
  */
 esp_err_t wifi_stop_all_services(void);
 
+/**
+ * @brief Retries stopping all Wi-Fi services
+ *
+ * This function attempts to stop all Wi-Fi services, retrying up to _max_retry_count times
+ * Each failed attempt is logged.
+ *
+ * @param _max_retry_count The maximum number of retry attempts.
+ * @return esp_err_t ESP_OK if successful, or an error code if all retries fail.
+ */
+esp_err_t wifi_stop_all_services_retry(uint16_t _max_retry_count);
+
 #endif // WIFI_MANAGER_H

@@ -41,7 +41,7 @@ void app_main() {
     //file_system_test();
 
     vTaskDelay(15000 / portTICK_PERIOD_MS); 
-    wifi_stop_all_services();
+    wifi_stop_all_services_retry(10);
 
 
     while(1) {
