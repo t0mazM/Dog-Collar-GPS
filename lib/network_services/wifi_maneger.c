@@ -129,11 +129,13 @@ esp_err_t wifi_stop_all_services(void) {
     
     bool any_errors = false;
     esp_err_t error;
+
+    // 1. FIRST: Unregister/stop wifi event handlers that are running in the background/tas
+    esp_event_handler_unregister(WIFI_EVENT, ESP_EVENT_ANY_ID, wifi_event_handler);
+    esp_event_handler_unregister(IP_EVENT, IP_EVENT_STA_GOT_IP, wifi_event_handler);
     
     // 1. Stop application services first
-    
     error =  http_server_stop();
-
     mdns_free(); //No return values
 
     // 2. Disconnect from network
