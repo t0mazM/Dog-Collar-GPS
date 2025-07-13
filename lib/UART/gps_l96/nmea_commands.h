@@ -31,5 +31,8 @@
 
 #define ONLY_GNRMC "$PMTK314,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0*29\r\n"
 
+#define GNSS_SET_UPDATE_RATE_1HZ "$PMTK220,1000*1F\r\n" // Set update rate to 1Hz
+
+
 #endif // NMEA_COMMANDS_H
     

@@ -32,11 +32,22 @@ esp_err_t gps_l96_start_recording(void) {
     gps_force_on_set(true); //Crucial to set it to HIGH
 
     
-    ESP_RETURN_ON_ERROR(gps_l96_send_command(GNSS_MODE_GPS_GLONASS), TAG, "Failed to send GNSS_MODE_GPS_GLONASS command");
-    // ESP_RETURN_ON_ERROR(gps_l96_send_command(GNSS_SET_UPDATE_RATE_1HZ), TAG, "Failed to send GNSS_SET_UPDATE_RATE_1HZ command");
-    // ESP_RETURN_ON_ERROR(gps_l96_send_command(GNSS_QUERY_UPDATE_RATE), TAG, "Failed to send GNSS_QUERY_UPDATE_RATE command");
-    vTaskDelay(1000 / portTICK_PERIOD_MS); // Wait for the GPS module to process the commands
-    ESP_RETURN_ON_ERROR(gps_l96_send_command(ONLY_GNRMC), TAG, "Failed to send ONLY_GNRMC command");
+    ESP_RETURN_ON_ERROR(gps_l96_send_command(GNSS_MODE_GPS_GLONASS), 
+                        TAG, 
+                        "Failed to send GNSS_MODE_GPS_GLONASS command");
+
+    vTaskDelay(1000 / portTICK_PERIOD_MS); // TODO: check if this is needed
+
+    ESP_RETURN_ON_ERROR(gps_l96_send_command(GNSS_SET_UPDATE_RATE_1HZ), 
+                        TAG, 
+                        "Failed to send GNSS_SET_UPDATE_RATE_1HZ command");
+   
+    vTaskDelay(1000 / portTICK_PERIOD_MS); // TODO: check if this is needed
+
+    ESP_RETURN_ON_ERROR(gps_l96_send_command(ONLY_GNRMC), 
+                        TAG, 
+                        "Failed to send ONLY_GNRMC command");
+                        
     gps_state = GPS_STATE_RECORDING;
     return ESP_OK;
 }
