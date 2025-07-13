@@ -152,3 +152,14 @@ void gps_l96_print_data(void){ // a DEBUG function to print GPS data
             printf("Date: %02d/%02d/%04d\n", gps_rcm_data.date.day, gps_rcm_data.date.month, gps_rcm_data.date.year + 2000);
 
 }
+
+esp_err_t gps_l96_start_activity_tracking(void) {
+
+    // Start recording
+    ESP_RETURN_ON_ERROR(gps_l96_start_recording(), 
+                        TAG, 
+                        "Failed to start GPS recording");
+
+
+    return ESP_OK;
+}
