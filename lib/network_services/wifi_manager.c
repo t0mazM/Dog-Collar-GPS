@@ -1,4 +1,4 @@
-#include "wifi_maneger.h"
+#include "wifi_manager.h"
 #include "wifi_credentials.h"
 
 static const char *TAG = "WIFI_APP";
