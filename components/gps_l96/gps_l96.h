@@ -2,8 +2,8 @@
 #define GPS_L96_H
 
 #include "nmea_commands.h"
-#include "gpio_expander.h"
-#include <uart.h>
+#include "gpio_expander/gpio_expander.h"
+#include "uart.h"
 #include "minmea.h"
 
 #define NMEA_SENTENCE_BUF_SIZE 1024 

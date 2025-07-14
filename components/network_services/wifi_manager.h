@@ -13,9 +13,9 @@
 #include "esp_err.h" 
 #include "esp_check.h"
 #include "esp_log.h"
-#include "file_system_littlefs.h"
+#include "file_system_littlefs/file_system_littlefs.h"
 #include "mdns_service.h"
-#include "http_server.h"
+#include "network_services/http_server.h"
 
 #define WIFI_RECONNECT_RETRIES_NUM 10
 #define WIFI_MAX_CONNECTION_TIMEOUT_MS 10000

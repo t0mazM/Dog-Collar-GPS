@@ -1,13 +1,13 @@
 #include <stdio.h>
 #include <i2c.h>
 #include <uart.h>
-#include <ext_flash.h>
-#include "battery_monitor.h"
-#include "gpio_expander.h"
-#include "gps_l96.h"
-#include "nmea_commands.h"
-#include "file_system_littlefs.h"
-#include "wifi_manager.h"
+#include "external_flash/ext_flash.h"
+#include "battery_monitor/battery_monitor.h"
+#include "gpio_expander/gpio_expander.h"
+#include "gps_l96/gps_l96.h"
+#include "gps_l96/nmea_commands.h"
+#include "file_system_littlefs/file_system_littlefs.h"
+#include "network_services/wifi_manager.h"
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"

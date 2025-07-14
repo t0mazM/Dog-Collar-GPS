@@ -6,7 +6,6 @@
 #include "driver/gpio.h"
 #include "esp_err.h"
 #include "external_flash_gpio.h" // For WP and HOLD pin definitions
-#include "error_handling.h" 
 #include "driver/spi_master.h"
 #include "driver/gpio.h"
 #include "esp_log.h"

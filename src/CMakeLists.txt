@@ -9,8 +9,7 @@ FILE(GLOB_RECURSE app_sources
 
 idf_component_register(
     SRCS ${app_sources}
-    INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/drivers
-    INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/components
-
+    INCLUDE_DIRS 
+        ${CMAKE_SOURCE_DIR}/drivers
+        ${CMAKE_SOURCE_DIR}/components
 )
-
