@@ -2,7 +2,7 @@
 #define GPS_L96_H
 
 #include "nmea_commands.h"
-#include "gpio_extender/gpio_extender.h"
+#include "gpio_extender.h"
 #include <uart.h>
 #include "minmea.h"
 

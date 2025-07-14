@@ -2,10 +2,10 @@
 #include <i2c.h>
 #include <uart.h>
 #include <ext_flash.h>
-#include "battery_monitor/battery_monitor.h"
-#include "gpio_extender/gpio_extender.h"
-#include "gps_l96/gps_l96.h"
-#include "gps_l96/nmea_commands.h"
+#include "battery_monitor.h"
+#include "gpio_extender.h"
+#include "gps_l96.h"
+#include "nmea_commands.h"
 #include "file_system_littlefs.h"
 #include "wifi_maneger.h"
 
