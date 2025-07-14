@@ -14,6 +14,8 @@
 #include "esp_log.h"
 #include "nvs_flash.h"
 
+#include "../dog_collar/dog_collar.h"
+
 
 void app_main() {
 

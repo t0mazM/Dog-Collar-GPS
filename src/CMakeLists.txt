@@ -5,6 +5,7 @@ FILE(GLOB_RECURSE app_sources
     ${CMAKE_SOURCE_DIR}/src/*.*
     ${CMAKE_SOURCE_DIR}/drivers/*.*
     ${CMAKE_SOURCE_DIR}/components/*.*
+    ${CMAKE_SOURCE_DIR}/dog_collar/*.*
 )
 
 idf_component_register(
@@ -12,4 +13,5 @@ idf_component_register(
     INCLUDE_DIRS 
         ${CMAKE_SOURCE_DIR}/drivers
         ${CMAKE_SOURCE_DIR}/components
+        ${CMAKE_SOURCE_DIR}/dog_collar
 )
