@@ -1,6 +1,6 @@
-#include "gpio_extender.h"
+#include "gpio_expander.h"
 
-static const char *TAG = "GPIO_EXTENDER";
+static const char *TAG = "GPIO_EXPANDER";
 static uint8_t gpio_output_state = 0xFF; //Global variable to hold the state of the GPIO pins
 
 // Initialize PCF8574 pins (all LEDs off)

@@ -3,7 +3,7 @@
 #include <uart.h>
 #include <ext_flash.h>
 #include "battery_monitor.h"
-#include "gpio_extender.h"
+#include "gpio_expander.h"
 #include "gps_l96.h"
 #include "nmea_commands.h"
 #include "file_system_littlefs.h"

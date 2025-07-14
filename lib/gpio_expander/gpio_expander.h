@@ -1,5 +1,5 @@
-#ifndef GPIO_EXTENDER_H
-#define GPIO_EXTENDER_H
+#ifndef GPIO_EXPANDER_H
+#define GPIO_EXPANDER_H
 
 #include <i2c.h>
 #define PCF8574_ADDR 0x27
@@ -24,4 +24,4 @@ void gpio_turn_off_leds(uint8_t led_mask);
 esp_err_t gpio_read_inputs(uint8_t *input_state);
 void gpio_reset_gps(void);
 esp_err_t gps_force_on_set(bool enable);
-#endif
+#endif // GPIO_EXPANDER_H
