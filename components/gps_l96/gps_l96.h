@@ -7,13 +7,6 @@
 #include "minmea.h"
 
 #define NMEA_SENTENCE_BUF_SIZE 1024 
-typedef enum {
-    GPS_STATE_IDLE,
-    GPS_STATE_WAIT_FIX,
-    GPS_STATE_HAS_FIX,
-    GPS_STATE_RECORDING,
-    GPS_STATE_DEEP_SLEEP
-} gps_state_t;
 
 typedef struct {
     uint8_t gps_point[3];

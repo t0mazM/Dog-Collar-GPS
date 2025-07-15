@@ -2,12 +2,11 @@
 
 static const char *TAG = "GPS_L96";
 
-gps_state_t gps_state = GPS_STATE_IDLE;  // Default state on power on
+
 struct minmea_sentence_rmc gps_rcm_data; // GPS RMC data structure to hold parsed data
 
 esp_err_t gps_l96_init(void) {
     gps_l96_send_command(GNSS_MODE_GPS_GLONASS);
-    gps_state = GPS_STATE_IDLE;
     return ESP_OK;
 }
 
@@ -22,7 +21,6 @@ esp_err_t gps_l96_go_to_standby_mode(void) {
 
     ESP_RETURN_ON_ERROR(gps_force_on_set(true), TAG, "Failed to set FORCE_ON pin");  // Set FORCE_ON pin to high (in case we are in deep sleep mode)
     ESP_RETURN_ON_ERROR(gps_l96_send_command(GPS_STAND_BY_MODE), TAG, "Failed to send GPS_STAND_BY_MODE command");
-    gps_state = GPS_STATE_IDLE;
     return ESP_OK;
 }
 
@@ -47,8 +45,6 @@ esp_err_t gps_l96_start_recording(void) {
     ESP_RETURN_ON_ERROR(gps_l96_send_command(ONLY_GNRMC), 
                         TAG, 
                         "Failed to send ONLY_GNRMC command");
-                        
-    gps_state = GPS_STATE_RECORDING;
     return ESP_OK;
 }
 
@@ -57,7 +53,6 @@ esp_err_t gps_l96_go_to_back_up_mode(void) { // same as deep sleep mode
     //note: we can't check if if was send succesfull becouse gps modeule goes into ddepsleep and it does not respond to any commands
     gps_l96_send_command(GPS_DEEP_SLEEP_MODE); 
     
-    gps_state = GPS_STATE_DEEP_SLEEP;
     return ESP_OK;
 }
 
