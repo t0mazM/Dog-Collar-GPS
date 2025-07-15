@@ -13,6 +13,7 @@
 #include "../components/file_system_littlefs/file_system_littlefs.h"
 #include "../components/gpio_expander/gpio_expander.h"
 #include "../components/gps_l96/gps_l96.h"
+#include "../components/network_services/wifi_manager.h"
 
 typedef enum {
     GPS_STATE_IDLE,

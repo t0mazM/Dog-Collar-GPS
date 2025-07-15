@@ -29,8 +29,8 @@ esp_err_t dog_collar_components_init(void){
     ESP_RETURN_ON_ERROR(lfs_init(), TAGG, "Failed to initialize File System");
     init_state.filesystem_ready = true;
 
-    // ESP_RETURN_ON_ERROR(wifi_server_init(), TAGG, "Failed to initialize WiFi Server");
-    // init_state.wifi_server_ready = true;
+    ESP_RETURN_ON_ERROR(wifi_init(), TAGG, "Failed to initialize Wi-Fi");
+    init_state.wifi_server_ready = true;
 
     return ESP_OK;
 }

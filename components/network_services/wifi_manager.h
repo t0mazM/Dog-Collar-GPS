@@ -13,12 +13,24 @@
 #include "esp_err.h" 
 #include "esp_check.h"
 #include "esp_log.h"
+#include "nvs_flash.h"
 #include "file_system_littlefs/file_system_littlefs.h"
 #include "mdns_service.h"
 #include "network_services/http_server.h"
 
 #define WIFI_RECONNECT_RETRIES_NUM 10
 #define WIFI_MAX_CONNECTION_TIMEOUT_MS 10000
+
+
+/**
+ * @brief Initializes all modules for WI-FI connectivity 
+ *
+ * This function initializes the NVS flash storage, connects to the specified Wi-Fi network,
+ * sets up the mDNS service, and starts the HTTP server.
+ *
+ * @return esp_err_t ESP_OK on success, or an error code on failure.
+ */
+esp_err_t wifi_init(void);
 
 esp_err_t wifi_connect_and_start_services(void);
 

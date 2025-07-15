@@ -13,6 +13,19 @@ static EventGroupHandle_t s_wifi_event_group;
 
 static int s_retry_num = 0;
 
+
+esp_err_t wifi_init(void) {
+
+    ESP_RETURN_ON_ERROR(nvs_flash_init(), 
+                        TAG, "Failed to initialize NVS"
+    );
+
+    ESP_RETURN_ON_ERROR(wifi_connect_and_start_services(),
+                        TAG, "Failed to connect to Wi-Fi network"
+    );
+    return ESP_OK;
+}
+
 /**
  * @brief Event handler for Wi-Fi events.
  * Handles connection, disconnection, and IP acquisition.
