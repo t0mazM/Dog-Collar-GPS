@@ -108,6 +108,18 @@ esp_err_t ext_flash_read_status_register(uint8_t *status);
  * @return ESP_OK if the flash is idle, or an error code on timeout or failure.
  */
 esp_err_t ext_flash_wait_for_idle(int timeout_ms);
+
+
+/**
+ * @brief Read data from the external flash chip.
+ * 
+ * This function reads a specified number of bytes from the external flash chip starting at a given address.
+ * 
+ * @param address The starting address to read from.
+ * @param buffer Pointer to the buffer where the read data will be stored.
+ * @param size Number of bytes to read.
+ * @return ESP_OK on success, or an error code on failure.
+ */
 esp_err_t ext_flash_read(uint32_t address, uint8_t *buffer, uint32_t size);
 esp_err_t ext_flash_write(uint32_t address, const uint8_t *buffer, uint32_t size);
 esp_err_t ext_flash_erase_sector(uint32_t address);

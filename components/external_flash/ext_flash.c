@@ -182,34 +182,32 @@ esp_err_t ext_flash_wait_for_idle(int timeout_ms) {
     } while (true); 
 }
 esp_err_t ext_flash_read(uint32_t address, uint8_t *buffer, uint32_t size) {
+
     if (size == 0) {
         return ESP_OK; // Nothing to read
     }
+
     if (size > SPI_MAX_TRANSFER_SIZE) {
         ESP_LOGE(TAG, "Read size (%lu) exceeds max transfer size (%d). Consider breaking into smaller reads.", size, SPI_MAX_TRANSFER_SIZE);
         return ESP_ERR_INVALID_SIZE;
     }
 
+    /* Initialize the transaction structure for reading the data */
     spi_transaction_ext_t t = {0}; 
-
     t.base.cmd = SPI_CMD_FAST_READ; 
     t.base.addr = address;          
-
     t.base.rx_buffer = buffer;      // Buffer to receive data
     t.base.rxlength = size * 8;     // Total bits to receive
-    t.base.length = size * 8;       // Set length equal to rxlength for full-duplex read
-
+    t.base.length = size * 8;       // Length equal to rxlength for full-duplex read
     t.base.flags = SPI_TRANS_VARIABLE_ADDR | SPI_TRANS_VARIABLE_DUMMY;
     t.address_bits = 24; 
     t.dummy_bits = 8;    
 
-    esp_err_t ret = spi_device_transmit(spi, (spi_transaction_t*)&t);
-    if (ret != ESP_OK) {
-        ESP_LOGE(TAG, "Failed to read %lu bytes from 0x%06lX: %s", size, address, esp_err_to_name(ret));
-    } else {
-        ESP_LOGD(TAG, "Read %lu bytes from 0x%06lX", size, address);
-    }
-    return ret;
+    ESP_RETURN_ON_ERROR(spi_device_transmit(spi, (spi_transaction_t*)&t),
+                        TAG, "Failed to read the data off the external flash chip."
+    );
+
+    return ESP_OK;
 }
 esp_err_t ext_flash_write(uint32_t address, const uint8_t *buffer, uint32_t size) {
     // Ensure write size does not exceed page size
