@@ -12,8 +12,11 @@
  * This function sets both pins to HIGH to test the SPI flash chip's
  * functionality.
  *
- * @note Used only for testing purposes.
+ * The pins could have been physically connected to the 3.3V, but were forgotten during design phase so this function
+ * ensures they are set to HIGH.
+ *
+ * @note This function should be called after initializing the GPIO expander.
  */
-void SPI_set_HOLD_WP_HIGH(void);
+esp_err_t SPI_set_HOLD_WP_HIGH(void);
 
 #endif  // SPI_GPIO_CONFIG_H

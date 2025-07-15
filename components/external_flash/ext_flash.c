@@ -35,7 +35,11 @@ spi_device_interface_config_t get_spi_device_config(void) {
 
 esp_err_t ext_flash_init(void) {
 
-    gpio_init();
+    // Initialize GPIO expander so you can control HOLD and WP pins
+    ESP_RETURN_ON_ERROR(gpio_init(), 
+                        TAG, "Failed to initialize GPIO"
+    );
+
     SPI_set_HOLD_WP_HIGH(); 
     
     spi_bus_config_t buscfg = get_spi_bus_config();

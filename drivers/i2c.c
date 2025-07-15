@@ -10,7 +10,7 @@ esp_err_t i2c_init(void) {
         ESP_LOGW(TAG, "I2C is already initialized");
         return ESP_OK;
     }
-    
+
     i2c_config_t config = {
         .mode = I2C_MODE_MASTER,
         .sda_io_num = I2C_SDA,
@@ -20,10 +20,15 @@ esp_err_t i2c_init(void) {
         .master.clk_speed = I2C_FREQ_HZ,
     };
 
-    ESP_RETURN_ON_ERROR(i2c_param_config(I2C_PORT, &config), TAG, "Config failed");
-    ESP_RETURN_ON_ERROR(i2c_driver_install(I2C_PORT, I2C_MODE_MASTER, 0, 0, 0), TAG, "Driver install failed");
+    ESP_RETURN_ON_ERROR(i2c_param_config(I2C_PORT, &config), 
+                                        TAG, "Config failed"
+    );
+    ESP_RETURN_ON_ERROR(i2c_driver_install(I2C_PORT, I2C_MODE_MASTER, 0, 0, 0), 
+                        TAG, "Driver install failed"
+    );
 
     ESP_LOGI(TAG, "I2C initialized");
+    i2c_initialized = true;
     return ESP_OK;
 }
 

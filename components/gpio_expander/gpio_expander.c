@@ -5,13 +5,19 @@ static uint8_t gpio_output_state = 0xFF; //Global variable to hold the state of 
 
 // Initialize PCF8574 pins (all LEDs off)
 esp_err_t gpio_init(void) {
+
+    // Initialize I2C for GPIO expander
+    ESP_RETURN_ON_ERROR(i2c_init(), 
+                        TAG, "Failed to initialize I2C for GPIO expander"
+    );
+
     // Set all GPIO pins to high (LEDs off)
     gpio_output_state = 0xFF;
-
     ESP_RETURN_ON_ERROR(i2c_write_byte(PCF8574_ADDR, REG_ADDR_NOT_USED, gpio_output_state), 
-    TAG, "Failed to initialize GPIO expander"
+                        TAG, "Failed to initialize GPIO expander"
     );
     
+    ESP_LOGI(TAG, "GPIO expander initialized");
     return ESP_OK;
 }
 

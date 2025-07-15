@@ -1,6 +1,6 @@
 #include "dog_collar.h"
 
-const char* TAGG = "dog_collar";
+const char* TAGG = "DOG_COLLAR";
 gps_state_t gps_state = GPS_STATE_IDLE;  // Default state on power on
 
 esp_err_t dog_collar_components_init(void){
