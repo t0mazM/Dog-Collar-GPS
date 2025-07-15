@@ -24,12 +24,9 @@ typedef enum {
 } gps_state_t;
 
 typedef struct {
-    bool i2c_ready;
-    bool uart_ready;
-    bool flash_ready;
-    bool gpio_ready;
-    bool gps_ready;
-    bool battery_ready;
+    bool ext_flash_ready;
+    bool gps_l96_ready;
+    bool batt_mon_ready;
     bool filesystem_ready;
     bool wifi_server_ready;
 } collar_init_state_t;
