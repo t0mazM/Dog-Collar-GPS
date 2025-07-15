@@ -22,34 +22,43 @@ esp_err_t battery_monitor_init(void) {
 
 void battery_monitor_update_battery_data(battery_data_t *battery_data) {
 
+    /* Temporary variables for battery data */
     float temp_voltage;
+    float temp_soc;
+    float temp_temperature;
+    uint16_t flags;
+
+    /* Read battery voltage */
     if (read_voltage(&temp_voltage) == ESP_OK) {
         battery_data->voltage = temp_voltage;
     } else {
-        ESP_LOGW(TAG, "Failed to read voltage");
+        ESP_LOGW(TAG, "Failed to read battery voltage");
+        battery_data->voltage = -1.0f;
     }
-    float temp_soc;
+
+    /* Read battery state of charge */
     if (read_soc(&temp_soc) == ESP_OK) {
         battery_data->soc = temp_soc;
     } else {
-        ESP_LOGW(TAG, "Failed to read state of charge");
+        ESP_LOGW(TAG, "Failed to read battery state of charge");
+        battery_data->soc = -1.0f;
     }
 
-    float temp_temperature;
+    /* Read battery temperature */
     if (read_temperature(&temp_temperature) == ESP_OK) {
         battery_data->temperature = temp_temperature;
     } else {
-        ESP_LOGW(TAG, "Failed to read temperature");
+        ESP_LOGW(TAG, "Failed to read battery temperature");
+        battery_data->temperature = -1.0f;
     }
 
-    uint16_t temp_flags;
-    if (read_flags(&temp_flags) == ESP_OK) {
-        battery_data->flags = temp_flags;
+    /* Read battery flags */
+    if (read_flags(&flags) == ESP_OK) {
+        battery_data->flags = flags;
     } else {
         ESP_LOGW(TAG, "Failed to read battery flags");
+        battery_data->flags = 0xFFFF; 
     }
-    
-ESP_LOGI(TAG, "Battery Voltage: %.2f V, SOC: %.2f %%, Temperature: %.2f C , Flags: 0x%04X\n", battery_data->voltage, battery_data->soc, battery_data->temperature, battery_data->flags);
 }
 
 esp_err_t read_voltage(float *voltage) {

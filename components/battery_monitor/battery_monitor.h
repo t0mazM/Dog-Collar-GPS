@@ -21,6 +21,19 @@ extern battery_data_t battery_data;
 
 
 esp_err_t battery_monitor_init(void);
+
+/**
+ * @brief Reads the battery data and updates the values in the battery_data struct
+ * @param battery_data Pointer to the battery_data_t struct to be updated
+ * 
+ * This function reads:
+ *  - Battery voltage
+ *  - Battery state of charge
+ *  - Battery temperature
+ *  - Battery flags
+ * @note If any read fails, it logs a warning and sets the corresponding value to an invalid state.
+ * * @return None
+ */
 void battery_monitor_update_battery_data(battery_data_t *battery_data);
 
 esp_err_t read_voltage(float *voltage);
