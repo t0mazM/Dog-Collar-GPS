@@ -51,9 +51,8 @@
 #define W25Q128JV_SECTOR_SIZE       4096     // Bytes per 4KB sector
 #define W25Q128JV_TOTAL_SIZE_BYTES  (16 * 1024 * 1024) // 128M-bit = 16M-byte
 
-
+esp_err_t ext_flash_init(void);
 esp_err_t ext_flash_reset_chip(void);
-void ext_flash_init(void);
 esp_err_t ext_flash_read_jedec_data(uint8_t *buf);
 spi_device_handle_t ext_flash_get_spi_handle(void);
 

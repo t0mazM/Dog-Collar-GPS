@@ -33,7 +33,7 @@ spi_device_interface_config_t get_spi_device_config(void) {
     return devcfg;
 }
 
-void ext_flash_init(void) {
+esp_err_t ext_flash_init(void) {
 
     SPI_set_HOLD_WP_HIGH(); 
     
@@ -41,13 +41,21 @@ void ext_flash_init(void) {
     spi_device_interface_config_t devcfg = get_spi_device_config();
 
     // Initialize the SPI bus
-    ESP_ERROR_CHECK(spi_bus_initialize(SPI2_HOST, &buscfg, SPI_DMA_CH_AUTO));
+    ESP_RETURN_ON_ERROR(spi_bus_initialize(SPI2_HOST, &buscfg, SPI_DMA_CH_AUTO),
+                        TAG, "Failed to initialize SPI bus");
 
     // Add the flash device to the bus
-    ESP_ERROR_CHECK(spi_bus_add_device(SPI2_HOST, &devcfg, &spi));
-    ESP_LOGI(TAG, "SPI Flash initialized successfully and device added.");
-    ESP_ERROR_CHECK(ext_flash_reset_chip()); 
-    ESP_ERROR_CHECK(ext_flash_global_block_unlock()); 
+    ESP_RETURN_ON_ERROR(spi_bus_add_device(SPI2_HOST, &devcfg, &spi),
+                        TAG, "Failed to add SPI device");
+
+    // Reset the external flash chip
+    ESP_RETURN_ON_ERROR(ext_flash_reset_chip(),
+                        TAG, "Failed to reset external flash chip");
+
+    // Unlock the global block
+    ESP_RETURN_ON_ERROR(ext_flash_global_block_unlock(),
+                        TAG, "Failed to unlock global block");
+    return ESP_OK;
 }
 
 esp_err_t ext_flash_reset_chip(void) {
