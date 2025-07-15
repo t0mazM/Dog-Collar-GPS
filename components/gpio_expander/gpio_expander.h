@@ -18,7 +18,7 @@ typedef enum {
 } gpio_bit_t;
 
 
-void gpio_init(void);
+esp_err_t gpio_init(void);
 void gpio_turn_on_leds(uint8_t led_mask);
 void gpio_turn_off_leds(uint8_t led_mask);
 esp_err_t gpio_read_inputs(uint8_t *input_state);

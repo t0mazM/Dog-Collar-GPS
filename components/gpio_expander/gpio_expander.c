@@ -4,9 +4,15 @@ static const char *TAG = "GPIO_EXPANDER";
 static uint8_t gpio_output_state = 0xFF; //Global variable to hold the state of the GPIO pins
 
 // Initialize PCF8574 pins (all LEDs off)
-void gpio_init(void) {
+esp_err_t gpio_init(void) {
+    // Set all GPIO pins to high (LEDs off)
     gpio_output_state = 0xFF;
-    i2c_write_byte(PCF8574_ADDR, REG_ADDR_NOT_USED, gpio_output_state);
+
+    ESP_RETURN_ON_ERROR(i2c_write_byte(PCF8574_ADDR, REG_ADDR_NOT_USED, gpio_output_state), 
+    TAG, "Failed to initialize GPIO expander"
+    );
+    
+    return ESP_OK;
 }
 
 void gpio_turn_on_leds(uint8_t led_mask) {
