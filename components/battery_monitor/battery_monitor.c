@@ -2,14 +2,23 @@
 
 static const char *TAG = "BATTERY_MONITOR";
 
+battery_data_t battery_data = {0};
 
-battery_data_t battery_data = {
-    .i2c_address = BQ27441_ADDRESS,
-    .voltage = 0.0f,
-    .soc = 0.0f,
-    .temperature = 0.0f,
-    .flags = 0x0000 
-};
+esp_err_t battery_monitor_init(void) {
+
+    // Initialize I2C for battery monitor
+    ESP_RETURN_ON_ERROR(i2c_init(), 
+    TAG, "Failed to initialize I2C for battery monitor"
+    );
+
+    battery_data.i2c_address = BQ27441_ADDRESS;
+    battery_data.voltage = 0.0f;
+    battery_data.soc = 0.0f;
+    battery_data.temperature = 0.0f;
+    battery_data.flags = 0x0000;
+
+    return ESP_OK;
+}
 
 void battery_monitor_update_battery_data(battery_data_t *battery_data) {
 

@@ -20,6 +20,7 @@ typedef struct {
 extern battery_data_t battery_data;
 
 
+esp_err_t battery_monitor_init(void);
 void battery_monitor_update_battery_data(battery_data_t *battery_data);
 
 esp_err_t read_voltage(float *voltage);
