@@ -96,6 +96,17 @@ esp_err_t ext_flash_write_enable(void);
  * @return ESP_OK on success, or an error code on failure.
  */
 esp_err_t ext_flash_read_status_register(uint8_t *status);
+
+/**
+ * @brief Wait for the external flash chip to be idle.
+ * 
+ * This function waits for the external flash chip to be idle (not busy).
+ * With polling (while loop) it checks the status register until the BUSY bit is cleared or a timeout occurs.
+ * 
+ * @param timeout_ms Timeout in milliseconds to wait for the flash to become idle.
+ * @note Some block deletion commands may take even 1-2 seconds, so a timeout of 1000 ms is recommended.
+ * @return ESP_OK if the flash is idle, or an error code on timeout or failure.
+ */
 esp_err_t ext_flash_wait_for_idle(int timeout_ms);
 esp_err_t ext_flash_read(uint32_t address, uint8_t *buffer, uint32_t size);
 esp_err_t ext_flash_write(uint32_t address, const uint8_t *buffer, uint32_t size);

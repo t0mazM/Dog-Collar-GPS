@@ -157,22 +157,19 @@ esp_err_t ext_flash_read_status_register(uint8_t *status_reg_value) {
     return ESP_OK;
 }
 
-
 esp_err_t ext_flash_wait_for_idle(int timeout_ms) {
     uint8_t status_reg;
     TickType_t start_time = xTaskGetTickCount(); // Start time for timeout calculation
 
     do {
-        esp_err_t ret = ext_flash_read_status_register(&status_reg);
-        if (ret != ESP_OK) {
-            ESP_LOGE(TAG, "Failed to read status register while waiting for flash operation to complete: %s", esp_err_to_name(ret));
-            return ret; // Return the error
-        }
+        /* Read the status register to check if the flash is busy */
+        ESP_RETURN_ON_ERROR(ext_flash_read_status_register(&status_reg), 
+                            TAG, "Failed to read status register"
+        );
 
-        // Check the BUSY bit (LSB of status register, S0). It's 0 when idle.
+        /* Check the BUSY bit (LSB of status register -> S0). It's 0 when idle. */
         if (!(status_reg & (1 << 0))) { 
-            ESP_LOGI(TAG, "Flash is not busy. Status: 0x%02X", status_reg);
-            return ESP_OK;
+            return ESP_OK; //break out if flash is idle-ready to accept new commands
         }
 
         vTaskDelay(pdMS_TO_TICKS(1)); // Wait 1ms before polling again
