@@ -1,8 +1,13 @@
 #include "battery_monitor.h"
 
 static const char *TAG = "BATTERY_MONITOR";
-
 battery_data_t battery_data = {0};
+
+/* Declarations of static functions used for reading battery data */
+static esp_err_t read_voltage(float *voltage);
+static esp_err_t read_soc(float *soc);
+static esp_err_t read_temperature(float *temp);
+static esp_err_t read_flags(uint16_t *flags);
 
 esp_err_t battery_monitor_init(void) {
 
@@ -61,7 +66,7 @@ void battery_monitor_update_battery_data(battery_data_t *battery_data) {
     }
 }
 
-esp_err_t read_voltage(float *voltage) {
+static esp_err_t read_voltage(float *voltage) {
     uint16_t raw_voltage;
     esp_err_t ret = i2c_read_16bit(BQ27441_ADDRESS, VOLTAGE_CMD, &raw_voltage);
     if (ret != ESP_OK) {
@@ -71,7 +76,7 @@ esp_err_t read_voltage(float *voltage) {
     return ESP_OK;
 }
 
-esp_err_t read_soc(float *soc) {
+static esp_err_t read_soc(float *soc) {
     uint8_t raw_soc;
     esp_err_t ret = i2c_read_8bit(BQ27441_ADDRESS, SOC_CMD, &raw_soc);
     if (ret != ESP_OK) {
@@ -81,7 +86,7 @@ esp_err_t read_soc(float *soc) {
     return ESP_OK;
 }
 
-esp_err_t read_temperature(float *temperature) {
+static esp_err_t read_temperature(float *temperature) {
     uint16_t raw_tempearture;
     esp_err_t ret = i2c_read_16bit(BQ27441_ADDRESS, TEMP_CMD, &raw_tempearture);
     if (ret != ESP_OK) {
@@ -91,7 +96,7 @@ esp_err_t read_temperature(float *temperature) {
     return ESP_OK;
 }
 
-esp_err_t read_flags(uint16_t *flags) {
+static esp_err_t read_flags(uint16_t *flags) {
     esp_err_t ret = i2c_read_16bit(BQ27441_ADDRESS, FLAGS_CMD, flags);
     if (ret != ESP_OK) {
         return ret;

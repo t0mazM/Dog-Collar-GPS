@@ -43,10 +43,5 @@ esp_err_t battery_monitor_init(void);
  */
 void battery_monitor_update_battery_data(battery_data_t *battery_data);
 
-esp_err_t read_voltage(float *voltage);
-esp_err_t read_soc(float *soc);
-esp_err_t read_temperature(float *temp);
-esp_err_t read_flags(uint16_t *flags);
-
 
 #endif  // BATTERY_MONITOR_H
