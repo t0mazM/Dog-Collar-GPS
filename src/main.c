@@ -14,7 +14,7 @@
 #include "esp_log.h"
 
 
-#include "../dog_collar/dog_collar.h"
+#include "../dog_collar/components_init.h"
 
 
 void app_main() {

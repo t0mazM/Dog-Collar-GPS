@@ -1,5 +1,5 @@
-#ifndef DOG_COLLAR_H
-#define DOG_COLLAR_H
+#ifndef COMPONENTS_INIT_H
+#define COMPONENTS_INIT_H
 
 /* Includes from standard libraries */
 #include <stdbool.h>
@@ -39,4 +39,4 @@ int dog_collar_get_status_string(char *string_buffer, size_t string_buffer_size)
 
 
 
-#endif // DOG_COLLAR_H
+#endif // COMPONENTS_INIT_H

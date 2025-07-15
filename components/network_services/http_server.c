@@ -7,6 +7,7 @@ httpd_handle_t server = NULL; //
 static esp_err_t hello_get_handler(httpd_req_t *req);
 static esp_err_t list_files_get_handler(httpd_req_t *req);
 static esp_err_t download_file_get_handler(httpd_req_t *req);
+static esp_err_t status_get_handler(httpd_req_t *req);
 
 esp_err_t http_server_start(void) {
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
@@ -33,14 +34,23 @@ esp_err_t http_server_start(void) {
         };
         httpd_register_uri_handler(server, &files_uri);
 
-            // download files URI handler
-            httpd_uri_t download_uri = {
+        // download files URI handler
+        httpd_uri_t download_uri = {
             .uri        = "/download", // you get like http://dogcollar.local/download?file=my_log.txt
             .method     = HTTP_GET,
             .handler    = download_file_get_handler,
             .user_ctx   = NULL
         };
         httpd_register_uri_handler(server, &download_uri);
+
+        /* Display status of ESP32 components and battery */
+        httpd_uri_t status_uri = {
+            .uri        = "/status",
+            .method     = HTTP_GET,
+            .handler    = status_get_handler, 
+            .user_ctx   = NULL
+        };
+        httpd_register_uri_handler(server, &status_uri);
 
         ESP_LOGI(TAG, "HTTP server started on port %d", config.server_port);
         return ESP_OK;
@@ -163,6 +173,17 @@ static esp_err_t download_file_get_handler(httpd_req_t *req) {
 
     lfs_file_close(&lfs, &file);
     ESP_LOGI(TAG, "File %s sent successfully", query_string);
+    return ESP_OK;
+}
+
+static esp_err_t status_get_handler(httpd_req_t *req) {
+    char status_buffer[256];
+    int status_length = dog_collar_get_status_string(status_buffer, sizeof(status_buffer));
+    if (status_length < 0) {
+        httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to get status off ESP32 components and the battery");
+        return ESP_FAIL;
+    }
+    httpd_resp_send(req, status_buffer, status_length);
     return ESP_OK;
 }
 
