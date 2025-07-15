@@ -7,8 +7,7 @@ struct minmea_sentence_rmc gps_rcm_data; // GPS RMC data structure to hold parse
 
 esp_err_t gps_l96_init(void) {
     ESP_RETURN_ON_ERROR(uart_init(), 
-                        TAG, 
-                        "Failed to initialize UART for GPS L96");
+                        TAG, "Failed to initialize UART for GPS L96");
     return ESP_OK;
 }
 
