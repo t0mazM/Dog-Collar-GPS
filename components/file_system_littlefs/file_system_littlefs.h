@@ -24,6 +24,7 @@
 #define LFS_MAX_FILE_NAME_SIZE      64      // Maximum file name size 
 
 // Public functions for LittleFS integration
+esp_err_t lfs_init(void);
 esp_err_t lfs_mount_filesystem(bool format_if_fail);
 esp_err_t lfs_unmount_filesystem(void);
 esp_err_t lfs_list_directory(const char *path, char *file_name_buffer, size_t buffer_size);

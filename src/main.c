@@ -26,7 +26,6 @@ void app_main() {
     gpio_init();
     uart_init();
     gps_l96_init();
-    lfs_mount_filesystem(true);
     nvs_flash_init();
     wifi_connect_and_start_services();
 

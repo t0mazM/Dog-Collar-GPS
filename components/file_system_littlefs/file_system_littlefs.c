@@ -72,8 +72,6 @@ static int lfs_sync(const struct lfs_config *c) {
     return LFS_ERR_OK;
 }
 
-// ----------------- Public LittleFS Integration Functions ---------------------
-
 esp_err_t lfs_mount_filesystem(bool format_if_fail) {
     ESP_LOGI(LFS_TAG, "Initializing LittleFS configuration...");
 
@@ -125,6 +123,18 @@ esp_err_t lfs_mount_filesystem(bool format_if_fail) {
         }
     }
     ESP_LOGI(LFS_TAG, "LittleFS mounted successfully.");
+    return ESP_OK;
+}
+
+
+// ----------------- Public LittleFS Integration Functions ---------------------
+
+esp_err_t lfs_init(void) {
+
+    ESP_RETURN_ON_ERROR(lfs_mount_filesystem(true), 
+    LFS_TAG, "Failed to mount LittleFS"
+    );
+    
     return ESP_OK;
 }
 
