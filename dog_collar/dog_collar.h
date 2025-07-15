@@ -32,7 +32,7 @@ typedef struct {
 } collar_init_state_t;
 
 esp_err_t dog_collar_components_init(void);
-
+int dog_collar_get_status_string(char *string_buffer, size_t string_buffer_size);
 
 
 
