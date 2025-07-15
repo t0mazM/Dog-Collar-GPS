@@ -1,6 +1,18 @@
 #ifndef DOG_COLLAR_H
 #define DOG_COLLAR_H
 
+/* Includes from standard libraries */
+#include <stdbool.h>
+
+/* Includes from ESP-IDF */
+#include "esp_err.h"
+
+/* Includes from dog collar components */
+#include "../components/battery_monitor/battery_monitor.h"
+#include "../components/external_flash/ext_flash.h"
+#include "../components/file_system_littlefs/file_system_littlefs.h"
+#include "../components/gpio_expander/gpio_expander.h"
+#include "../components/gps_l96/gps_l96.h"
 
 typedef enum {
     GPS_STATE_IDLE,
@@ -10,9 +22,18 @@ typedef enum {
     GPS_STATE_DEEP_SLEEP
 } gps_state_t;
 
+typedef struct {
+    bool i2c_ready;
+    bool uart_ready;
+    bool flash_ready;
+    bool gpio_ready;
+    bool gps_ready;
+    bool battery_ready;
+    bool filesystem_ready;
+    bool wifi_server_ready;
+} collar_init_state_t;
 
-
-
+esp_err_t dog_collar_components_init(void);
 
 
 
