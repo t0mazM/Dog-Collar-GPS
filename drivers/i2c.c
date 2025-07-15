@@ -1,10 +1,16 @@
 #include "i2c.h"
 
 static const char *TAG = "I2C";
+static bool i2c_initialized = false;
 
 #define I2C_PORT I2C_NUM_0
 
 esp_err_t i2c_init(void) {
+    if(i2c_initialized) {
+        ESP_LOGW(TAG, "I2C is already initialized");
+        return ESP_OK;
+    }
+    
     i2c_config_t config = {
         .mode = I2C_MODE_MASTER,
         .sda_io_num = I2C_SDA,
