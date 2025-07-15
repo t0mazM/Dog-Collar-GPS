@@ -8,6 +8,7 @@ static esp_err_t read_voltage(float *voltage);
 static esp_err_t read_soc(float *soc);
 static esp_err_t read_temperature(float *temp);
 static esp_err_t read_flags(uint16_t *flags);
+static esp_err_t read_current(int16_t *current);
 
 esp_err_t battery_monitor_init(void) {
 
@@ -18,6 +19,7 @@ esp_err_t battery_monitor_init(void) {
 
     battery_data.i2c_address = BQ27441_ADDRESS;
     battery_data.voltage = 0.0f;
+    battery_data.current = 0;
     battery_data.soc = 0.0f;
     battery_data.temperature = 0.0f;
     battery_data.flags = 0x0000;
@@ -28,30 +30,38 @@ esp_err_t battery_monitor_init(void) {
 void battery_monitor_update_battery_data(battery_data_t *battery_data) {
 
     /* Temporary variables for battery data */
-    float temp_voltage;
-    float temp_soc;
-    float temp_temperature;
+    float voltage;
+    int16_t current;
+    float soc;
+    float temperature;
     uint16_t flags;
 
     /* Read battery voltage */
-    if (read_voltage(&temp_voltage) == ESP_OK) {
-        battery_data->voltage = temp_voltage;
+    if (read_voltage(&voltage) == ESP_OK) {
+        battery_data->voltage = voltage;
     } else {
         ESP_LOGW(TAG, "Failed to read battery voltage");
         battery_data->voltage = -1.0f;
     }
 
+    if( read_current(&current) == ESP_OK) {
+        battery_data->current = current;
+    } else {
+        ESP_LOGW(TAG, "Failed to read battery current");
+        battery_data->current = -1.0f;
+    }
+
     /* Read battery state of charge */
-    if (read_soc(&temp_soc) == ESP_OK) {
-        battery_data->soc = temp_soc;
+    if (read_soc(&soc) == ESP_OK) {
+        battery_data->soc = soc;
     } else {
         ESP_LOGW(TAG, "Failed to read battery state of charge");
         battery_data->soc = -1.0f;
     }
 
     /* Read battery temperature */
-    if (read_temperature(&temp_temperature) == ESP_OK) {
-        battery_data->temperature = temp_temperature;
+    if (read_temperature(&temperature) == ESP_OK) {
+        battery_data->temperature = temperature;
     } else {
         ESP_LOGW(TAG, "Failed to read battery temperature");
         battery_data->temperature = -1.0f;
@@ -107,16 +117,28 @@ static esp_err_t read_flags(uint16_t *flags) {
     return ESP_OK;
 }
 
+static esp_err_t read_current(int16_t *current) {
+    esp_err_t ret = i2c_read_16bit(BQ27441_ADDRESS, CURRENT_CMD, (uint16_t *)current);
+    if (ret != ESP_OK) {
+        ESP_LOGI(TAG, "Failed to read current: %s", esp_err_to_name(ret));
+        return ret;
+    }
+    printf("Raw current: %d\n", *current);
+    return ESP_OK;
+}
+
 int battery_monitor_get_data_string(char *string_buffer, size_t string_buffer_size) {
     int written = snprintf(string_buffer, string_buffer_size,
         "\n============= Battery Monitor Data ==============\n"
         "Battery Data:\n"
         "Voltage: %.2f V\n"
+        "Current: %d mA\n"
         "State of Charge: %.2f %%\n"
         "Temperature: %.2f °C\n"
         "Flags: 0x%04X\n"
         "\n=================================================\n",
         battery_data.voltage,
+        battery_data.current,
         battery_data.soc,
         battery_data.temperature,
         battery_data.flags

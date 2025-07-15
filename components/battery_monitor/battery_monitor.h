@@ -6,6 +6,8 @@
 // I2C Device Addresses
 #define BQ27441_ADDRESS 0x55
 #define VOLTAGE_CMD     0x04
+#define CURRENT_CMD     0x10
+#define POWER_CMD       0x18
 #define SOC_CMD         0x1C
 #define TEMP_CMD        0x02
 #define FLAGS_CMD       0x06
@@ -13,6 +15,7 @@
 typedef struct {
     uint8_t i2c_address; // Default I2C address for BQ27441
     float voltage; //In mili Volts
+    int16_t current; //In mili Amperes
     float soc;  //In %
     float temperature; //In degrees Celsius
     uint16_t flags; // Battery flags
