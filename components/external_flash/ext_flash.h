@@ -74,7 +74,6 @@ esp_err_t ext_flash_reset_chip(void);
  * @return ESP_OK on success, or an error code on failure.
  */
 esp_err_t ext_flash_read_jedec_data(void);
-spi_device_handle_t ext_flash_get_spi_handle(void);
 
 // New functions for LittleFS integration
 esp_err_t ext_flash_write_enable(void);

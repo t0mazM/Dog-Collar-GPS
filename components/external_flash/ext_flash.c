@@ -119,11 +119,6 @@ esp_err_t ext_flash_read_jedec_data(void) {
     return ESP_OK;
 }
 
-
-spi_device_handle_t ext_flash_get_handle(void) {
-    return spi;
-}
-
 esp_err_t ext_flash_write_enable(void) {
     spi_transaction_ext_t t = {0}; 
     
