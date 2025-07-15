@@ -177,13 +177,20 @@ static esp_err_t download_file_get_handler(httpd_req_t *req) {
 }
 
 static esp_err_t status_get_handler(httpd_req_t *req) {
+
     char status_buffer[256];
     int status_length = dog_collar_get_status_string(status_buffer, sizeof(status_buffer));
+    
     if (status_length < 0) {
         httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to get status off ESP32 components and the battery");
         return ESP_FAIL;
     }
-    httpd_resp_send(req, status_buffer, status_length);
+
+    ESP_RETURN_ON_ERROR(httpd_resp_set_type(req, "text/plain"),
+                        TAG, "Failed to set response type to text/plain");
+
+    ESP_RETURN_ON_ERROR(httpd_resp_send(req, status_buffer, status_length),
+                        TAG, "Failed to send status response");
     return ESP_OK;
 }
 
