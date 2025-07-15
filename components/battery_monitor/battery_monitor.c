@@ -5,7 +5,7 @@ battery_data_t battery_data = {0};
 
 /* Declarations of static functions used for reading battery data */
 static esp_err_t read_voltage(float *voltage);
-static esp_err_t read_soc(float *soc);
+static esp_err_t read_soc(uint8_t *soc);
 static esp_err_t read_temperature(float *temp);
 static esp_err_t read_flags(uint16_t *flags);
 static esp_err_t read_current(int16_t *current);
@@ -20,7 +20,7 @@ esp_err_t battery_monitor_init(void) {
     battery_data.i2c_address = BQ27441_ADDRESS;
     battery_data.voltage = 0.0f;
     battery_data.current = 0;
-    battery_data.soc = 0.0f;
+    battery_data.soc = 0;
     battery_data.temperature = 0.0f;
     battery_data.flags = 0x0000;
 
@@ -32,7 +32,7 @@ void battery_monitor_update_battery_data(battery_data_t *battery_data) {
     /* Temporary variables for battery data */
     float voltage;
     int16_t current;
-    float soc;
+    uint8_t soc;
     float temperature;
     uint16_t flags;
 
@@ -89,42 +89,30 @@ static esp_err_t read_voltage(float *voltage) {
     return ESP_OK;
 }
 
-static esp_err_t read_soc(float *soc) {
-    uint8_t raw_soc;
-    esp_err_t ret = i2c_read_8bit(BQ27441_ADDRESS, SOC_CMD, &raw_soc);
-    if (ret != ESP_OK) {
-        return ret;
-    }
-    *soc = (float)raw_soc; // State of Charge is already in percentage
-    return ESP_OK;
+static esp_err_t read_soc(uint8_t *soc) {
+    return(i2c_read_8bit(BQ27441_ADDRESS, SOC_CMD, soc));
 }
 
 static esp_err_t read_temperature(float *temperature) {
-    uint16_t raw_tempearture;
-    esp_err_t ret = i2c_read_16bit(BQ27441_ADDRESS, TEMP_CMD, &raw_tempearture);
+    uint16_t raw_temperature;
+    esp_err_t ret = i2c_read_16bit(BQ27441_ADDRESS, TEMP_CMD, &raw_temperature);
     if (ret != ESP_OK) {
         return ret;
     }
-    *temperature = (raw_tempearture * 0.1f) - 273.15f; // Convert to Celsius
+    *temperature = (raw_temperature * 0.1f) - 273.15f; // Convert to Celsius
     return ESP_OK;
 }
 
 static esp_err_t read_flags(uint16_t *flags) {
     esp_err_t ret = i2c_read_16bit(BQ27441_ADDRESS, FLAGS_CMD, flags);
-    if (ret != ESP_OK) {
+    if (ret != ESP_OK){ 
         return ret;
     }
     return ESP_OK;
 }
 
 static esp_err_t read_current(int16_t *current) {
-    esp_err_t ret = i2c_read_16bit(BQ27441_ADDRESS, CURRENT_CMD, (uint16_t *)current);
-    if (ret != ESP_OK) {
-        ESP_LOGI(TAG, "Failed to read current: %s", esp_err_to_name(ret));
-        return ret;
-    }
-    printf("Raw current: %d\n", *current);
-    return ESP_OK;
+    return (i2c_read_16bit(BQ27441_ADDRESS, CURRENT_CMD, (uint16_t *)current));
 }
 
 int battery_monitor_get_data_string(char *string_buffer, size_t string_buffer_size) {
@@ -138,7 +126,7 @@ int battery_monitor_get_data_string(char *string_buffer, size_t string_buffer_si
         "Flags: 0x%04X\n"
         "\n=================================================\n",
         battery_data.voltage,
-        battery_data.current,
+        (int)battery_data.current,
         battery_data.soc,
         battery_data.temperature,
         battery_data.flags
