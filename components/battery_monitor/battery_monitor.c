@@ -116,7 +116,7 @@ esp_err_t battery_monitor_get_data_string(char *string_buffer, size_t string_buf
         "Temperature: %.2f °C\n"
         "Flags: 0x%04X\n"
         "\n=================================================\n",
-        battery_data.voltage / 1000.0f, // Convert to volts
+        battery_data.voltage,
         battery_data.soc,
         battery_data.temperature,
         battery_data.flags
