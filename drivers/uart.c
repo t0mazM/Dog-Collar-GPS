@@ -1,10 +1,15 @@
 #include <uart.h>
 
 static const char *TAG = "UART";
-
+static bool uart_initialized = false;
 
 esp_err_t uart_init(void)
 {
+    if (uart_initialized) {
+        ESP_LOGW(TAG, "UART is already initialized");
+        return ESP_OK;
+    }
+
     const uart_config_t cfg = {
         .baud_rate  = UART_BAUD_RATE,
         .data_bits  = UART_DATA_8_BITS,

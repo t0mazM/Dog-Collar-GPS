@@ -6,7 +6,9 @@ static const char *TAG = "GPS_L96";
 struct minmea_sentence_rmc gps_rcm_data; // GPS RMC data structure to hold parsed data
 
 esp_err_t gps_l96_init(void) {
-    gps_l96_send_command(GNSS_MODE_GPS_GLONASS);
+    ESP_RETURN_ON_ERROR(uart_init(), 
+                        TAG, 
+                        "Failed to initialize UART for GPS L96");
     return ESP_OK;
 }
 
