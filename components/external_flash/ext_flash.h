@@ -85,6 +85,16 @@ esp_err_t ext_flash_read_jedec_data(void);
  * @return ESP_OK on success, or an error code on failure.
  */
 esp_err_t ext_flash_write_enable(void);
+
+/**
+ * @brief Read the status register of the external flash chip.
+ * 
+ * This function reads the Status Register-1 of the external flash chip.
+ * If the external flash chip is not busy (usually erasing or writing) it will register value 0x00.
+ * 
+ * @param status Pointer to a variable where the status value will be stored.
+ * @return ESP_OK on success, or an error code on failure.
+ */
 esp_err_t ext_flash_read_status_register(uint8_t *status);
 esp_err_t ext_flash_wait_for_idle(int timeout_ms);
 esp_err_t ext_flash_read(uint32_t address, uint8_t *buffer, uint32_t size);

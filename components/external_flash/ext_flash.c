@@ -138,28 +138,25 @@ esp_err_t ext_flash_write_enable(void) {
 }
 
 esp_err_t ext_flash_read_status_register(uint8_t *status_reg_value) {
+
+    /* Initialize the transaction structure for reading the status register */
     spi_transaction_ext_t t = {0}; 
-    
     t.base.cmd = SPI_CMD_READ_STATUS_REG1;
     t.base.length = 8;       
     t.base.rxlength = 8;     
-
     t.base.flags = SPI_TRANS_VARIABLE_ADDR | SPI_TRANS_VARIABLE_DUMMY; 
     t.address_bits = 0;
     t.dummy_bits = 0;       
 
-    uint8_t received_status;
-    t.base.rx_buffer = &received_status;
+    /* Set the RX buffer for the status register and read the register from external flash chip*/
+    t.base.rx_buffer = status_reg_value;
+    ESP_RETURN_ON_ERROR(spi_device_transmit(spi, (spi_transaction_t*)&t),
+                        TAG, "Failed to read status register"
+    );
 
-    esp_err_t ret = spi_device_transmit(spi, (spi_transaction_t*)&t);
-    if (ret != ESP_OK) {
-        ESP_LOGE(TAG, "Failed to read Status Register-1 (0x%02X): %s", SPI_CMD_READ_STATUS_REG1, esp_err_to_name(ret));
-    } else {
-        *status_reg_value = received_status;
-        ESP_LOGI(TAG, "Read Status Register-1: 0x%02X", *status_reg_value);
-    }
-    return ret;
+    return ESP_OK;
 }
+
 
 esp_err_t ext_flash_wait_for_idle(int timeout_ms) {
     uint8_t status_reg;
