@@ -66,31 +66,31 @@ esp_err_t ext_flash_init(void) {
 }
 
 esp_err_t ext_flash_reset_chip(void) {
+
+    /* Initialize the transaction structure */
     spi_transaction_ext_t t = {0}; 
     t.base.length = 0;      
     t.base.rxlength = 0;    
-
     t.base.flags = SPI_TRANS_VARIABLE_ADDR | SPI_TRANS_VARIABLE_DUMMY; 
     t.address_bits = 0;     
     t.dummy_bits = 0;       
-
     t.base.cmd = SPI_CMD_ENABLE_RESET;
+
+    // Send the Enable Reset command
     esp_err_t ret = spi_device_transmit(spi, (spi_transaction_t*)&t);
     if (ret != ESP_OK) {
         ESP_LOGE(TAG, "Failed to send Enable Reset (0x%02X) command: %s", SPI_CMD_ENABLE_RESET, esp_err_to_name(ret));
         return ret;
     }
-    ESP_LOGI(TAG, "Sent Enable Reset (0x%02X)", SPI_CMD_ENABLE_RESET);
 
+    /* Reset the device by sending the Reset Device command */
     t.base.cmd = SPI_CMD_RESET_DEVICE;
     ret = spi_device_transmit(spi, (spi_transaction_t*)&t);
     if (ret != ESP_OK) {
         ESP_LOGE(TAG, "Failed to send Reset Device (0x%02X) command: %s", SPI_CMD_RESET_DEVICE, esp_err_to_name(ret));
         return ret;
     }
-    ESP_LOGI(TAG, "Sent Reset Device (0x%02X)", SPI_CMD_RESET_DEVICE);
 
-    vTaskDelay(pdMS_TO_TICKS(1)); 
     return ESP_OK;
 }
 

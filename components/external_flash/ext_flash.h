@@ -52,6 +52,15 @@
 #define W25Q128JV_TOTAL_SIZE_BYTES  (16 * 1024 * 1024) // 128M-bit = 16M-byte
 
 esp_err_t ext_flash_init(void);
+
+/**
+ * @brief Reset the external flash chip.
+ * 
+ * This function sends the Enable Reset command followed by 
+ * the Reset Device command to reset the external flash chip.
+
+   @note Reset is not neccessary but a good practice to ensure the chip is in a known state.
+ */ 
 esp_err_t ext_flash_reset_chip(void);
 esp_err_t ext_flash_read_jedec_data(uint8_t *buf);
 spi_device_handle_t ext_flash_get_spi_handle(void);
