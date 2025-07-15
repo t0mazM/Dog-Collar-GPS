@@ -2,11 +2,11 @@
 #define EXT_FLASH_H
 
 #include "driver/spi_master.h"
+#include "../gpio_expander/gpio_expander.h"
 #include "esp_log.h"
 #include "driver/gpio.h"
 #include "esp_err.h"
 #include "external_flash_gpio.h" // For WP and HOLD pin definitions
-#include "driver/spi_master.h"
 #include "driver/gpio.h"
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"

@@ -21,14 +21,8 @@ void app_main() {
 
     vTaskDelay(3000 / portTICK_PERIOD_MS); // Delay to allow system to stabilize
 
-    i2c_init();
-    ext_flash_init();
-    gpio_init();
-    uart_init();
-    gps_l96_init();
-    nvs_flash_init();
-    wifi_connect_and_start_services();
 
+    dog_collar_components_init(); // Initialize all components
 
 
     uint8_t jedec_id[3] = {0};
@@ -42,7 +36,7 @@ void app_main() {
     //file_system_test();
 
     vTaskDelay(15000 / portTICK_PERIOD_MS); 
-    wifi_stop_all_services_retry(10);
+    wifi_stop_all_services_retry(3);
 
 
     while(1) {

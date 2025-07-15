@@ -35,6 +35,7 @@ spi_device_interface_config_t get_spi_device_config(void) {
 
 esp_err_t ext_flash_init(void) {
 
+    gpio_init();
     SPI_set_HOLD_WP_HIGH(); 
     
     spi_bus_config_t buscfg = get_spi_bus_config();
@@ -55,6 +56,8 @@ esp_err_t ext_flash_init(void) {
     // Unlock the global block
     ESP_RETURN_ON_ERROR(ext_flash_global_block_unlock(),
                         TAG, "Failed to unlock global block");
+
+    ESP_LOGI(TAG, "External flash initialized successfully");
     return ESP_OK;
 }
 
