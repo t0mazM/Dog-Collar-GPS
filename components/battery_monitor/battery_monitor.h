@@ -19,7 +19,14 @@ typedef struct {
 } battery_data_t;
 extern battery_data_t battery_data;
 
-
+/**
+ * @brief Initializes the battery monitor
+ * 
+ * It initializes the I2C interface for the battery monitor 
+ * and sets initial values for the battery data to zero.
+ * 
+ * @return ESP_OK on success, or an error code on failure
+ */
 esp_err_t battery_monitor_init(void);
 
 /**

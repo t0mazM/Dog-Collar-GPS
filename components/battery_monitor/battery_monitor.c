@@ -8,7 +8,7 @@ esp_err_t battery_monitor_init(void) {
 
     // Initialize I2C for battery monitor
     ESP_RETURN_ON_ERROR(i2c_init(), 
-    TAG, "Failed to initialize I2C for battery monitor"
+                        TAG, "Failed to initialize I2C for battery monitor"
     );
 
     battery_data.i2c_address = BQ27441_ADDRESS;
