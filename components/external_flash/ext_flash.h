@@ -75,7 +75,15 @@ esp_err_t ext_flash_reset_chip(void);
  */
 esp_err_t ext_flash_read_jedec_data(void);
 
-// New functions for LittleFS integration
+/* ----------------- functions for littlefs integration ----------------- */
+
+/**
+ * @brief Send te write enable command to the external flash chip
+ * 
+ * This function sends the enable command so that the chip is ready for write operations. 
+ * 
+ * @return ESP_OK on success, or an error code on failure.
+ */
 esp_err_t ext_flash_write_enable(void);
 esp_err_t ext_flash_read_status_register(uint8_t *status);
 esp_err_t ext_flash_wait_for_idle(int timeout_ms);

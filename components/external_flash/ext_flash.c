@@ -120,22 +120,21 @@ esp_err_t ext_flash_read_jedec_data(void) {
 }
 
 esp_err_t ext_flash_write_enable(void) {
+
+    /* Initialize the transaction structure for Write Enable command */
     spi_transaction_ext_t t = {0}; 
-    
     t.base.cmd = SPI_CMD_WRITE_ENABLE;
     t.base.length = 0;      
     t.base.rxlength = 0;    
-
     t.base.flags = SPI_TRANS_VARIABLE_ADDR | SPI_TRANS_VARIABLE_DUMMY; 
     t.address_bits = 0;      
     t.dummy_bits = 0;        
 
-    esp_err_t ret = spi_device_transmit(spi, (spi_transaction_t*)&t);
-    if (ret != ESP_OK) {
-        ESP_LOGE(TAG, "Failed to send Write Enable (0x%02X) command: %s", SPI_CMD_WRITE_ENABLE, esp_err_to_name(ret));
-    }
-    ESP_LOGI(TAG, "Write Enable command sent (0x%02X)", SPI_CMD_WRITE_ENABLE);
-    return ret;
+    ESP_RETURN_ON_ERROR(spi_device_transmit(spi, (spi_transaction_t*)&t),
+                        TAG, "Failed to send Write Enable command"
+    );
+
+    return ESP_OK;
 }
 
 esp_err_t ext_flash_read_status_register(uint8_t *status_reg_value) {
