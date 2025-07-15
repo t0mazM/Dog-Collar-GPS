@@ -44,4 +44,20 @@ esp_err_t battery_monitor_init(void);
 void battery_monitor_update_battery_data(battery_data_t *battery_data);
 
 
+/**
+ * @brief Returns the string with data from battery monitor
+ * 
+ * @param string_buffer Pointer to the buffer to store the string
+ * @param string_buffer_size Size of the string buffer
+ * @return ESP_OK on success, or an error code on failure
+ */
+esp_err_t battery_monitor_get_data_string(char *string_buffer, size_t string_buffer_size);
+
+/**
+ * @brief Logs the battery data
+ * 
+ * This function retrieves the battery data as a string and logs it.
+ */
+static void battery_monitor_log_data(void);
+
 #endif  // BATTERY_MONITOR_H

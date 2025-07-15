@@ -34,8 +34,10 @@ void app_main() {
     ext_flash_wait_for_idle(2000);
     //file_system_test();
 
-    vTaskDelay(15000 / portTICK_PERIOD_MS); 
-    wifi_stop_all_services_retry(3);
+
+
+    //vTaskDelay(15000 / portTICK_PERIOD_MS); 
+    //wifi_stop_all_services_retry(3)
 
 
     while(1) {

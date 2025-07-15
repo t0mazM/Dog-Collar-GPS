@@ -7,7 +7,8 @@ httpd_handle_t server = NULL; //
 static esp_err_t hello_get_handler(httpd_req_t *req);
 static esp_err_t list_files_get_handler(httpd_req_t *req);
 static esp_err_t download_file_get_handler(httpd_req_t *req);
-static esp_err_t status_get_handler(httpd_req_t *req);
+static esp_err_t init_status_get_handler(httpd_req_t *req);
+static esp_err_t battery_data_get_handler(httpd_req_t *req);
 
 esp_err_t http_server_start(void) {
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
@@ -43,14 +44,23 @@ esp_err_t http_server_start(void) {
         };
         httpd_register_uri_handler(server, &download_uri);
 
-        /* Display status of ESP32 components and battery */
-        httpd_uri_t status_uri = {
+        /* Display init status of ESP32 components*/
+        httpd_uri_t init_status_uri = {
             .uri        = "/status",
             .method     = HTTP_GET,
-            .handler    = status_get_handler, 
+            .handler    = init_status_get_handler,
             .user_ctx   = NULL
         };
-        httpd_register_uri_handler(server, &status_uri);
+        httpd_register_uri_handler(server, &init_status_uri);
+
+        /* Display battery data */
+        httpd_uri_t battery_data_uri = {
+            .uri        = "/battery",
+            .method     = HTTP_GET,
+            .handler    = battery_data_get_handler,
+            .user_ctx   = NULL
+        };
+        httpd_register_uri_handler(server, &battery_data_uri);
 
         ESP_LOGI(TAG, "HTTP server started on port %d", config.server_port);
         return ESP_OK;
@@ -71,7 +81,7 @@ static esp_err_t hello_get_handler(httpd_req_t *req) {
 }
 
 static esp_err_t list_files_get_handler(httpd_req_t *req) {
-    char *response_buffer = (char *)malloc(RESPONSE_BUFFER_SIZE);
+    char *response_buffer = (char *)malloc(RESPONSE_BUFFER_SIZE); //TODO fix the memory leaks here if fails happen
 
     if (response_buffer == NULL) {
         ESP_LOGE(TAG, "Failed to allocate memory for file list response.");
@@ -176,12 +186,12 @@ static esp_err_t download_file_get_handler(httpd_req_t *req) {
     return ESP_OK;
 }
 
-static esp_err_t status_get_handler(httpd_req_t *req) {
+static esp_err_t init_status_get_handler(httpd_req_t *req) {
 
-    char status_buffer[256];
-    int status_length = dog_collar_get_status_string(status_buffer, sizeof(status_buffer));
-    
-    if (status_length < 0) {
+    char init_status_buffer[1024];
+    int init_status_length = dog_collar_get_status_string(init_status_buffer, sizeof(init_status_buffer));
+
+    if (init_status_length < 0) {
         httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to get status off ESP32 components and the battery");
         return ESP_FAIL;
     }
@@ -189,8 +199,26 @@ static esp_err_t status_get_handler(httpd_req_t *req) {
     ESP_RETURN_ON_ERROR(httpd_resp_set_type(req, "text/plain"),
                         TAG, "Failed to set response type to text/plain");
 
-    ESP_RETURN_ON_ERROR(httpd_resp_send(req, status_buffer, status_length),
+    ESP_RETURN_ON_ERROR(httpd_resp_send(req, init_status_buffer, init_status_length),
                         TAG, "Failed to send status response");
+    return ESP_OK;
+}
+
+static esp_err_t battery_data_get_handler(httpd_req_t *req) {
+
+    char battery_data_buffer[1024];
+    int battery_data_length = battery_monitor_get_data_string(battery_data_buffer, sizeof(battery_data_buffer));
+
+    if (battery_data_length < 0) {
+        httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to get battery data");
+        return ESP_FAIL;
+    }
+
+    ESP_RETURN_ON_ERROR(httpd_resp_set_type(req, "text/plain"),
+                        TAG, "Failed to set response type to text/plain");
+
+    ESP_RETURN_ON_ERROR(httpd_resp_send(req, battery_data_buffer, battery_data_length),
+                        TAG, "Failed to send battery data response");
     return ESP_OK;
 }
 

@@ -64,6 +64,9 @@ void battery_monitor_update_battery_data(battery_data_t *battery_data) {
         ESP_LOGW(TAG, "Failed to read battery flags");
         battery_data->flags = 0xFFFF; 
     }
+
+    /* Log the battery data */
+    battery_monitor_log_data();
 }
 
 static esp_err_t read_voltage(float *voltage) {
@@ -101,6 +104,37 @@ static esp_err_t read_flags(uint16_t *flags) {
     if (ret != ESP_OK) {
         return ret;
     }
-    printf("Battery flags: 0x%04X\n", *flags);  // prints hex flags
     return ESP_OK;
+}
+
+esp_err_t battery_monitor_get_data_string(char *string_buffer, size_t string_buffer_size) {
+    int written = snprintf(string_buffer, string_buffer_size,
+        "\n============= Battery Monitor Data ==============\n"
+        "Battery Data:\n"
+        "Voltage: %.2f V\n"
+        "State of Charge: %.2f %%\n"
+        "Temperature: %.2f °C\n"
+        "Flags: 0x%04X\n"
+        "\n=================================================\n",
+        battery_data.voltage / 1000.0f, // Convert to volts
+        battery_data.soc,
+        battery_data.temperature,
+        battery_data.flags
+    );
+
+    if (written < 0 || (size_t)written >= string_buffer_size) {
+        ESP_LOGW(TAG, "Buffer too small for battery data string");
+        return ESP_ERR_NO_MEM; // Buffer too small
+    }
+    return ESP_OK;
+}
+
+static void battery_monitor_log_data(void) {
+    char log_buffer[256];
+    if (battery_monitor_get_data_string(log_buffer, sizeof(log_buffer)) == ESP_OK) {
+        ESP_LOGI(TAG, "%s", log_buffer);
+    }
+    else {
+        ESP_LOGE(TAG, "Failed to get battery data string");
+    }
 }
