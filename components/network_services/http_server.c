@@ -211,6 +211,7 @@ static esp_err_t battery_data_get_handler(httpd_req_t *req) {
 
     if (battery_data_length < 0) {
         httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to get battery data");
+        ESP_LOGW(TAG, "Failed to get battery data string");
         return ESP_FAIL;
     }
 

@@ -107,7 +107,7 @@ static esp_err_t read_flags(uint16_t *flags) {
     return ESP_OK;
 }
 
-esp_err_t battery_monitor_get_data_string(char *string_buffer, size_t string_buffer_size) {
+int battery_monitor_get_data_string(char *string_buffer, size_t string_buffer_size) {
     int written = snprintf(string_buffer, string_buffer_size,
         "\n============= Battery Monitor Data ==============\n"
         "Battery Data:\n"
@@ -124,14 +124,14 @@ esp_err_t battery_monitor_get_data_string(char *string_buffer, size_t string_buf
 
     if (written < 0 || (size_t)written >= string_buffer_size) {
         ESP_LOGW(TAG, "Buffer too small for battery data string");
-        return ESP_ERR_NO_MEM; // Buffer too small
+        return -1;  // Indicate error
     }
-    return ESP_OK;
+    return written;  // Return the number of bytes written
 }
 
 static void battery_monitor_log_data(void) {
     char log_buffer[256];
-    if (battery_monitor_get_data_string(log_buffer, sizeof(log_buffer)) == ESP_OK) {
+    if (battery_monitor_get_data_string(log_buffer, sizeof(log_buffer)) > 0) {
         ESP_LOGI(TAG, "%s", log_buffer);
     }
     else {

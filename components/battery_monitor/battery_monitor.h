@@ -51,7 +51,7 @@ void battery_monitor_update_battery_data(battery_data_t *battery_data);
  * @param string_buffer_size Size of the string buffer
  * @return ESP_OK on success, or an error code on failure
  */
-esp_err_t battery_monitor_get_data_string(char *string_buffer, size_t string_buffer_size);
+int battery_monitor_get_data_string(char *string_buffer, size_t string_buffer_size);
 
 /**
  * @brief Logs the battery data
