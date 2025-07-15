@@ -14,7 +14,7 @@ esp_err_t gpio_init(void) {
     // Set all GPIO pins to high (LEDs off)
     gpio_output_state = 0xFF;
     ESP_RETURN_ON_ERROR(i2c_write_byte(PCF8574_ADDR, REG_ADDR_NOT_USED, gpio_output_state), 
-                        TAG, "Failed to initialize GPIO expander"
+                        TAG, "Failed to set default GPIO expander state"
     );
     
     ESP_LOGI(TAG, "GPIO expander initialized");

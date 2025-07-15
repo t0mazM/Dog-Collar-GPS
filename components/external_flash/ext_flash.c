@@ -94,32 +94,28 @@ esp_err_t ext_flash_reset_chip(void) {
     return ESP_OK;
 }
 
-esp_err_t ext_flash_read_jedec_data(uint8_t *buf) {
-    spi_transaction_ext_t t = {0}; 
+esp_err_t ext_flash_read_jedec_data(void) {
 
+    /* Initialize the transaction structure for JEDEC ID read */
+    spi_transaction_ext_t t = {0}; 
     t.base.cmd = SPI_CMD_JEDEC_ID;
     t.base.rxlength = SPI_JEDEC_DATA_BITS; 
     t.base.length = SPI_JEDEC_DATA_BITS; 
-    
     t.base.flags = SPI_TRANS_VARIABLE_ADDR | SPI_TRANS_VARIABLE_DUMMY; 
     t.address_bits = 0;    
     t.dummy_bits = 0;      
 
-    uint8_t received_data[3]; // Buffer to hold the 3 received bytes
+    uint8_t received_data[3]; // Buffer to hold the 3 received bytes (Manufacturer ID, Memory Type, Capacity)
     t.base.rx_buffer = received_data;
 
-    esp_err_t ret = spi_device_transmit(spi, (spi_transaction_t*)&t);
-    if (ret != ESP_OK) {
-        ESP_LOGE(TAG, "Failed to transmit JEDEC ID command: %s", esp_err_to_name(ret));
-        return ret;
-    }
+    /* Send the JEDEC ID command */
+    ESP_RETURN_ON_ERROR(spi_device_transmit(spi, (spi_transaction_t*)&t),
+                        TAG, "Failed to read JEDEC ID");
 
-    buf[0] = received_data[0]; // Manufacturer ID
-    buf[1] = received_data[1]; // Memory Type
-    buf[2] = received_data[2]; // Capacity
 
     ESP_LOGI(TAG, "JEDEC ID: Manufacturer: 0x%02X, Memory Type: 0x%02X, Capacity: 0x%02X",
-             buf[0], buf[1], buf[2]);
+             received_data[0], received_data[1], received_data[2]);
+
     return ESP_OK;
 }
 

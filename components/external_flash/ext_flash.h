@@ -62,7 +62,18 @@ esp_err_t ext_flash_init(void);
    @note Reset is not neccessary but a good practice to ensure the chip is in a known state.
  */ 
 esp_err_t ext_flash_reset_chip(void);
-esp_err_t ext_flash_read_jedec_data(uint8_t *buf);
+
+
+/**
+ * @brief Read the JEDEC ID of the external flash chip.
+ * 
+ * This function sends the JEDEC ID command and reads and prints the 
+ * Manufacturer ID, Memory Type, and Capacity.
+ * 
+ * @note Used for testing and verification of the flash chip.
+ * @return ESP_OK on success, or an error code on failure.
+ */
+esp_err_t ext_flash_read_jedec_data(void);
 spi_device_handle_t ext_flash_get_spi_handle(void);
 
 // New functions for LittleFS integration

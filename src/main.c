@@ -25,8 +25,7 @@ void app_main() {
     dog_collar_components_init(); // Initialize all components
 
 
-    uint8_t jedec_id[3] = {0};
-    ext_flash_read_jedec_data(jedec_id);
+    ext_flash_read_jedec_data();
 
     uint8_t status_reg = 0;
     ext_flash_read_status_register(&status_reg);
