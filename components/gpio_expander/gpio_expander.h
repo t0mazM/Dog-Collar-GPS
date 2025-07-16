@@ -15,10 +15,30 @@ typedef enum {
     GPS_RESET    = 0b00000010, // GP1 -> Output
     GPS_JAM_IND  = 0b00000100, // GP2 -> Input
     GPS_FORCE_ON = 0b00001000, // GP3 -> Output
-} gpio_bit_t;
+} led_colour_t;
 
 
 esp_err_t gpio_init(void);
+/**
+ * @brief Synchronizes the GPIO state off the PCF8574 GPIO expander.
+ * 
+ * This function reds the states off all GPIO pins from the PCF8574 GPIO expander
+ * and updates the global variable `gpio_output_state` with the current state.
+ * 
+ * @return ESP_OK on success, or an error code on failure
+ */
+esp_err_t gpio_sync_state(void);
+
+/**
+ * @brief Toggles the leds specified by the led_mask.
+ * 
+ * This function updates the global variable `gpio_output_state` 
+ * and toggles the leds specified by the `led_mask`.
+ * 
+ * @param led_mask Bitmask specifying which LEDs to turn on
+ */
+esp_err_t gpio_toggle_leds(uint8_t led_mask);
+
 void gpio_turn_on_leds(uint8_t led_mask);
 void gpio_turn_off_leds(uint8_t led_mask);
 esp_err_t gpio_read_inputs(uint8_t *input_state);
