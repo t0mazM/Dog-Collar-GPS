@@ -33,6 +33,8 @@
 
 #define GNSS_SET_UPDATE_RATE_1HZ "$PMTK220,1000*1F\r\n" // Set update rate to 1Hz
 
+#define GNSS_ENABLE_EASY  "$PMTK869,1,0*34\r\n" // Enable Easy mode - it stores the last position so on nexct gps start it gets fix faster
+
 
 #endif // NMEA_COMMANDS_H
     
