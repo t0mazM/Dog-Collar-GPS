@@ -22,6 +22,19 @@ typedef struct {
 } battery_data_t;
 extern battery_data_t battery_data;
 
+typedef struct {
+    bool over_temp;
+    bool under_temp;
+    bool full_charge;
+    bool charging;
+    bool ocv_taken;
+    bool battery_detected;
+    bool soc1;
+    bool socf;
+    bool discharging;
+    bool relax_discharge;
+} battery_status_flags_t;
+
 /**
  * @brief Initializes the battery monitor
  * 

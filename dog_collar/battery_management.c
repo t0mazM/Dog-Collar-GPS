@@ -10,6 +10,8 @@ static const char *TAG = "BATTERY_MANAGEMENT";
 */
 
 void battery_management_routine(void) {
-    
-    
+
+    battery_monitor_update_battery_data();
+
+
 }

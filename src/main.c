@@ -41,6 +41,7 @@ void app_main() {
 
 
     while(1) {
+        battery_monitor_update_battery_data();
         gpio_toggle_leds(LED_RED | LED_GREEN);
         vTaskDelay(pdMS_TO_TICKS(1000));
     }

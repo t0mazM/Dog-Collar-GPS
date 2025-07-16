@@ -2,6 +2,7 @@
 
 static const char *TAG = "BATTERY_MONITOR";
 battery_data_t battery_data = {0};
+battery_status_flags_t battery_status_flags = {0};
 
 /* Declarations of static functions used for reading battery data */
 static esp_err_t read_voltage(float *voltage);
@@ -9,6 +10,7 @@ static esp_err_t read_soc(uint8_t *soc);
 static esp_err_t read_temperature(float *temp);
 static esp_err_t read_flags(uint16_t *flags);
 static esp_err_t read_current(int16_t *current);
+static void battery_monitor_parse_flags(void);
 
 esp_err_t battery_monitor_init(void) {
 
@@ -70,6 +72,7 @@ void battery_monitor_update_battery_data(void) {
     /* Read battery flags */
     if (read_flags(&flags) == ESP_OK) {
         battery_data.flags = flags;
+        battery_monitor_parse_flags(); // Parse the flags into bool status structure for easier access
     } else {
         ESP_LOGW(TAG, "Failed to read battery flags");
         battery_data.flags = 0xFFFF;
@@ -114,6 +117,18 @@ static esp_err_t read_flags(uint16_t *flags) {
 static esp_err_t read_current(int16_t *current) {
     return (i2c_read_16bit(BQ27441_ADDRESS, CURRENT_CMD, (uint16_t *)current));
 }
+static void battery_monitor_parse_flags(void) {
+    battery_status_flags.over_temp        = (battery_data.flags >> 15) & 0x01;
+    battery_status_flags.under_temp       = (battery_data.flags >> 14) & 0x01;
+    battery_status_flags.full_charge      = (battery_data.flags >> 13) & 0x01;
+    battery_status_flags.charging         = (battery_data.flags >> 12) & 0x01;
+    battery_status_flags.ocv_taken        = (battery_data.flags >> 11) & 0x01;
+    battery_status_flags.battery_detected = (battery_data.flags >> 10) & 0x01;
+    battery_status_flags.soc1             = (battery_data.flags >> 9)  & 0x01;
+    battery_status_flags.socf             = (battery_data.flags >> 8)  & 0x01;
+    battery_status_flags.discharging      = (battery_data.flags >> 7)  & 0x01;
+    battery_status_flags.relax_discharge  = (battery_data.flags >> 6)  & 0x01;
+}
 
 int battery_monitor_get_data_string(char *string_buffer, size_t string_buffer_size) {
     int written = snprintf(string_buffer, string_buffer_size,
@@ -123,13 +138,34 @@ int battery_monitor_get_data_string(char *string_buffer, size_t string_buffer_si
         "Current: %d mA\n"
         "State of Charge: %.2f %%\n"
         "Temperature: %.2f °C\n"
-        "Flags: 0x%04X\n"
+        "Raw Flags: 0x%04X\n"
+        "Battery Status Flags:\n"
+        "  Over Temperature: %s\n"
+        "  Under Temperature: %s\n"
+        "  Full Charge: %s\n"
+        "  Charging: %s\n"
+        "  OCV Taken: %s\n"
+        "  Battery Detected: %s\n"
+        "  SOC1: %s\n"
+        "  SOCF: %s\n"
+        "  Discharging: %s\n"
+        "  Relax Discharge: %s\n"
         "\n=================================================\n",
         battery_data.voltage,
         (int)battery_data.current,
         battery_data.soc,
         battery_data.temperature,
-        battery_data.flags
+        battery_data.flags,
+        battery_status_flags.over_temp ? "Yes" : "No",
+        battery_status_flags.under_temp ? "Yes" : "No",
+        battery_status_flags.full_charge ? "Yes" : "No",
+        battery_status_flags.charging ? "Yes" : "No",
+        battery_status_flags.ocv_taken ? "Yes" : "No",
+        battery_status_flags.battery_detected ? "Yes" : "No",
+        battery_status_flags.soc1 ? "Yes" : "No",
+        battery_status_flags.socf ? "Yes" : "No",
+        battery_status_flags.discharging ? "Yes" : "No",
+        battery_status_flags.relax_discharge ? "Yes" : "No"
     );
 
     if (written < 0 || (size_t)written >= string_buffer_size) {
