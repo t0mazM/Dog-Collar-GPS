@@ -8,3 +8,8 @@ static const char *TAG = "BATTERY_MANAGEMENT";
     - If the battery is charging, you can show a different LED pattern - using 3 leds you can show charging status, with blinkin also
     - If the battery is fully charged, you can show a green LED pattern
 */
+
+void battery_management_routine(void) {
+    
+    
+}

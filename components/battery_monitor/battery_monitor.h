@@ -44,8 +44,7 @@ esp_err_t battery_monitor_init(void);
  * @note If any read fails, it logs a warning and sets the corresponding value to an invalid state.
  * * @return None
  */
-void battery_monitor_update_battery_data(battery_data_t *battery_data);
-
+void battery_monitor_update_battery_data(void);
 
 /**
  * @brief Returns the string with data from battery monitor
