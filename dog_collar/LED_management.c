@@ -12,4 +12,3 @@ TODO:
 
 static const char *TAG = "LED_MANAGEMENT";
 
-
