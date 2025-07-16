@@ -15,13 +15,13 @@ typedef struct {
 /**
  * @brief Initializes the GPS L96 module.
  *
- * This function initializes the GPS module by sending the NMEA commands.
- * All settings are lost after power off, so the initialization must be
- * called every time the device is powered on.
+ * This function initializes the GPS module by:
+ * - Initializing the UART for communication.
+ * - Enabling Easy Mode, which allows the module to store the last position for faster fix on the next start.
  *
  * @return ESP_OK on success, or an error code if initialization fails.
  *
- * @note This function be called every time the device is powered on.
+ * @note This function be called every time the device is powered on, since it loses all settings.
  */
 esp_err_t gps_l96_init(void);
 
