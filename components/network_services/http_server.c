@@ -206,7 +206,7 @@ static esp_err_t init_status_get_handler(httpd_req_t *req) {
 
 static esp_err_t battery_data_get_handler(httpd_req_t *req) {
 
-    char battery_data_buffer[1024];
+    char battery_data_buffer[BAT_MON_LOG_BUF_SIZE];
     int battery_data_length = battery_monitor_get_data_string(battery_data_buffer, sizeof(battery_data_buffer));
 
     if (battery_data_length < 0) {

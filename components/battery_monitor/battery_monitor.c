@@ -11,6 +11,7 @@ static esp_err_t read_temperature(float *temp);
 static esp_err_t read_flags(uint16_t *flags);
 static esp_err_t read_current(int16_t *current);
 static void battery_monitor_parse_flags(void);
+static void battery_monitor_log_data(void);
 
 esp_err_t battery_monitor_init(void) {
 
@@ -118,16 +119,16 @@ static esp_err_t read_current(int16_t *current) {
     return (i2c_read_16bit(BQ27441_ADDRESS, CURRENT_CMD, (uint16_t *)current));
 }
 static void battery_monitor_parse_flags(void) {
+ 
     battery_status_flags.over_temp        = (battery_data.flags >> 15) & 0x01;
-    battery_status_flags.under_temp       = (battery_data.flags >> 14) & 0x01;
-    battery_status_flags.full_charge      = (battery_data.flags >> 13) & 0x01;
-    battery_status_flags.charging         = (battery_data.flags >> 12) & 0x01;
-    battery_status_flags.ocv_taken        = (battery_data.flags >> 11) & 0x01;
-    battery_status_flags.battery_detected = (battery_data.flags >> 10) & 0x01;
-    battery_status_flags.soc1             = (battery_data.flags >> 9)  & 0x01;
-    battery_status_flags.socf             = (battery_data.flags >> 8)  & 0x01;
-    battery_status_flags.discharging      = (battery_data.flags >> 7)  & 0x01;
-    battery_status_flags.relax_discharge  = (battery_data.flags >> 6)  & 0x01;
+    battery_status_flags.under_temp       = (battery_data.flags >> 14) & 0x01;  
+    battery_status_flags.full_charge      = (battery_data.flags >> 9)  & 0x01; 
+    battery_status_flags.charging         = (battery_data.flags >> 8)  & 0x01;  
+    battery_status_flags.battery_detected = (battery_data.flags >> 3)  & 0x01;  
+    battery_status_flags.soc1             = (battery_data.flags >> 2)  & 0x01; 
+    battery_status_flags.socf             = (battery_data.flags >> 1)  & 0x01;  
+    battery_status_flags.discharging      = (battery_data.flags >> 0)  & 0x01;  
+
 }
 
 int battery_monitor_get_data_string(char *string_buffer, size_t string_buffer_size) {
@@ -144,12 +145,10 @@ int battery_monitor_get_data_string(char *string_buffer, size_t string_buffer_si
         "  Under Temperature: %s\n"
         "  Full Charge: %s\n"
         "  Charging: %s\n"
-        "  OCV Taken: %s\n"
         "  Battery Detected: %s\n"
         "  SOC1: %s\n"
         "  SOCF: %s\n"
         "  Discharging: %s\n"
-        "  Relax Discharge: %s\n"
         "\n=================================================\n",
         battery_data.voltage,
         (int)battery_data.current,
@@ -160,12 +159,10 @@ int battery_monitor_get_data_string(char *string_buffer, size_t string_buffer_si
         battery_status_flags.under_temp ? "Yes" : "No",
         battery_status_flags.full_charge ? "Yes" : "No",
         battery_status_flags.charging ? "Yes" : "No",
-        battery_status_flags.ocv_taken ? "Yes" : "No",
         battery_status_flags.battery_detected ? "Yes" : "No",
         battery_status_flags.soc1 ? "Yes" : "No",
         battery_status_flags.socf ? "Yes" : "No",
-        battery_status_flags.discharging ? "Yes" : "No",
-        battery_status_flags.relax_discharge ? "Yes" : "No"
+        battery_status_flags.discharging ? "Yes" : "No"
     );
 
     if (written < 0 || (size_t)written >= string_buffer_size) {
@@ -176,7 +173,7 @@ int battery_monitor_get_data_string(char *string_buffer, size_t string_buffer_si
 }
 
 static void battery_monitor_log_data(void) {
-    char log_buffer[256];
+    char log_buffer[BAT_MON_LOG_BUF_SIZE];
     if (battery_monitor_get_data_string(log_buffer, sizeof(log_buffer)) > 0) {
         ESP_LOGI(TAG, "%s", log_buffer);
     }

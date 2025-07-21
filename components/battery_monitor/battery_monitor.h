@@ -12,6 +12,8 @@
 #define TEMP_CMD        0x02
 #define FLAGS_CMD       0x06
 
+#define BAT_MON_LOG_BUF_SIZE 512
+
 typedef struct {
     uint8_t i2c_address; // Default I2C address for BQ27441
     float voltage; //In mili Volts
@@ -27,12 +29,10 @@ typedef struct {
     bool under_temp;
     bool full_charge;
     bool charging;
-    bool ocv_taken;
     bool battery_detected;
     bool soc1;
     bool socf;
     bool discharging;
-    bool relax_discharge;
 } battery_status_flags_t;
 
 /**
@@ -73,6 +73,4 @@ int battery_monitor_get_data_string(char *string_buffer, size_t string_buffer_si
  * 
  * This function retrieves the battery data as a string and logs it.
  */
-static void battery_monitor_log_data(void);
-
 #endif  // BATTERY_MONITOR_H

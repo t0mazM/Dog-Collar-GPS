@@ -9,9 +9,9 @@ static const char *TAG = "BATTERY_MANAGEMENT";
     - If the battery is fully charged, you can show a green LED pattern
 */
 
-void battery_management_routine(void) {
+// void battery_management_routine(void) {
 
-    battery_monitor_update_battery_data();
+//     battery_monitor_update_battery_data();
 
 
-}
+// }
