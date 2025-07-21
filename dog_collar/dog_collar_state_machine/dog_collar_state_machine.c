@@ -47,10 +47,3 @@ dog_collar_state_t dog_collar_state_machine_run(void) {
     }
     return current_state;
 }
-
-dog_collar_state_t handle_initializing_state(void) {
-
-
-    
-    return DOG_COLLAR_STATE_NORMAL;
-}
