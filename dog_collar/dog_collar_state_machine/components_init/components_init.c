@@ -8,40 +8,46 @@ static void dog_collar_log_init_state(void);
 esp_err_t dog_collar_components_init(void){
 
     esp_err_t ret;
+    esp_err_t overall_init_result = ESP_OK;
 
     // Initialize each component and update the init_state accordingly
     ret = ext_flash_init();
     if (ret != ESP_OK) {
         ESP_LOGE(TAGG, "Failed to initialize External Flash");
+        overall_init_result = ret;
     }
     collar_init_state.ext_flash_ready = (ret == ESP_OK);
     
     ret = gps_l96_init();
     if (ret != ESP_OK) {
         ESP_LOGE(TAGG, "Failed to initialize GPS L96");
+        overall_init_result = ret;
     }
     collar_init_state.gps_l96_ready = (ret == ESP_OK);
 
     ret = battery_monitor_init();
     if (ret != ESP_OK) {
         ESP_LOGE(TAGG, "Failed to initialize Battery Monitor");
+        overall_init_result = ret;
     }
     collar_init_state.batt_mon_ready = (ret == ESP_OK);
 
     ret = lfs_init();
     if (ret != ESP_OK) {
         ESP_LOGE(TAGG, "Failed to initialize File System");
+        overall_init_result = ret;
     }
     collar_init_state.filesystem_ready = (ret == ESP_OK);
 
     ret = wifi_init();
     if (ret != ESP_OK) {
         ESP_LOGE(TAGG, "Failed to initialize Wi-Fi");
+        overall_init_result = ret;
     }
     collar_init_state.wifi_server_ready = (ret == ESP_OK);
 
     dog_collar_log_init_state();
-    return ESP_OK;
+    return overall_init_result;
 }
 
 static bool dog_collar_are_all_components_functional() {

@@ -1,7 +1,7 @@
 #ifndef DOG_COLLAR_STATE_MACHINE_H
 #define DOG_COLLAR_STATE_MACHINE_H
 
-
+#include "components_init/components_init.h"
 
 typedef enum {
     DOG_COLLAR_STATE_INITIALIZING, 
