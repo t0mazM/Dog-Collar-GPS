@@ -47,3 +47,17 @@ dog_collar_state_t dog_collar_state_machine_run(void) {
     }
     return current_state;
 }
+
+
+dog_collar_state_t handle_initializing_state(void) {
+   
+
+    esp_err_t init_result = dog_collar_components_init();
+
+    if (init_result == ESP_OK) {
+        return DOG_COLLAR_STATE_NORMAL;
+    } else {
+        /* We can check the specific component that failed in global struct collar_init_state */
+        return DOG_COLLAR_STATE_ERROR; 
+    }
+}
