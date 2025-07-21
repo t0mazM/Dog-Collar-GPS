@@ -6,7 +6,7 @@
 #include "esp_err.h"
 
 #include "file_system_littlefs/file_system_littlefs.h"
-#include "../dog_collar/components_init.h" 
+#include "../../dog_collar/dog_collar_state_machine/components_init/components_init.h"
 
 #define RESPONSE_BUFFER_SIZE 4096
 #define HTTP_SERVER_PORT_NUM 80

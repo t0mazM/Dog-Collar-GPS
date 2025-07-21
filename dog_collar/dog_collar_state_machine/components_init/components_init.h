@@ -15,13 +15,6 @@
 #include "../components/gps_l96/gps_l96.h"
 #include "../components/network_services/wifi_manager.h"
 
-typedef enum {
-    GPS_STATE_IDLE,
-    GPS_STATE_WAIT_FIX,
-    GPS_STATE_HAS_FIX,
-    GPS_STATE_RECORDING,
-    GPS_STATE_DEEP_SLEEP
-} gps_state_t;
 
 typedef struct {
     bool ext_flash_ready;

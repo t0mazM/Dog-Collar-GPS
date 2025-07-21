@@ -1,7 +1,6 @@
 #include "components_init.h"
 
 const char* TAGG = "DOG_COLLAR";
-gps_state_t gps_state = GPS_STATE_IDLE;  // Default state on power on
 collar_init_state_t collar_init_state = {0};
 
 static void dog_collar_log_init_state(void);
