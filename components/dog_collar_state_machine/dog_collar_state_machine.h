@@ -1,0 +1,18 @@
+#ifndef DOG_COLLAR_STATE_MACHINE_H
+#define DOG_COLLAR_STATE_MACHINE_H
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#endif // DOG_COLLAR_STATE_MACHINE_H
