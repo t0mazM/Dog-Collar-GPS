@@ -8,6 +8,7 @@
 #include "gps_l96/nmea_commands.h"
 #include "file_system_littlefs/file_system_littlefs.h"
 #include "network_services/wifi_manager.h"
+#include "../dog_collar/dog_collar_state_machine/dog_collar_state_machine.h"
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -19,31 +20,9 @@
 
 void app_main() {
 
-    vTaskDelay(3000 / portTICK_PERIOD_MS); // Delay to allow system to stabilize
-
-
-    dog_collar_components_init(); // Initialize all components
-
-
-    ext_flash_read_jedec_data();
-
-    uint8_t status_reg = 0;
-    ext_flash_read_status_register(&status_reg);
-    ext_flash_write_enable();
-    ext_flash_read_status_register(&status_reg);
-    ext_flash_wait_for_idle(2000);
-    //file_system_test();
-
-
-
-    //vTaskDelay(15000 / portTICK_PERIOD_MS); 
-    //wifi_stop_all_services_retry(3)
-
-
-    while(1) {
-        battery_monitor_update_battery_data();
-        gpio_toggle_leds(LED_RED | LED_GREEN);
-        vTaskDelay(pdMS_TO_TICKS(1000));
+    while(true) {
+        dog_collar_state_machine_run();
+        vTaskDelay(pdMS_TO_TICKS(1000)); 
     }
 
 

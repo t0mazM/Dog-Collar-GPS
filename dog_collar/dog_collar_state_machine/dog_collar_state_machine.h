@@ -27,6 +27,8 @@ typedef enum {
     DOG_COLLAR_STATE_ERROR
 } dog_collar_state_t;
 
+dog_collar_state_t dog_collar_state_machine_run(void);
+
 /**
  * @brief Manages the battery state and performs actions based on the battery status.
  *
@@ -35,7 +37,7 @@ typedef enum {
  *
  * @return esp_err_t ESP_OK on success, or an error code on failure.
  */
-dog_collar_state_t battery_management_routine(void);
+dog_collar_state_t battery_management_routine(dog_collar_state_t current_state);
 
 /**
  * @brief Handles the initializing state of the dog collar.

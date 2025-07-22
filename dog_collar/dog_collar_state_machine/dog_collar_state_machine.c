@@ -6,6 +6,9 @@ static const char *TAG = "DOG_COLLAR_STATE_MACHINE";
 static dog_collar_state_t current_state = DOG_COLLAR_STATE_INITIALIZING;
 
 dog_collar_state_t dog_collar_state_machine_run(void) {
+
+    current_state = battery_management_routine(current_state);
+
     switch (current_state) {
         case DOG_COLLAR_STATE_INITIALIZING:
             current_state = handle_initializing_state();
@@ -50,34 +53,28 @@ dog_collar_state_t dog_collar_state_machine_run(void) {
     return current_state;
 }
 
-dog_collar_state_t battery_management_routine(void){
-
-/*Lots of debug statements, TODO: remove them once you finish testing */
-
+dog_collar_state_t battery_management_routine(dog_collar_state_t current_state) {
     esp_err_t ret = battery_monitor_update_battery_data();
     if (ret != ESP_OK) {
         ESP_LOGE(TAG, "Failed to update battery data");
         return DOG_COLLAR_STATE_ERROR;
     }
 
-    if(battery_status_flags.charging) {
+    if (battery_status_flags.charging && current_state != DOG_COLLAR_STATE_CHARGING) {
         ESP_LOGI(TAG, "Battery is charging");
         return DOG_COLLAR_STATE_CHARGING;
     }
 
-
-    if (battery_data.soc >= 0.0f && battery_data.soc <= 10.0f) {
+    if (battery_data.soc >= 0.0f && battery_data.soc <= 10.0f && current_state != DOG_COLLAR_STATE_CRITICAL_LOW_BATTERY) {
         ESP_LOGW(TAG, "Battery is critically low");
         return DOG_COLLAR_STATE_CRITICAL_LOW_BATTERY;
-    } else if (battery_data.soc > 10.0f && battery_data.soc <= 20.0f) {
+    } else if (battery_data.soc > 10.0f && battery_data.soc <= 20.0f && current_state != DOG_COLLAR_STATE_LOW_BATTERY) {
         ESP_LOGW(TAG, "Battery is low");
         return DOG_COLLAR_STATE_LOW_BATTERY;
-    } else {
-        ESP_LOGI(TAG, "Battery charge is ok");
-        return DOG_COLLAR_STATE_NORMAL;
     }
 
-    return DOG_COLLAR_STATE_NORMAL;
+    // If battery is OK, stay in the current state (do not go to NORMAL)
+    return current_state;
 }
 
 dog_collar_state_t handle_initializing_state(void) {
