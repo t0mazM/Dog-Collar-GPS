@@ -14,6 +14,9 @@ dog_collar_state_t dog_collar_state_machine_run(void) {
         case DOG_COLLAR_STATE_LOW_BATTERY:
             current_state = handle_low_battery_state();
             break;
+        case DOG_COLLAR_STATE_CRITICAL_LOW_BATTERY:
+            current_state = handle_critical_low_battery_state();
+            break;
         case DOG_COLLAR_STATE_CHARGING:
             current_state = handle_charging_state();
             break;
@@ -23,6 +26,9 @@ dog_collar_state_t dog_collar_state_machine_run(void) {
         case DOG_COLLAR_STATE_GPS_READY:
             current_state = handle_gps_ready_state();
             break;
+        case DOG_COLLAR_STATE_GPS_FILE_CREATION:
+            current_state = handle_gps_file_creation_state();
+            break;
         case DOG_COLLAR_STATE_GPS_TRACKING:
             current_state = handle_gps_tracking_state();
             break;
@@ -31,12 +37,6 @@ dog_collar_state_t dog_collar_state_machine_run(void) {
             break;
         case DOG_COLLAR_STATE_WIFI_SYNC:
             current_state = handle_wifi_sync_state();
-            break;
-        case DOG_COLLAR_STATE_LIGHT_SLEEP:
-            current_state = handle_light_sleep_state();
-            break;
-        case DOG_COLLAR_STATE_DEEP_SLEEP:
-            current_state = handle_deep_sleep_state();
             break;
         case DOG_COLLAR_STATE_ERROR:
             current_state = handle_error_state();
@@ -64,12 +64,17 @@ dog_collar_state_t handle_initializing_state(void) {
 
 dog_collar_state_t handle_normal_state(void) {
 
-    return DOG_COLLAR_STATE_NORMAL;  // Continue in normal state, or implement logic to transition to other states
+    return DOG_COLLAR_STATE_NORMAL; 
 }
 
 dog_collar_state_t handle_low_battery_state(void) {
 
     return DOG_COLLAR_STATE_LOW_BATTERY;
+}
+
+dog_collar_state_t handle_critical_low_battery_state(void) {
+
+    return DOG_COLLAR_STATE_CRITICAL_LOW_BATTERY;
 }
 
 dog_collar_state_t handle_charging_state(void) {
@@ -87,6 +92,11 @@ dog_collar_state_t handle_gps_ready_state(void) {
     return DOG_COLLAR_STATE_GPS_READY;
 }
 
+dog_collar_state_t handle_gps_file_creation_state(void) {
+
+    return DOG_COLLAR_STATE_GPS_FILE_CREATION;
+}
+
 dog_collar_state_t handle_gps_tracking_state(void) {
 
     return DOG_COLLAR_STATE_GPS_TRACKING;
@@ -102,15 +112,6 @@ dog_collar_state_t handle_wifi_sync_state(void) {
     return DOG_COLLAR_STATE_WIFI_SYNC;
 }
 
-dog_collar_state_t handle_light_sleep_state(void) {
-
-    return DOG_COLLAR_STATE_LIGHT_SLEEP;
-}
-
-dog_collar_state_t handle_deep_sleep_state(void) {
-
-    return DOG_COLLAR_STATE_DEEP_SLEEP;
-}
 
 dog_collar_state_t handle_error_state(void) {
 
