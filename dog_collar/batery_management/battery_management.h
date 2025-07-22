@@ -5,4 +5,5 @@
 
 
 
+
 #endif // BATTERY_MANAGEMENT_H

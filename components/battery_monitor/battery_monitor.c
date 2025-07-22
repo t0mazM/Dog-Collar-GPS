@@ -30,7 +30,7 @@ esp_err_t battery_monitor_init(void) {
     return ESP_OK;
 }
 
-void battery_monitor_update_battery_data(void) {
+esp_err_t battery_monitor_update_battery_data(void) {
 
     /* Temporary variables for battery data */
     float voltage;
@@ -39,19 +39,24 @@ void battery_monitor_update_battery_data(void) {
     float temperature;
     uint16_t flags;
 
+    esp_err_t overall_status = ESP_OK;
+
     /* Read battery voltage */
     if (read_voltage(&voltage) == ESP_OK) {
         battery_data.voltage = voltage;
     } else {
         ESP_LOGW(TAG, "Failed to read battery voltage");
         battery_data.voltage = -1.0f;
+        overall_status = ESP_FAIL; 
     }
 
+    /* Read battery current */
     if( read_current(&current) == ESP_OK) {
         battery_data.current = current;
     } else {
         ESP_LOGW(TAG, "Failed to read battery current");
         battery_data.current = -1.0f;
+        overall_status = ESP_FAIL;
     }
 
     /* Read battery state of charge */
@@ -60,6 +65,7 @@ void battery_monitor_update_battery_data(void) {
     } else {
         ESP_LOGW(TAG, "Failed to read battery state of charge");
         battery_data.soc = -1.0f;
+        overall_status = ESP_FAIL;
     }
 
     /* Read battery temperature */
@@ -68,6 +74,7 @@ void battery_monitor_update_battery_data(void) {
     } else {
         ESP_LOGW(TAG, "Failed to read battery temperature");
         battery_data.temperature = -1.0f;
+        overall_status = ESP_FAIL;
     }
 
     /* Read battery flags */
@@ -77,10 +84,18 @@ void battery_monitor_update_battery_data(void) {
     } else {
         ESP_LOGW(TAG, "Failed to read battery flags");
         battery_data.flags = 0xFFFF;
+        overall_status = ESP_FAIL;
     }
 
     /* Log the battery data */
     battery_monitor_log_data();
+
+    if (overall_status != ESP_OK) {
+        ESP_LOGE(TAG, "Battery data update encountered errors");
+    } else {
+        ESP_LOGI(TAG, "Battery data updated successfully");
+    }
+    return overall_status;
 }
 
 static esp_err_t read_voltage(float *voltage) {
