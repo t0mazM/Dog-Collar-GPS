@@ -62,4 +62,14 @@ esp_err_t wifi_stop_all_services(void);
  */
 esp_err_t wifi_stop_all_services_retry(uint16_t _max_retry_count);
 
+/**
+ * @brief Reconnects to the Wi-Fi network.
+ *
+ * This function stops all services, reinitializes the Wi-Fi, and attempts to reconnect.
+
+ *
+ * @return esp_err_t ESP_OK on success, or an error code on failure.
+ */
+esp_err_t wifi_manager_reconnect(void);
+
 #endif // WIFI_MANAGER_H

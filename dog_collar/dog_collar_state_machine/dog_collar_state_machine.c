@@ -95,7 +95,7 @@ dog_collar_state_t handle_initializing_state(void) {
 
 dog_collar_state_t handle_normal_state(void) {
 
-    return DOG_COLLAR_STATE_NORMAL; 
+    return DOG_COLLAR_STATE_WIFI_SYNC; 
 }
 
 dog_collar_state_t handle_low_battery_state(void) {
@@ -140,6 +140,7 @@ dog_collar_state_t handle_gps_paused_state(void) {
 
 dog_collar_state_t handle_wifi_sync_state(void) {
 
+    wifi_manager_reconnect();
     return DOG_COLLAR_STATE_WIFI_SYNC;
 }
 

@@ -3,6 +3,9 @@
 
 static const char *TAG = "WIFI_APP";
 static bool wifi_initialized = false;
+static bool default_event_loop_created = false;
+
+static esp_netif_t* sta_netif = NULL;
 
 char *ssid = WIFI_CRED_SSID; 
 char *password = WIFI_CRED_PASS; 
@@ -72,15 +75,23 @@ esp_err_t wifi_connect_and_start_services(void) { //TODO HANDLE ERRORS - return 
                         TAG,
                         "Failed to initialize TCP/IP stack");
 
-    // Create default event loop
-    ESP_RETURN_ON_ERROR(esp_event_loop_create_default(),
-                        TAG,
-                        "Failed to create default event loop");
+    // Create default event loop (can be called only once in the whole application lifetime)
+    if (!default_event_loop_created) {
+        esp_err_t err = esp_event_loop_create_default();
+        if (err == ESP_OK || err == ESP_ERR_INVALID_STATE) {
+            default_event_loop_created = true;
+        } else {
+            ESP_LOGE(TAG, "Failed to create default event loop: %s", esp_err_to_name(err));
+            return err;
+        }
+    }
 
-    esp_netif_t* sta_netif = esp_netif_create_default_wifi_sta(); // My/your wifi newtwork info/iterface
     if (sta_netif == NULL) {
-        ESP_LOGE(TAG, "Failed to create default Wi-Fi station network interface");
-        return ESP_FAIL;
+        sta_netif = esp_netif_create_default_wifi_sta();
+        if (sta_netif == NULL) {
+            ESP_LOGE(TAG, "Failed to create default Wi-Fi station network interface");
+            return ESP_FAIL;
+        }
     }
 
     // Initialize Wi-Fi driver
@@ -186,16 +197,22 @@ esp_err_t wifi_stop_all_services(void) {
         any_errors = true;
     }
 
-    // 6. Clean up event group
+    /* 6. Destroy/delete network interface */
+    if (sta_netif != NULL) {
+        esp_netif_destroy(sta_netif);
+        sta_netif = NULL;
+    }
+
+    // 7. Clean up event group
     if (s_wifi_event_group != NULL) {
         vEventGroupDelete(s_wifi_event_group);
         s_wifi_event_group = NULL;
     }
 
-    // 7. Reset retry counter for next wifi connection
+    // 8. Reset retry counter for next wifi connection
     s_retry_num = 0;
 
-    // 8. Display final status
+    // 9. Display final status
     if (any_errors) {
         ESP_LOGW(TAG, "WiFi shutdown completed with some errors");
         return ESP_FAIL;
@@ -221,4 +238,22 @@ do{
 }while(error != ESP_OK && retry_count < _max_retry_count);
 
 return error;
+}
+
+esp_err_t wifi_manager_reconnect(void) {
+    ESP_LOGI(TAG, "Reconnecting to WiFi...");
+
+    // Stop all services and deinit WiFi if already initialized
+    if (wifi_initialized) {
+        wifi_stop_all_services();
+    }
+
+    // Re-init and connect
+    esp_err_t ret = wifi_init();
+    if (ret == ESP_OK) {
+        ESP_LOGI(TAG, "WiFi reconnected successfully.");
+    } else {
+        ESP_LOGE(TAG, "WiFi reconnection failed!");
+    }
+    return ret;
 }
