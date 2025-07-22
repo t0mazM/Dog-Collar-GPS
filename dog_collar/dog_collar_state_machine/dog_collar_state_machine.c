@@ -109,7 +109,7 @@ dog_collar_state_t handle_normal_state(void) {
         return DOG_COLLAR_STATE_WIFI_SYNC;
     }
 
-    enter_light_sleep(SLEEP_TIME_S * 1000);
+    enter_light_sleep(SLEEP_TIME_S * 1000 * 1000);
     // Remain in NORMAL state
     gpio_toggle_leds(LED_GREEN);
     return DOG_COLLAR_STATE_NORMAL;
