@@ -1,7 +1,12 @@
 #ifndef DOG_COLLAR_STATE_MACHINE_H
 #define DOG_COLLAR_STATE_MACHINE_H
 
+#include <stdint.h>
+#include "esp_err.h"
+#include "esp_log.h"
+
 #include "components_init/components_init.h"
+#include "../components/battery_monitor/battery_monitor.h"
 
 typedef enum {
     DOG_COLLAR_STATE_INITIALIZING, 
@@ -21,6 +26,16 @@ typedef enum {
 
     DOG_COLLAR_STATE_ERROR
 } dog_collar_state_t;
+
+/**
+ * @brief Manages the battery state and performs actions based on the battery status.
+ *
+ * This function is called periodically to check:
+ * TODO add docs here after implementing and testing the battery management routine
+ *
+ * @return esp_err_t ESP_OK on success, or an error code on failure.
+ */
+dog_collar_state_t battery_management_routine(void);
 
 /**
  * @brief Handles the initializing state of the dog collar.

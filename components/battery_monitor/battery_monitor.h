@@ -15,12 +15,12 @@
 #define BAT_MON_LOG_BUF_SIZE 512
 
 typedef struct {
-    uint8_t i2c_address; // Default I2C address for BQ27441
-    float voltage; //In mili Volts
-    int16_t current; //In mili Amperes
-    float soc;  //In %
-    float temperature; //In degrees Celsius
-    uint16_t flags; // Battery flags
+    uint8_t i2c_address;    // Default I2C address for BQ27441
+    float voltage;          // In mili Volts
+    int16_t current;        // In mili Amperes
+    float soc;              // In %
+    float temperature;      // In degrees Celsius
+    uint16_t flags;         // In binary format
 } battery_data_t;
 extern battery_data_t battery_data;
 
@@ -34,6 +34,7 @@ typedef struct {
     bool socf;
     bool discharging;
 } battery_status_flags_t;
+extern battery_status_flags_t battery_status_flags;
 
 /**
  * @brief Initializes the battery monitor
