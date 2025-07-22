@@ -1,7 +1,7 @@
 #include "http_server.h"
 
 static const char *TAG = "HTTP_SERVER";
-httpd_handle_t server = NULL; //
+httpd_handle_t server = NULL;
 
 // Handlers prototypes
 static esp_err_t hello_get_handler(httpd_req_t *req);

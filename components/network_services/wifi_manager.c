@@ -2,6 +2,7 @@
 #include "wifi_credentials.h"
 
 static const char *TAG = "WIFI_APP";
+static bool wifi_initialized = false;
 
 char *ssid = WIFI_CRED_SSID; 
 char *password = WIFI_CRED_PASS; 
@@ -15,6 +16,10 @@ static int s_retry_num = 0;
 
 
 esp_err_t wifi_init(void) {
+    if (wifi_initialized) {
+        ESP_LOGW(TAG, "Wi-Fi already initialized");
+        return ESP_OK;
+    }
 
     ESP_RETURN_ON_ERROR(nvs_flash_init(), 
                         TAG, "Failed to initialize NVS"
@@ -23,6 +28,8 @@ esp_err_t wifi_init(void) {
     ESP_RETURN_ON_ERROR(wifi_connect_and_start_services(),
                         TAG, "Failed to connect to Wi-Fi network"
     );
+
+    wifi_initialized = true;
     return ESP_OK;
 }
 
@@ -195,6 +202,7 @@ esp_err_t wifi_stop_all_services(void) {
     }
 
     ESP_LOGI(TAG, "WiFi services shutdown completed successfully");
+    wifi_initialized = false; // Reset the initialization flag
     return ESP_OK;
 }
 

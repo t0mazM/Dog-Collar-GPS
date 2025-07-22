@@ -1,5 +1,6 @@
 #include "dog_collar_state_machine.h"
 
+static char *get_current_state_string(dog_collar_state_t state);
 static const char *TAG = "DOG_COLLAR_STATE_MACHINE";
 
 /* Default state at startup is to initialize the system */
@@ -7,8 +8,8 @@ static dog_collar_state_t current_state = DOG_COLLAR_STATE_INITIALIZING;
 
 dog_collar_state_t dog_collar_state_machine_run(void) {
 
-    
-    printf("Current state: %d\n", current_state);
+
+    printf("Current state: %s\n", get_current_state_string(current_state));
 
     switch (current_state) {
         case DOG_COLLAR_STATE_INITIALIZING:
@@ -145,6 +146,49 @@ dog_collar_state_t handle_wifi_sync_state(void) {
 
 dog_collar_state_t handle_error_state(void) {
         gpio_toggle_leds(LED_RED);
-        vTaskDelay(pdMS_TO_TICKS(1000));
-    return DOG_COLLAR_STATE_ERROR;
+        vTaskDelay(pdMS_TO_TICKS(500));
+        gpio_toggle_leds(LED_RED);
+        vTaskDelay(pdMS_TO_TICKS(500));
+        gpio_toggle_leds(LED_RED);
+        vTaskDelay(pdMS_TO_TICKS(500));
+        gpio_toggle_leds(LED_RED);
+        vTaskDelay(pdMS_TO_TICKS(500));
+        gpio_toggle_leds(LED_RED);
+        vTaskDelay(pdMS_TO_TICKS(500));
+        gpio_toggle_leds(LED_RED);
+        vTaskDelay(pdMS_TO_TICKS(500));
+        gpio_toggle_leds(LED_RED);
+        vTaskDelay(pdMS_TO_TICKS(500));
+    return DOG_COLLAR_STATE_INITIALIZING;
+}
+
+static char *get_current_state_string(dog_collar_state_t state) {
+    switch (state) {
+        case DOG_COLLAR_STATE_INITIALIZING:
+            return "INITIALIZING";
+        case DOG_COLLAR_STATE_NORMAL:
+            return "NORMAL";
+        case DOG_COLLAR_STATE_LOW_BATTERY:
+            return "LOW_BATTERY";
+        case DOG_COLLAR_STATE_CRITICAL_LOW_BATTERY:
+            return "CRITICAL_LOW_BATTERY";
+        case DOG_COLLAR_STATE_CHARGING:
+            return "CHARGING";
+        case DOG_COLLAR_STATE_GPS_ACQUIRING:
+            return "GPS_ACQUIRING";
+        case DOG_COLLAR_STATE_GPS_READY:
+            return "GPS_READY";
+        case DOG_COLLAR_STATE_GPS_FILE_CREATION:
+            return "GPS_FILE_CREATION";
+        case DOG_COLLAR_STATE_GPS_TRACKING:
+            return "GPS_TRACKING";
+        case DOG_COLLAR_STATE_GPS_PAUSED:
+            return "GPS_PAUSED";
+        case DOG_COLLAR_STATE_WIFI_SYNC:
+            return "WIFI_SYNC";
+        case DOG_COLLAR_STATE_ERROR:
+            return "ERROR";
+        default:
+            return "UNKNOWN";
+    }
 }

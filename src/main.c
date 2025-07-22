@@ -24,7 +24,7 @@ void app_main() {
 
     while(true) {
         dog_collar_state_machine_run();
-        vTaskDelay(pdMS_TO_TICKS(5000)); 
+        vTaskDelay(pdMS_TO_TICKS(500)); 
     }
 
 
