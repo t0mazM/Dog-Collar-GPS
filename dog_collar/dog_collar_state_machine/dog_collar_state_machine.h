@@ -10,6 +10,9 @@
 #include "components_init/components_init.h"
 #include "../components/battery_monitor/battery_monitor.h"
 
+#define WIFI_SYNC_TIME_S 10
+#define SLEEP_TIME_S 3 
+
 typedef enum {
     DOG_COLLAR_STATE_INITIALIZING, 
     DOG_COLLAR_STATE_NORMAL,
