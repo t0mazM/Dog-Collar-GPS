@@ -7,7 +7,8 @@ static dog_collar_state_t current_state = DOG_COLLAR_STATE_INITIALIZING;
 
 dog_collar_state_t dog_collar_state_machine_run(void) {
 
-    current_state = battery_management_routine(current_state);
+    
+    printf("Current state: %d\n", current_state);
 
     switch (current_state) {
         case DOG_COLLAR_STATE_INITIALIZING:
@@ -50,6 +51,7 @@ dog_collar_state_t dog_collar_state_machine_run(void) {
             // Handle unexpected state
             current_state = DOG_COLLAR_STATE_ERROR;
     }
+    current_state = battery_management_routine(current_state);
     return current_state;
 }
 
@@ -142,5 +144,7 @@ dog_collar_state_t handle_wifi_sync_state(void) {
 
 
 dog_collar_state_t handle_error_state(void) {
+        gpio_toggle_leds(LED_RED);
+        vTaskDelay(pdMS_TO_TICKS(1000));
     return DOG_COLLAR_STATE_ERROR;
 }
