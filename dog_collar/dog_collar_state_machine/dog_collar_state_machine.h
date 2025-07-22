@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include "esp_err.h"
 #include "esp_log.h"
+#include "esp_timer.h"
+#include "esp_sleep.h"
 
 #include "components_init/components_init.h"
 #include "../components/battery_monitor/battery_monitor.h"

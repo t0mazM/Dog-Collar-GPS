@@ -24,7 +24,7 @@ void app_main() {
 
     while(true) {
         dog_collar_state_machine_run();
-        vTaskDelay(pdMS_TO_TICKS(2000)); 
+        vTaskDelay(pdMS_TO_TICKS(500)); 
     }
 
 
@@ -33,11 +33,8 @@ void app_main() {
     //gps_l96_go_to_standby_mode();
     // gps_l96_go_to_back_up_mode();
     // vTaskDelay(5000 / portTICK_PERIOD_MS); 
-    // gps_l96_read_task();
-    // gps_l96_start_recording();
+    gps_l96_read_task();
+    gps_l96_start_recording();
 
-    // while(1){
-    //     gps_l96_read_task();
-    //     vTaskDelay(1000 / portTICK_PERIOD_MS); 
-    // }
+
 }

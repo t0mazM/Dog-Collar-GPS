@@ -1,7 +1,10 @@
 #include "dog_collar_state_machine.h"
 
 static char *get_current_state_string(dog_collar_state_t state);
+static void enter_light_sleep(uint64_t sleep_time_us);
+
 static const char *TAG = "DOG_COLLAR_STATE_MACHINE";
+static int64_t last_wifi_sync_time_us = 0; // Last wifi sync time in microseconds
 
 /* Default state at startup is to initialize the system */
 static dog_collar_state_t current_state = DOG_COLLAR_STATE_INITIALIZING;
@@ -94,8 +97,23 @@ dog_collar_state_t handle_initializing_state(void) {
 }
 
 dog_collar_state_t handle_normal_state(void) {
+    int64_t now_us = esp_timer_get_time();
 
-    return DOG_COLLAR_STATE_WIFI_SYNC; 
+    // If first entry, set the timer
+    if (last_wifi_sync_time_us == 0) {
+        last_wifi_sync_time_us = now_us;
+    }
+
+    if ((now_us - last_wifi_sync_time_us) >= 10 * 1000 * 1000) { 
+        ESP_LOGI(TAG, "10s passed, going to WIFI_SYNC");
+        last_wifi_sync_time_us = now_us;
+        return DOG_COLLAR_STATE_WIFI_SYNC;
+    }
+
+    enter_light_sleep(30000); 
+    // Remain in NORMAL state
+    gpio_toggle_leds(LED_GREEN);
+    return DOG_COLLAR_STATE_NORMAL;
 }
 
 dog_collar_state_t handle_low_battery_state(void) {
@@ -141,7 +159,7 @@ dog_collar_state_t handle_gps_paused_state(void) {
 dog_collar_state_t handle_wifi_sync_state(void) {
 
     wifi_manager_reconnect();
-    return DOG_COLLAR_STATE_WIFI_SYNC;
+    return DOG_COLLAR_STATE_NORMAL;
 }
 
 
@@ -192,4 +210,19 @@ static char *get_current_state_string(dog_collar_state_t state) {
         default:
             return "UNKNOWN";
     }
+}
+
+static void enter_light_sleep(uint64_t sleep_time_us) {
+
+    esp_err_t ret = esp_sleep_enable_timer_wakeup(3000000);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to enable timer wakeup for light sleep: %s", esp_err_to_name(ret));
+        return;
+    }
+    ESP_LOGI(TAG, "Entering light sleep for %llu us", sleep_time_us);
+    ret = esp_light_sleep_start();
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to enter light sleep: %s", esp_err_to_name(ret));
+    }
+    ESP_LOGI(TAG, "Woke up from light sleep");
 }
