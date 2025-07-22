@@ -214,15 +214,16 @@ static char *get_current_state_string(dog_collar_state_t state) {
 
 static void enter_light_sleep(uint64_t sleep_time_us) {
 
-    esp_err_t ret = esp_sleep_enable_timer_wakeup(3000000);
-    if (ret != ESP_OK) {
-        ESP_LOGE(TAG, "Failed to enable timer wakeup for light sleep: %s", esp_err_to_name(ret));
-        return;
-    }
-    ESP_LOGI(TAG, "Entering light sleep for %llu us", sleep_time_us);
-    ret = esp_light_sleep_start();
-    if (ret != ESP_OK) {
-        ESP_LOGE(TAG, "Failed to enter light sleep: %s", esp_err_to_name(ret));
-    }
-    ESP_LOGI(TAG, "Woke up from light sleep");
+    // esp_sleep_enable_timer_wakeup(3000000);
+
+    // ESP_LOGI(TAG, "Entering light sleep for %llu us", sleep_time_us);
+    // esp_light_sleep_start();
+
+    // ESP_LOGI(TAG, "Woke up from light sleep");
+
+
+    /* The light sleep functionality is currently disabled as after 
+    waking up the usb uart is not reinitialized properly and is not working*/
+
+    vTaskDelay(pdMS_TO_TICKS(sleep_time_us / 1000)); 
 }
