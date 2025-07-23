@@ -103,11 +103,8 @@ dog_collar_state_t handle_normal_state(void) {
 
     // 1) Check if button was pressed
     if (is_button_short_pressed()) {
+        vTaskDelay(pdMS_TO_TICKS(500)); // Wait a bit and clear the button state
         return DOG_COLLAR_STATE_GPS_ACQUIRING;
-    }
-
-    if (is_button_long_pressed()) {
-        return DOG_COLLAR_STATE_ERROR;
     }
 
     // 2) Start enter wifi_sync state every WIFI_SYNC_PERIODIC_TIME_S seconds
@@ -150,7 +147,15 @@ dog_collar_state_t handle_charging_state(void) {
 
 dog_collar_state_t handle_gps_acquiring_state(void) {
 
-    return DOG_COLLAR_STATE_GPS_ACQUIRING;
+    
+    if (is_button_short_pressed()) { 
+        return DOG_COLLAR_STATE_GPS_FILE_CREATION; // go and create a GPS file
+    }
+    if (is_button_long_pressed()) {
+        return DOG_COLLAR_STATE_NORMAL;            // go back to normal state
+    }
+
+    return DOG_COLLAR_STATE_GPS_ACQUIRING; // Loop back to GPS_ACQUIRING
 }
 
 dog_collar_state_t handle_gps_ready_state(void) {
