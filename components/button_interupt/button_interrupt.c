@@ -4,6 +4,7 @@
 #include "esp_timer.h"
 
 static const char *TAG = "BUTTON_HANDLER";
+static bool button_interrupt_initialized = false;
 
 volatile bool button_pressed = false;
 volatile bool button_long_pressed = false;
@@ -38,6 +39,10 @@ static void debounce_timer_callback(void* arg) {
 }
 
 esp_err_t button_interrupt_init(void) {
+    if (button_interrupt_initialized) {
+        ESP_LOGW(TAG, "Button interrupt already initialized");
+        return ESP_OK;
+    }
     gpio_config_t io_conf = {
         .pin_bit_mask = (1ULL << BUTTON_GPIO),
         .mode = GPIO_MODE_INPUT,
@@ -59,6 +64,8 @@ esp_err_t button_interrupt_init(void) {
     ESP_ERROR_CHECK(gpio_isr_handler_add(BUTTON_GPIO, button_isr_handler, NULL));
 
     ESP_LOGI(TAG, "Button interrupt initialized");
+
+    button_interrupt_initialized = true;
     return ESP_OK;
 }
 
