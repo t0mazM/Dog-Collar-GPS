@@ -4,7 +4,6 @@ static char *get_current_state_string(dog_collar_state_t state);
 static void enter_light_sleep(uint64_t sleep_time_us);
 
 static const char *TAG = "DOG_COLLAR_STATE_MACHINE";
-static int64_t last_wifi_sync_time_us = 0; // Last wifi sync time in microseconds
 
 /* Default state at startup is to initialize the system */
 static dog_collar_state_t current_state = DOG_COLLAR_STATE_INITIALIZING;
@@ -98,21 +97,39 @@ dog_collar_state_t handle_initializing_state(void) {
 }
 
 dog_collar_state_t handle_normal_state(void) {
+    static bool normal_started = false;
+    static int64_t normal_start_time_us = 0;
     int64_t now_us = esp_timer_get_time();
 
-    // If first entry, set the timer
-    if (last_wifi_sync_time_us == 0) {
-        last_wifi_sync_time_us = now_us;
+    // 1) Check if button was pressed
+    if (is_button_short_pressed()) {
+        return DOG_COLLAR_STATE_GPS_ACQUIRING;
     }
 
-    if ((now_us - last_wifi_sync_time_us) >= WIFI_SYNC_PERIODIC_TIME_S * 1000 * 1000) { 
-        last_wifi_sync_time_us = now_us;
+    if (is_button_long_pressed()) {
+        return DOG_COLLAR_STATE_ERROR;
+    }
+
+    // 2) Start enter wifi_sync state every WIFI_SYNC_PERIODIC_TIME_S seconds
+    // 2.a) On first normal state entry, set the start time
+    if (!normal_started) {
+        normal_start_time_us = now_us;
+        normal_started = true;
+    }
+
+    // 2.b) If time is up, go to WIFI_SYNC state
+    if ((now_us - normal_start_time_us) >= WIFI_SYNC_PERIODIC_TIME_S * 1000 * 1000) {
+        normal_started = false;
         return DOG_COLLAR_STATE_WIFI_SYNC;
     }
 
+    /** 3) If nothing happened, go to light sleep and stay in NORMAL state 
+        Set normal_started to false so that we can start the timer again on next entry */
     enter_light_sleep(SLEEP_TIME_S * 1000 * 1000);
-    // Remain in NORMAL state
-    gpio_toggle_leds(LED_GREEN);
+    normal_started = false;
+
+    gpio_toggle_leds(LED_GREEN); //used to debug. TODO: add a proper LED blinking routine
+
     return DOG_COLLAR_STATE_NORMAL;
 }
 
@@ -236,14 +253,16 @@ static char *get_current_state_string(dog_collar_state_t state) {
 
 static void enter_light_sleep(uint64_t sleep_time_us) {
 
-    esp_sleep_enable_timer_wakeup(sleep_time_us);
-    esp_sleep_enable_gpio_wakeup();
-    gpio_wakeup_enable(BUTTON_GPIO, GPIO_INTR_LOW_LEVEL); // Wake on button press (active low)
+    // esp_sleep_enable_timer_wakeup(sleep_time_us);
+    // esp_sleep_enable_gpio_wakeup();
+    // gpio_wakeup_enable(BUTTON_GPIO, GPIO_INTR_LOW_LEVEL); // Wake on button press (active low)
 
-    esp_light_sleep_start();
+    // esp_light_sleep_start();
 
     /* The light sleep functionality is currently disabled as after 
     waking up the usb uart is not reinitialized properly and is not working*/
+
+    vTaskDelay(pdMS_TO_TICKS(5000)); // Simulate light sleep with delay
 
     
 }
