@@ -69,7 +69,6 @@ esp_err_t button_interrupt_init(void) {
     return ESP_OK;
 }
 
-// Accessor functions
 bool is_button_pressed(void) {
     return button_pressed;
 }
