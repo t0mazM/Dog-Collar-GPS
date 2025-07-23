@@ -88,12 +88,12 @@ esp_err_t battery_monitor_update_battery_data(void) {
     }
 
     /* Log the battery data */
-    battery_monitor_log_data();
+    //battery_monitor_log_data();
 
     if (overall_status != ESP_OK) {
         ESP_LOGE(TAG, "Battery data update encountered errors");
     } else {
-        ESP_LOGI(TAG, "Battery data updated successfully");
+        // ESP_LOGI(TAG, "Battery data updated successfully");
     }
     return overall_status;
 }

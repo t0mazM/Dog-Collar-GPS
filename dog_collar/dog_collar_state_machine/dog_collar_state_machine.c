@@ -12,7 +12,6 @@ dog_collar_state_t dog_collar_state_machine_run(void) {
 
 
     printf("Current state: %s\n", get_current_state_string(current_state));
-    printf("Short press: %d, Long press: %d\n", is_button_short_pressed(), is_button_long_pressed()); 
 
     switch (current_state) {
         case DOG_COLLAR_STATE_INITIALIZING:
@@ -103,7 +102,8 @@ dog_collar_state_t handle_normal_state(void) {
 
     // 1) Check if button was pressed
     if (is_button_short_pressed()) {
-        vTaskDelay(pdMS_TO_TICKS(500)); // Wait a bit and clear the button state
+        vTaskDelay(pdMS_TO_TICKS(WAIT_AFTER_USER_PRESS_MS)); // Wait a bit and clear the button state
+        clear_button_press_states();
         return DOG_COLLAR_STATE_GPS_ACQUIRING;
     }
 
@@ -146,7 +146,7 @@ dog_collar_state_t handle_charging_state(void) {
 }
 
 dog_collar_state_t handle_gps_acquiring_state(void) {
-
+    ESP_LOGI(TAG, "Waiting for GPS fix or user input");
     
     if (is_button_short_pressed()) { 
         return DOG_COLLAR_STATE_GPS_FILE_CREATION; // go and create a GPS file
@@ -155,26 +155,53 @@ dog_collar_state_t handle_gps_acquiring_state(void) {
         return DOG_COLLAR_STATE_NORMAL;            // go back to normal state
     }
 
+    //TODO: Add if we have GPS fix, go to GPS_READY state
+
     return DOG_COLLAR_STATE_GPS_ACQUIRING; // Loop back to GPS_ACQUIRING
 }
 
 dog_collar_state_t handle_gps_ready_state(void) {
+    ESP_LOGI(TAG, "GPS is ready. Waiting for user input");
 
+    if (is_button_short_pressed()) { 
+        return DOG_COLLAR_STATE_GPS_FILE_CREATION; // go and create a GPS file
+    }
+    if (is_button_long_pressed()) {
+        return DOG_COLLAR_STATE_NORMAL;            // go back to normal state
+    }
+
+    //TODO: Add LED animation for GPS ready state
     return DOG_COLLAR_STATE_GPS_READY;
 }
 
 dog_collar_state_t handle_gps_file_creation_state(void) {
 
-    return DOG_COLLAR_STATE_GPS_FILE_CREATION;
+    ESP_LOGI(TAG, "Creating GPS file");
+    return DOG_COLLAR_STATE_GPS_TRACKING;
 }
 
 dog_collar_state_t handle_gps_tracking_state(void) {
 
+    ESP_LOGI(TAG, "Tracking GPS");
+
+    if (is_button_short_pressed()) { 
+        return DOG_COLLAR_STATE_GPS_PAUSED; 
+    }
     return DOG_COLLAR_STATE_GPS_TRACKING;
 }
 
 dog_collar_state_t handle_gps_paused_state(void) {
+    
+    ESP_LOGI(TAG, "GPS is paused. Waiting for user input");
 
+    if (is_button_short_pressed()) { 
+        return DOG_COLLAR_STATE_GPS_TRACKING; // go and create a GPS file
+    }
+    if (is_button_long_pressed()) {
+        return DOG_COLLAR_STATE_NORMAL;            // go back to normal state
+    }
+
+    //TODO: Add LED animation for GPS paused state
     return DOG_COLLAR_STATE_GPS_PAUSED;
 }
 
