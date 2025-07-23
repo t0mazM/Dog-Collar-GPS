@@ -14,7 +14,7 @@
 
 #define BUTTON_GPIO         9    
 #define DEBOUNCE_TIME_MS    50
-#define LONG_PRESS_TIME_MS  2000
+#define LONG_PRESS_TIME_MS  1000
 
 /**
  * @brief Initializes the button interrupt service.
@@ -26,7 +26,7 @@ esp_err_t button_interrupt_init(void);
  * @brief Checks if the button is currently pressed.
  * @return true if the button is pressed, false otherwise.
  */
-bool is_button_pressed(void);
+bool is_button_short_pressed(void);
 bool is_button_long_pressed(void);
 
 #endif // BUTTON_INTERRUPT_H

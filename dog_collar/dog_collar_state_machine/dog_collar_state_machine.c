@@ -13,6 +13,7 @@ dog_collar_state_t dog_collar_state_machine_run(void) {
 
 
     printf("Current state: %s\n", get_current_state_string(current_state));
+    printf("Short press: %d, Long press: %d\n", is_button_short_pressed(), is_button_long_pressed()); 
 
     switch (current_state) {
         case DOG_COLLAR_STATE_INITIALIZING:
@@ -106,7 +107,7 @@ dog_collar_state_t handle_normal_state(void) {
 
     if ((now_us - last_wifi_sync_time_us) >= WIFI_SYNC_TIME_S * 1000 * 1000) { 
         last_wifi_sync_time_us = now_us;
-        return DOG_COLLAR_STATE_WIFI_SYNC;
+        //return DOG_COLLAR_STATE_WIFI_SYNC;
     }
 
     enter_light_sleep(SLEEP_TIME_S * 1000 * 1000);
@@ -213,18 +214,18 @@ static char *get_current_state_string(dog_collar_state_t state) {
 
 static void enter_light_sleep(uint64_t sleep_time_us) {
 
-    esp_sleep_enable_timer_wakeup(sleep_time_us);
-    esp_sleep_enable_gpio_wakeup();
-    gpio_wakeup_enable(BUTTON_GPIO, GPIO_INTR_LOW_LEVEL); // Wake on button press (active low)
+    // esp_sleep_enable_timer_wakeup(sleep_time_us);
+    // esp_sleep_enable_gpio_wakeup();
+    // gpio_wakeup_enable(BUTTON_GPIO, GPIO_INTR_LOW_LEVEL); // Wake on button press (active low)
 
-    ESP_LOGI(TAG, "Entering light sleep for %llu us", sleep_time_us);
-    esp_light_sleep_start();
+    // ESP_LOGI(TAG, "Entering light sleep for %llu us", sleep_time_us);
+    // esp_light_sleep_start();
 
-    ESP_LOGI(TAG, "Woke up from light sleep");
+    // ESP_LOGI(TAG, "Woke up from light sleep");
 
 
     /* The light sleep functionality is currently disabled as after 
     waking up the usb uart is not reinitialized properly and is not working*/
 
-    //vTaskDelay(pdMS_TO_TICKS(sleep_time_us / 1000)); 
+    vTaskDelay(pdMS_TO_TICKS(sleep_time_us / 1000)); 
 }

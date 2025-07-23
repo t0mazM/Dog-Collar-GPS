@@ -66,9 +66,17 @@ esp_err_t button_interrupt_init(void) {
 }
 
 bool is_button_short_pressed(void) {
-    return button_short_pressed;
+    if (button_short_pressed) {
+        button_short_pressed = false;
+        return true;
+    }
+    return false;
 }
 
 bool is_button_long_pressed(void) {
-    return button_long_pressed;
+    if (button_long_pressed) {
+        button_long_pressed = false;
+        return true;
+    }
+    return false;
 }
