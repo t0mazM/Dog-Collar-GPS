@@ -55,7 +55,7 @@ dog_collar_state_t battery_management_routine(dog_collar_state_t current_state);
  *
  * @return dog_collar_state_t The next state of the dog collar.
  */
-static dog_collar_state_t handle_initializing_state(void);
+dog_collar_state_t handle_initializing_state(void);
 
 
 /**
@@ -67,7 +67,7 @@ static dog_collar_state_t handle_initializing_state(void);
  *
  * @return dog_collar_state_t Wifi sync state if time to sync, otherwise normal state.
  */
-static dog_collar_state_t handle_normal_state(void);
+dog_collar_state_t handle_normal_state(void);
 
 
 /**
@@ -80,7 +80,7 @@ static dog_collar_state_t handle_normal_state(void);
  *
  * @return dog_collar_state_t Light sleep state.
  */
-static dog_collar_state_t handle_low_battery_state(void);
+dog_collar_state_t handle_low_battery_state(void);
 
 /**
  * @brief Handles the critical low battery state of the dog collar.
@@ -93,7 +93,7 @@ static dog_collar_state_t handle_low_battery_state(void);
  * @note When waking up from deep sleep, we return at main function and start program from the beginning.
  * @return dog_collar_state_t Normal state, although we will not reach this point as we will reset the device.
  */
-static dog_collar_state_t handle_critical_low_battery_state(void);
+dog_collar_state_t handle_critical_low_battery_state(void);
 
 /**
  * @brief Handles the charging state of the dog collar.
@@ -105,7 +105,7 @@ static dog_collar_state_t handle_critical_low_battery_state(void);
  * @note If discharging while charging, the battery monitor routine will check if it has enough charge to continue operating.
  * @return dog_collar_state_t Charging state if not fully charged, normal state if fully charged.
  */
-static dog_collar_state_t handle_charging_state(void);
+dog_collar_state_t handle_charging_state(void);
 
 /**
  * @brief Handles the GPS acquiring state of the dog collar.
@@ -118,7 +118,7 @@ static dog_collar_state_t handle_charging_state(void);
  *
  * @return dog_collar_state_t gps_acquiring state if GPS fix is not acquired, gps_ready state if GPS is ready.
  */
-static dog_collar_state_t handle_gps_acquiring_state(void);
+dog_collar_state_t handle_gps_acquiring_state(void);
 
 /**
  * @brief Handles the GPS ready state of the dog collar.
@@ -130,7 +130,7 @@ static dog_collar_state_t handle_gps_acquiring_state(void);
  *
  * @return dog_collar_state_t gps_file_creation state if button is pressed, gps_ready state if no button press.
  */
-static dog_collar_state_t handle_gps_ready_state(void);
+dog_collar_state_t handle_gps_ready_state(void);
 
 /**
  * @brief Handles the GPS file creation state of the dog collar.
@@ -142,7 +142,7 @@ static dog_collar_state_t handle_gps_ready_state(void);
  *
  * @return dog_collar_state_t gps_tracking state after file creation.
  */
-static dog_collar_state_t handle_gps_file_creation_state(void);
+dog_collar_state_t handle_gps_file_creation_state(void);
 
 /**
  * @brief Handles the GPS tracking state of the dog collar.
@@ -155,7 +155,7 @@ static dog_collar_state_t handle_gps_file_creation_state(void);
  *
  * @return dog_collar_state_t gps_paused state if button is pressed, gps_tracking state if no button press.
  */
-static dog_collar_state_t handle_gps_tracking_state(void);
+dog_collar_state_t handle_gps_tracking_state(void);
 
 /**
  * @brief Handles the GPS paused state of the dog collar.
@@ -168,7 +168,7 @@ static dog_collar_state_t handle_gps_tracking_state(void);
  *
  * @return dog_collar_state_t gps_tracking state if button is pressed, gps_paused state if no button press or gps_normal state if button is held for a longer period.
  */
-static dog_collar_state_t handle_gps_paused_state(void);
+dog_collar_state_t handle_gps_paused_state(void);
 
 /**
  * @brief Handles the Wi-Fi sync state of the dog collar.
@@ -179,7 +179,7 @@ static dog_collar_state_t handle_gps_paused_state(void);
  *
  * @return dog_collar_state_t normal_state 
  */
-static dog_collar_state_t handle_wifi_sync_state(void);
+dog_collar_state_t handle_wifi_sync_state(void);
 
 /**
  * @brief Handles the error state of the dog collar.
@@ -187,7 +187,7 @@ static dog_collar_state_t handle_wifi_sync_state(void);
  * - Logs the error and notifies the user with error LED animation.
  * - Stops all operations and enters a safe state.
  */
-static dog_collar_state_t handle_error_state(void);
+dog_collar_state_t handle_error_state(void);
 
 
 

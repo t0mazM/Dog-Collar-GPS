@@ -80,7 +80,7 @@ esp_err_t wifi_manager_reconnect(void);
  *
  * @return true if Wi-Fi is initialized and connected, false otherwise.
  */
-static bool wifi_manager_is_initialized_and_connected(void);
+bool wifi_manager_is_initialized_and_connected(void);
 
 
 

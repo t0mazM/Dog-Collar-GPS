@@ -261,7 +261,7 @@ esp_err_t wifi_manager_reconnect(void) {
     return ret;
 }
 
-static bool wifi_manager_is_initialized_and_connected(void) {
+bool wifi_manager_is_initialized_and_connected(void) {
     if (s_wifi_event_group == NULL || !default_event_loop_created || !wifi_initialized) {
         ESP_LOGI(TAG, "Wifi not initialized");
         return false;
