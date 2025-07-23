@@ -80,3 +80,8 @@ bool is_button_long_pressed(void) {
     }
     return false;
 }
+
+void clear_button_press_states(void) {
+    button_short_pressed = false;
+    button_long_pressed = false;
+}

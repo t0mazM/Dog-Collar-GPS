@@ -39,4 +39,13 @@ bool is_button_short_pressed(void);
   */
 bool is_button_long_pressed(void);
 
+/**
+ * @brief Clears the button press states.
+ * This function resets the button_short_pressed and button_long_pressed flags to false.
+ *
+ * @note Calling is used to not get bugs when the button is pressed multiple times in a short period.
+ *       It is recommended to call this function after processing the button press.
+ */
+void clear_button_press_states(void);
+
 #endif // BUTTON_INTERRUPT_H
