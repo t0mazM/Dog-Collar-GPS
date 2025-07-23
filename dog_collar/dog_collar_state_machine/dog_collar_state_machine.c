@@ -157,9 +157,31 @@ dog_collar_state_t handle_gps_paused_state(void) {
 }
 
 dog_collar_state_t handle_wifi_sync_state(void) {
+    static bool sync_started = false;
+    static int64_t sync_start_time_us = 0;
+    int64_t now = esp_timer_get_time();
 
-    wifi_manager_reconnect();
-    return DOG_COLLAR_STATE_NORMAL;
+    /* Start WIFI sync and set the start time */
+    if (sync_started == false) {
+        wifi_manager_reconnect(); 
+        sync_start_time_us = now;
+        sync_started = true;
+    }
+
+    // Allow button press to interrupt Wi-Fi sync and go to GPS acquiring state
+    if (is_button_short_pressed() || is_button_long_pressed()) {
+        sync_started = false;
+        return DOG_COLLAR_STATE_GPS_ACQUIRING;
+    }
+
+    /* If time is up go back to normal state*/
+    if ((now - sync_start_time_us) >= 10 * 1000 * 1000) {
+        sync_started = false;
+        return DOG_COLLAR_STATE_NORMAL;
+    }
+
+    // Stay in WIFI_SYNC until timeout or button press
+    return DOG_COLLAR_STATE_WIFI_SYNC;
 }
 
 
@@ -214,18 +236,14 @@ static char *get_current_state_string(dog_collar_state_t state) {
 
 static void enter_light_sleep(uint64_t sleep_time_us) {
 
-    // esp_sleep_enable_timer_wakeup(sleep_time_us);
-    // esp_sleep_enable_gpio_wakeup();
-    // gpio_wakeup_enable(BUTTON_GPIO, GPIO_INTR_LOW_LEVEL); // Wake on button press (active low)
+    esp_sleep_enable_timer_wakeup(sleep_time_us);
+    esp_sleep_enable_gpio_wakeup();
+    gpio_wakeup_enable(BUTTON_GPIO, GPIO_INTR_LOW_LEVEL); // Wake on button press (active low)
 
-    // ESP_LOGI(TAG, "Entering light sleep for %llu us", sleep_time_us);
-    // esp_light_sleep_start();
-
-    // ESP_LOGI(TAG, "Woke up from light sleep");
-
+    esp_light_sleep_start();
 
     /* The light sleep functionality is currently disabled as after 
     waking up the usb uart is not reinitialized properly and is not working*/
 
-    vTaskDelay(pdMS_TO_TICKS(sleep_time_us / 1000)); 
+    
 }
