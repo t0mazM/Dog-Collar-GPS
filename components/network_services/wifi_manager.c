@@ -257,3 +257,17 @@ esp_err_t wifi_manager_reconnect(void) {
     }
     return ret;
 }
+
+static bool wifi_manager_is_connected(void) {
+    if (s_wifi_event_group == NULL && !default_event_loop_created && !wifi_initialized) {
+        ESP_LOGI(TAG, "Wifi not initialized");
+        return false;
+    }
+    EventBits_t bits = xEventGroupGetBits(s_wifi_event_group);
+    if ((bits & WIFI_CONNECTED_BIT) != 0) {
+        ESP_LOGI(TAG, "WiFi is connected");
+        return true;
+    }
+    ESP_LOGI(TAG, "WiFi is not connected");
+    return false;
+}

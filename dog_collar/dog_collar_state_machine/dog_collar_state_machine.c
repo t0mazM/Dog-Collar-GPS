@@ -107,7 +107,7 @@ dog_collar_state_t handle_normal_state(void) {
 
     if ((now_us - last_wifi_sync_time_us) >= WIFI_SYNC_TIME_S * 1000 * 1000) { 
         last_wifi_sync_time_us = now_us;
-        //return DOG_COLLAR_STATE_WIFI_SYNC;
+        return DOG_COLLAR_STATE_WIFI_SYNC;
     }
 
     enter_light_sleep(SLEEP_TIME_S * 1000 * 1000);

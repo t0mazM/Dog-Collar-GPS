@@ -72,4 +72,16 @@ esp_err_t wifi_stop_all_services_retry(uint16_t _max_retry_count);
  */
 esp_err_t wifi_manager_reconnect(void);
 
+/**
+ * @brief Checks if the Wi-Fi manager is initialized and currently connected to a network.
+ *
+ * This function verifies that the Wi-Fi event group has been created and checks the connection status
+ * by testing the WIFI_CONNECTED_BIT. Returns true if connected, false otherwise.
+ *
+ * @return true if Wi-Fi is initialized and connected, false otherwise.
+ */
+static bool wifi_manager_is_connected(void);
+
+
+
 #endif // WIFI_MANAGER_H
