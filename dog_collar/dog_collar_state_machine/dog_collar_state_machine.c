@@ -147,6 +147,8 @@ dog_collar_state_t handle_charging_state(void) {
 
 dog_collar_state_t handle_gps_acquiring_state(void) {
     ESP_LOGI(TAG, "Waiting for GPS fix or user input");
+    gps_l96_read_task();
+    vTaskDelay(pdMS_TO_TICKS(1000)); //Used to test if 1Hz is working or not
     
     if (is_button_short_pressed()) { 
         return DOG_COLLAR_STATE_GPS_FILE_CREATION; // go and create a GPS file
@@ -162,6 +164,8 @@ dog_collar_state_t handle_gps_acquiring_state(void) {
 
 dog_collar_state_t handle_gps_ready_state(void) {
     ESP_LOGI(TAG, "GPS is ready. Waiting for user input");
+    gps_l96_start_recording();
+    gps_l96_read_task();
 
     if (is_button_short_pressed()) { 
         return DOG_COLLAR_STATE_GPS_FILE_CREATION; // go and create a GPS file

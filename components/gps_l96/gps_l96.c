@@ -10,14 +10,25 @@ esp_err_t gps_l96_init(void) {
     ESP_RETURN_ON_ERROR(uart_init(), 
                         TAG, "Failed to initialize UART for GPS L96");
 
-    /*Delay so that GPS module can initialize properly - MUST have. 
-    During testing found that 100 ms is not enough time */
-    vTaskDelay(pdMS_TO_TICKS(100));
+    /*Delay so that GPS module can initialize properly - MUST have.*/ 
+    vTaskDelay(pdMS_TO_TICKS(GPS_L96_INIT_WAIT_TIME_MS));
 
     /*Enable Easy Mode - it stores the last position so on next gps start it gets fix faster*/
     ESP_RETURN_ON_ERROR(gps_l96_send_command(GNSS_ENABLE_EASY), 
                         TAG, 
                         "Failed to send GNSS_ENABLE_EASY command");
+
+    vTaskDelay(pdMS_TO_TICKS(GPS_L96_INIT_WAIT_TIME_MS));
+
+    ESP_RETURN_ON_ERROR(gps_l96_send_command(GNSS_SET_UPDATE_RATE_1HZ), 
+                        TAG, 
+                        "Failed to send GNSS_SET_UPDATE_RATE_1HZ command");
+
+    vTaskDelay(pdMS_TO_TICKS(GPS_L96_INIT_WAIT_TIME_MS));
+
+    ESP_RETURN_ON_ERROR(gps_l96_send_command(ONLY_GNRMC), 
+                        TAG, 
+                        "Failed to send ONLY_GNRMC command");
     return ESP_OK;
 }
 

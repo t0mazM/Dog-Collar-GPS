@@ -6,6 +6,8 @@
 #include "uart.h"
 #include "minmea.h"
 
+#define GPS_L96_INIT_WAIT_TIME_MS 1000 // Time to wait for GPS module to process init commands
+
 #define NMEA_SENTENCE_BUF_SIZE 1024 
 
 typedef struct {
