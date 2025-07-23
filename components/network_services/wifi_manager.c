@@ -268,7 +268,7 @@ static bool wifi_manager_is_initialized_and_connected(void) {
     }
     EventBits_t bits = xEventGroupGetBits(s_wifi_event_group);
     if ((bits & WIFI_CONNECTED_BIT) != 0) {
-        ESP_LOGI(TAG, "WiFi is connected");
+        ESP_LOGI(TAG, "WiFi is already connected. No need to reconect again");
         return true;
     }
     ESP_LOGI(TAG, "WiFi is not connected");
