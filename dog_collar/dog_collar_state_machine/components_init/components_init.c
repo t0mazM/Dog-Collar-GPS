@@ -10,6 +10,12 @@ esp_err_t dog_collar_components_init(void){
     esp_err_t ret;
     esp_err_t overall_init_result = ESP_OK;
 
+    ret = button_interrupt_init();
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAGG, "Failed to initialize Button Interrupt");
+        overall_init_result = ret;
+    }
+
     // Initialize each component and update the init_state accordingly
     ret = ext_flash_init();
     if (ret != ESP_OK) {

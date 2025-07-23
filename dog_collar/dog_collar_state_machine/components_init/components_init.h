@@ -14,6 +14,7 @@
 #include "../components/gpio_expander/gpio_expander.h"
 #include "../components/gps_l96/gps_l96.h"
 #include "../components/network_services/wifi_manager.h"
+#include "../components/button_interupt/button_interrupt.h"
 
 
 typedef struct {
