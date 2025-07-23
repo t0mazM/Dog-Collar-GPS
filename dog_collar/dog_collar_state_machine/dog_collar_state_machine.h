@@ -11,7 +11,9 @@
 #include "../components/battery_monitor/battery_monitor.h"
 #include "../components/button_interupt/button_interrupt.h"
 
-#define WIFI_SYNC_TIME_S 20
+#define WIFI_SYNC_TIME_S 20     //Time for one sync in seconds
+#define WIFI_SYNC_PERIODIC_TIME_S 10  // Time between each Wi-Fi syncs in seconds
+
 #define SLEEP_TIME_S 10 
 
 typedef enum {

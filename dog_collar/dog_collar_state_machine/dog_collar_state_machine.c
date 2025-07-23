@@ -105,7 +105,7 @@ dog_collar_state_t handle_normal_state(void) {
         last_wifi_sync_time_us = now_us;
     }
 
-    if ((now_us - last_wifi_sync_time_us) >= WIFI_SYNC_TIME_S * 1000 * 1000) { 
+    if ((now_us - last_wifi_sync_time_us) >= WIFI_SYNC_PERIODIC_TIME_S * 1000 * 1000) { 
         last_wifi_sync_time_us = now_us;
         return DOG_COLLAR_STATE_WIFI_SYNC;
     }
@@ -175,7 +175,7 @@ dog_collar_state_t handle_wifi_sync_state(void) {
     }
 
     /* If time is up go back to normal state*/
-    if ((now - sync_start_time_us) >= 10 * 1000 * 1000) {
+    if ((now - sync_start_time_us) >= WIFI_SYNC_TIME_S * 1000 * 1000) {
         sync_started = false;
         return DOG_COLLAR_STATE_NORMAL;
     }
