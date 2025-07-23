@@ -26,7 +26,17 @@ esp_err_t button_interrupt_init(void);
  * @brief Checks if the button is currently pressed.
  * @return true if the button is pressed, false otherwise.
  */
+
+ /**
+  * @brief Returns bool value if button was short pressed
+  * The bool value is saved in static global variable and once read is set back to false
+  */
 bool is_button_short_pressed(void);
+
+ /**
+  * @brief Returns bool value if button was long pressed
+  * The bool value is saved in static global variable and once read is set back to false
+  */
 bool is_button_long_pressed(void);
 
 #endif // BUTTON_INTERRUPT_H
