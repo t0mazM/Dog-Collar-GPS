@@ -243,6 +243,9 @@ return error;
 esp_err_t wifi_manager_reconnect(void) {
     ESP_LOGI(TAG, "Reconnecting to WiFi...");
 
+    if(wifi_manager_is_initialized_and_connected()){
+        return ESP_OK;
+    }
     // Stop all services and deinit WiFi if already initialized
     if (wifi_initialized) {
         wifi_stop_all_services();
@@ -258,8 +261,8 @@ esp_err_t wifi_manager_reconnect(void) {
     return ret;
 }
 
-static bool wifi_manager_is_connected(void) {
-    if (s_wifi_event_group == NULL && !default_event_loop_created && !wifi_initialized) {
+static bool wifi_manager_is_initialized_and_connected(void) {
+    if (s_wifi_event_group == NULL || !default_event_loop_created || !wifi_initialized) {
         ESP_LOGI(TAG, "Wifi not initialized");
         return false;
     }
