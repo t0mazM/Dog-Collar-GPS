@@ -1,18 +1,14 @@
 #include "button_interrupt.h"
-#include "driver/gpio.h"
-#include "esp_log.h"
-#include "esp_timer.h"
+
 
 static const char *TAG = "BUTTON_HANDLER";
 static bool button_interrupt_initialized = false;
 
-volatile bool button_pressed = false;
-volatile bool button_long_pressed = false;
+volatile static bool button_short_pressed = false;
+volatile static bool button_long_pressed = false;
 
 static int64_t button_press_time = 0;
 static esp_timer_handle_t debounce_timer;
-
-
 
 static void IRAM_ATTR button_isr_handler(void* arg) {
     esp_timer_start_once(debounce_timer, DEBOUNCE_TIME_MS * 1000);
@@ -22,21 +18,21 @@ static void debounce_timer_callback(void* arg) {
     int level = gpio_get_level(BUTTON_GPIO);
     int64_t now = esp_timer_get_time() / 1000; // ms
 
-    if (level == 0) { // Button pressed (assuming active low)
-        button_pressed = true;
-        button_long_pressed = false;
-        button_press_time = now;
-    } else { // Button released
-        button_pressed = false;
+    if (level == 0) {
+        button_press_time = now; // Button pressed
+    } else {
         if ((now - button_press_time) >= LONG_PRESS_TIME_MS) {
             button_long_pressed = true;
             ESP_LOGI(TAG, "Button long press detected");
+            gpio_toggle_leds(LED_YELLOW);
         } else {
-            button_long_pressed = false;
+            button_short_pressed = true;
             ESP_LOGI(TAG, "Button short press detected");
+            gpio_toggle_leds(LED_RED);
         }
     }
 }
+
 
 esp_err_t button_interrupt_init(void) {
     if (button_interrupt_initialized) {
@@ -52,7 +48,7 @@ esp_err_t button_interrupt_init(void) {
     };
     ESP_ERROR_CHECK(gpio_config(&io_conf));
 
-    // Create debounce timer
+    // Debounce timer
     const esp_timer_create_args_t debounce_timer_args = {
         .callback = debounce_timer_callback,
         .name = "debounce_timer"
@@ -69,8 +65,8 @@ esp_err_t button_interrupt_init(void) {
     return ESP_OK;
 }
 
-bool is_button_pressed(void) {
-    return button_pressed;
+bool is_button_short_pressed(void) {
+    return button_short_pressed;
 }
 
 bool is_button_long_pressed(void) {
