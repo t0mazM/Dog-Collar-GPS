@@ -10,6 +10,7 @@
 #include "components_init/components_init.h"
 #include "../components/battery_monitor/battery_monitor.h"
 #include "../components/button_interupt/button_interrupt.h"
+#include "../components/file_system_littlefs/file_system_littlefs.h"
 
 #define WIFI_SYNC_TIME_S 20             //Time for one sync in seconds
 #define WIFI_SYNC_PERIODIC_TIME_S 10    // Time between each Wi-Fi syncs in seconds

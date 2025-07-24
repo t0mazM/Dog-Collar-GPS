@@ -7,7 +7,7 @@ static const char *TAG = "DOG_COLLAR_STATE_MACHINE";
 
 /* Global variables for dog collar state machine */
 static dog_collar_state_t current_state = DOG_COLLAR_STATE_INITIALIZING;
-static char gps_file_name[GPS_FILE_NAME_MAX_LENGTH] = {0}; 
+static char gps_file_name[LFS_MAX_FILE_NAME_SIZE] = {0};
 
 dog_collar_state_t dog_collar_state_machine_run(void) {
 
@@ -181,7 +181,13 @@ dog_collar_state_t handle_gps_ready_state(void) {
 
 dog_collar_state_t handle_gps_file_creation_state(void) {
 
-    ESP_LOGI(TAG, "Creating GPS file");
+    
+    esp_err_t ret = lfs_create_new_csv_file(gps_file_name);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to create GPS file");
+        return DOG_COLLAR_STATE_ERROR;
+    }
+
     return DOG_COLLAR_STATE_GPS_TRACKING;
 }
 
