@@ -128,7 +128,7 @@ esp_err_t gps_l96_extract_and_process_nmea_sentences(const uint8_t *buffer, size
                 sentence_idx = 0; 
                 reading_sentence = false; 
 
-                // 3. Process the complete NMEA sentence TODO
+                // 4. Process the complete NMEA sentence TODO
                 ESP_LOGI(TAG, "L96 Response: %s", NMEA_sentence);
                 gps_l96_extract_data_from_nmea_sentence(NMEA_sentence); 
             }
@@ -138,21 +138,35 @@ esp_err_t gps_l96_extract_and_process_nmea_sentences(const uint8_t *buffer, size
     
 }
 
-void gps_l96_read_task(void) { //Just a dummy task to test the GPS module
+void gps_l96_read_task(char *gps_file_name) { 
     uint8_t rx_buffer[UART_RX_BUF_SIZE];
-    memset(rx_buffer, 0, sizeof(rx_buffer)); // Clear the buffer
+    memset(rx_buffer, 0, sizeof(rx_buffer));
     size_t read_len = 0;
+    char NMEA_sentence[NMEA_SENTENCE_BUF_SIZE] = {0};
 
-    printf("-------- UART READ ------------\n");
-    esp_err_t err = uart_receive_cmd(rx_buffer, sizeof(rx_buffer), &read_len);
-    if (err == ESP_OK && read_len > 0) {
-        gps_l96_extract_and_process_nmea_sentences(rx_buffer, read_len);
+    // 1) Read uart buffer
+    esp_err_t ret = uart_receive_cmd(rx_buffer, sizeof(rx_buffer), &read_len);
+    if (ret == ESP_OK && read_len > 0) {
+    // 2) Extract the received buffer and save data to global struct gps_rcm_data
+        ret = gps_l96_extract_and_process_nmea_sentences(rx_buffer, read_len);
+
+        // 3) Process data -> make file line from the data in gps_rcm_data
+        //TODO
+        }
+
+        if( ret == ESP_OK) {
+    // 4) Append the NMEA sentence to the file
+            gps_l96_append_to_file(gps_file_name, NMEA_sentence); // Append the NMEA sentence to the file
+            
+        }
+        else {
+            ESP_LOGE(TAG, "Failed to extract and process NMEA sentences: %s", esp_err_to_name(ret));
+        }
     }
 }
 
 esp_err_t gps_l96_extract_data_from_nmea_sentence(const char *nmea_sentence) {
 
-    
     enum minmea_sentence_id nmea_id = minmea_sentence_id(nmea_sentence, false);
 
     switch(nmea_id) {
@@ -166,7 +180,7 @@ esp_err_t gps_l96_extract_data_from_nmea_sentence(const char *nmea_sentence) {
             break;
         default:
             ESP_LOGW(TAG, "Unknown NMEA sentence ID: %d", nmea_id);
-            return ESP_ERR_NOT_SUPPORTED;
+            break; // Ignore sentences with errors
     }
     return ESP_OK;
 }

@@ -50,6 +50,16 @@ esp_err_t gps_l96_init(void);
  */
 bool gps_l96_is_geo_fence_triggered(void);
 
+/**
+ * @brief Receives the buffer with many NMEA sentences and processes them.
+ * 
+ * This function reads the buffer received from the GPS module via UART,
+ * extracts complete NMEA sentences, and processes each sentence at a time.
+ *
+ * @note If more of the same NMEA sentence is received, the last one will be saved.
+ * @param buffer Pointer to the buffer containing raw data received from the GPS module via UART.
+ * @param read_len The number of bytes in the buffer that were read from the UART.
+ */
 esp_err_t gps_l96_extract_and_process_nmea_sentences(const uint8_t *buffer, size_t read_len);
 
 /**
