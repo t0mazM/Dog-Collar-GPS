@@ -158,7 +158,9 @@ dog_collar_state_t handle_gps_acquiring_state(void) {
         return DOG_COLLAR_STATE_NORMAL;            // go back to normal state
     }
 
-    //TODO: Add if we have GPS fix, go to GPS_READY state
+    if(gps_l96_has_fix() ) {
+        return DOG_COLLAR_STATE_GPS_READY;
+    }
 
     return DOG_COLLAR_STATE_GPS_ACQUIRING; // Loop back to GPS_ACQUIRING
 }
