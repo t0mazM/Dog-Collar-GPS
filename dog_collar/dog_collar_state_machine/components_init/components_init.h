@@ -22,7 +22,6 @@ typedef struct {
     bool gps_l96_ready;
     bool batt_mon_ready;
     bool filesystem_ready;
-    bool wifi_server_ready;
 } collar_init_state_t;
 
 esp_err_t dog_collar_components_init(void);

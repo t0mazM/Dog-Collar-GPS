@@ -45,13 +45,6 @@ esp_err_t dog_collar_components_init(void){
     }
     collar_init_state.filesystem_ready = (ret == ESP_OK);
 
-    ret = wifi_init();
-    if (ret != ESP_OK) {
-        ESP_LOGE(TAGG, "Failed to initialize Wi-Fi");
-        overall_init_result = ret;
-    }
-    collar_init_state.wifi_server_ready = (ret == ESP_OK);
-
     dog_collar_log_init_state();
     return overall_init_result;
 }
@@ -61,8 +54,7 @@ static bool dog_collar_are_all_components_functional() {
     return collar_init_state.ext_flash_ready &&
            collar_init_state.gps_l96_ready &&
            collar_init_state.batt_mon_ready &&
-           collar_init_state.filesystem_ready &&
-           collar_init_state.wifi_server_ready;
+           collar_init_state.filesystem_ready;
 }
 
 int dog_collar_get_status_string(char *string_buffer, size_t string_buffer_size) {
@@ -73,14 +65,12 @@ int dog_collar_get_status_string(char *string_buffer, size_t string_buffer_size)
         "GPS Module:       %s\n" 
         "Battery Monitor:  %s\n"
         "File System:      %s\n"
-        "Wi-Fi Server:     %s\n"
         "Overall Status:   %s\n"
         "=========================================================\n",
         collar_init_state.ext_flash_ready ? "OK" : "FAILED",
         collar_init_state.gps_l96_ready ? "OK" : "FAILED",
         collar_init_state.batt_mon_ready ? "OK" : "FAILED",
         collar_init_state.filesystem_ready ? "OK" : "FAILED",
-        collar_init_state.wifi_server_ready ? "OK" : "FAILED",
         dog_collar_are_all_components_functional(collar_init_state) ? "All OK" : "Yeah, there are issues"
     );
 
