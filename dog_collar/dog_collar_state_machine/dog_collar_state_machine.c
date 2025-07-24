@@ -202,6 +202,7 @@ dog_collar_state_t handle_gps_tracking_state(void) {
 
 
     gps_tracking_task(gps_file_name);
+    enter_light_sleep( 500 * 1000); //500ms //TODO test sleep. Test if uart wakes up the sleep
 
     return DOG_COLLAR_STATE_GPS_TRACKING;
 }
@@ -306,13 +307,14 @@ static void enter_light_sleep(uint64_t sleep_time_us) {
     // esp_sleep_enable_timer_wakeup(sleep_time_us);
     // esp_sleep_enable_gpio_wakeup();
     // gpio_wakeup_enable(BUTTON_GPIO, GPIO_INTR_LOW_LEVEL); // Wake on button press (active low)
+    // esp_sleep_enable_uart_wakeup(UART_PORT_NUM); // Wake on UART activity TODO:test this with sleep while gps is tracking
 
     // esp_light_sleep_start();
 
     /* The light sleep functionality is currently disabled as after 
     waking up the usb uart is not reinitialized properly and is not working*/
 
-    vTaskDelay(pdMS_TO_TICKS(5000)); // Simulate light sleep with delay
+    vTaskDelay(pdMS_TO_TICKS(sleep_time_us)); // Simulate light sleep with delay
 
     
 }
