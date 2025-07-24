@@ -39,7 +39,7 @@ esp_err_t lfs_append_to_file(const char* data, const char* filename);
  * 
  * @param filename Pointer to a buffer where the new file name will be stored. The buffer should be at least LFS_MAX_FILE_NAME_SIZE bytes long.
  */
-esp_err_t lfs_create_new_csv_file(char* filename);
+esp_err_t lfs_create_new_csv_file(char* filename, size_t filename_size);
 esp_err_t lfs_delete_file(const char* filename);
 
 

@@ -389,7 +389,7 @@ static bool lfs_file_exsists(const char* filename) {
     return false;
 }
 
-esp_err_t lfs_create_new_csv_file(char* filename) {
+esp_err_t lfs_create_new_csv_file(char* filename, size_t filename_size) {
     lfs_file_t file;
     const char* file_prefix = "dog_run";
     const char* file_suffix = ".csv";
@@ -398,7 +398,7 @@ esp_err_t lfs_create_new_csv_file(char* filename) {
 
     // 1) Create a new file name with the current time
     ESP_RETURN_ON_ERROR(
-        lfs_create_new_file_name(file_prefix, file_suffix, filename, sizeof(filename)),
+        lfs_create_new_file_name(file_prefix, file_suffix, filename, filename_size),
         LFS_TAG,
         "Failed to create new file name"
     );
@@ -414,7 +414,7 @@ esp_err_t lfs_create_new_csv_file(char* filename) {
 
         // Create new file name
         ESP_RETURN_ON_ERROR(
-            lfs_create_new_file_name(modified_prefix, file_suffix, filename, sizeof(filename)),
+            lfs_create_new_file_name(modified_prefix, file_suffix, filename, filename_size),
             LFS_TAG,
             "Failed to create new file name"
         );

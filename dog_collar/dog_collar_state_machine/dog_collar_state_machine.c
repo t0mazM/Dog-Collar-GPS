@@ -183,7 +183,7 @@ dog_collar_state_t handle_gps_ready_state(void) {
 dog_collar_state_t handle_gps_file_creation_state(void) {
 
     
-    esp_err_t ret = lfs_create_new_csv_file(gps_file_name);
+    esp_err_t ret = lfs_create_new_csv_file(gps_file_name, sizeof(gps_file_name));
     if (ret != ESP_OK) {
         ESP_LOGE(TAG, "Failed to create GPS file");
         return DOG_COLLAR_STATE_ERROR;
@@ -316,10 +316,10 @@ static void enter_light_sleep(uint64_t sleep_time_us) {
 }
 
 esp_err_t gps_tracking_task(char *gps_file_name) { 
-    uint8_t rx_buffer[UART_RX_BUF_SIZE];
+    static uint8_t rx_buffer[UART_RX_BUF_SIZE];
     memset(rx_buffer, 0, sizeof(rx_buffer));
     size_t read_len = 0;
-    char NMEA_sentence[NMEA_SENTENCE_BUF_SIZE] = {0};
+    static char NMEA_sentence[NMEA_SENTENCE_BUF_SIZE] = {0};
 
     esp_err_t ret = uart_receive_cmd(rx_buffer, sizeof(rx_buffer), &read_len);
     if (ret != ESP_OK || read_len == 0) {
