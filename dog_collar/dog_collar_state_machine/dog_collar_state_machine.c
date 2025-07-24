@@ -69,7 +69,7 @@ dog_collar_state_t battery_management_routine(dog_collar_state_t current_state) 
 
     if (battery_status_flags.charging && current_state != DOG_COLLAR_STATE_CHARGING) {
         ESP_LOGI(TAG, "Battery is charging");
-        return DOG_COLLAR_STATE_CHARGING;
+        // return DOG_COLLAR_STATE_CHARGING; commened out for easy testing
     }
 
     if (battery_data.soc >= 0.0f && battery_data.soc <= 10.0f && current_state != DOG_COLLAR_STATE_CRITICAL_LOW_BATTERY) {
@@ -106,6 +106,7 @@ dog_collar_state_t handle_normal_state(void) {
     if (is_button_short_pressed()) {
         vTaskDelay(pdMS_TO_TICKS(WAIT_AFTER_USER_PRESS_MS)); // Wait a bit and clear the button state
         clear_button_press_states();
+        normal_started = false; // Set flag to false so that we can start the timer again on next entry
         return DOG_COLLAR_STATE_GPS_ACQUIRING;
     }
 
@@ -118,14 +119,13 @@ dog_collar_state_t handle_normal_state(void) {
 
     // 2.b) If time is up, go to WIFI_SYNC state
     if ((now_us - normal_start_time_us) >= WIFI_SYNC_PERIODIC_TIME_S * 1000 * 1000) {
-        normal_started = false;
+        normal_started = false; // Set flag to false so that we can start the timer again on next entry
         return DOG_COLLAR_STATE_WIFI_SYNC;
     }
 
     /** 3) If nothing happened, go to light sleep and stay in NORMAL state 
         Set normal_started to false so that we can start the timer again on next entry */
     enter_light_sleep(SLEEP_TIME_S * 1000 * 1000);
-    normal_started = false;
 
     gpio_toggle_leds(LED_GREEN); //used to debug. TODO: add a proper LED blinking routine
 
