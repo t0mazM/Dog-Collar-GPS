@@ -123,4 +123,16 @@ void gps_l96_print_data(void);
 
 esp_err_t gps_l96_start_activity_tracking(void);
 
+/**
+ * @brief Formats a CSV line from the GPS data.
+ *
+ * This function formats a CSV line from the GPS data stored in the global struct gps_rcm_data.
+ *
+ * @param file_line Pointer to the buffer where the formatted CSV line will be stored.
+ * @param file_line_size Size of the buffer.
+ * @return ESP_OK on success, or an error code if formatting fails.
+ */
+esp_err_t gps_l96_format_csv_line_from_data(char *file_line, size_t file_line_size);
+
+
 #endif // GPS_L96_H
