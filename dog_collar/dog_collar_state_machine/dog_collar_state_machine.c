@@ -236,12 +236,14 @@ dog_collar_state_t handle_wifi_sync_state(void) {
     // Allow button press to interrupt Wi-Fi sync and go to GPS acquiring state
     if (is_button_short_pressed() || is_button_long_pressed()) {
         sync_started = false;
+        wifi_stop_all_services();
         return DOG_COLLAR_STATE_GPS_ACQUIRING;
     }
 
     /* If time is up go back to normal state*/
     if ((now - sync_start_time_us) >= WIFI_SYNC_TIME_S * 1000 * 1000) {
         sync_started = false;
+        wifi_stop_all_services();
         return DOG_COLLAR_STATE_NORMAL;
     }
 
