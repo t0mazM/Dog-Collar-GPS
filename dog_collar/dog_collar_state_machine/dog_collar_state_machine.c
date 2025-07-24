@@ -2,6 +2,7 @@
 
 static char *get_current_state_string(dog_collar_state_t state);
 static void enter_light_sleep(uint64_t sleep_time_us);
+static void gps_tracking_task(char *gps_file_name);
 
 static const char *TAG = "DOG_COLLAR_STATE_MACHINE";
 
@@ -148,7 +149,6 @@ dog_collar_state_t handle_charging_state(void) {
 
 dog_collar_state_t handle_gps_acquiring_state(void) {
     ESP_LOGI(TAG, "Waiting for GPS fix or user input");
-    gps_l96_read_task();
     vTaskDelay(pdMS_TO_TICKS(1000)); //Used to test if 1Hz is working or not
     
     if (is_button_short_pressed()) { 
@@ -166,7 +166,6 @@ dog_collar_state_t handle_gps_acquiring_state(void) {
 dog_collar_state_t handle_gps_ready_state(void) {
     ESP_LOGI(TAG, "GPS is ready. Waiting for user input");
     gps_l96_start_recording();
-    gps_l96_read_task();
 
     if (is_button_short_pressed()) { 
         return DOG_COLLAR_STATE_GPS_FILE_CREATION; // go and create a GPS file
@@ -198,6 +197,10 @@ dog_collar_state_t handle_gps_tracking_state(void) {
     if (is_button_short_pressed()) { 
         return DOG_COLLAR_STATE_GPS_PAUSED; 
     }
+
+
+    gps_tracking_task(gps_file_name);
+
     return DOG_COLLAR_STATE_GPS_TRACKING;
 }
 
@@ -309,3 +312,30 @@ static void enter_light_sleep(uint64_t sleep_time_us) {
 
     
 }
+
+void gps_tracking_task(char *gps_file_name) { 
+    uint8_t rx_buffer[UART_RX_BUF_SIZE];
+    memset(rx_buffer, 0, sizeof(rx_buffer));
+    size_t read_len = 0;
+    char NMEA_sentence[NMEA_SENTENCE_BUF_SIZE] = {0};
+
+    // 1) Read uart buffer
+    esp_err_t ret = uart_receive_cmd(rx_buffer, sizeof(rx_buffer), &read_len);
+    if (ret == ESP_OK && read_len > 0) {
+        // 2) Extract the received buffer and save data to global struct gps_rcm_data
+        ret = gps_l96_extract_and_process_nmea_sentences(rx_buffer, read_len);
+
+        // 3) Process data -> make file line from the data in gps_rcm_data
+        if (ret == ESP_OK) {
+            ret = gps_l96_format_csv_line_from_data(NMEA_sentence, sizeof(NMEA_sentence));
+    
+            // 4) Append the NMEA sentence to the file
+            if( ret == ESP_OK) {
+                lfs_append_to_file(NMEA_sentence, gps_file_name); // Append the NMEA sentence to the file
+            }
+        }
+    } else {
+        ESP_LOGE(TAG, "Failed to extract and process NMEA sentences: %s", esp_err_to_name(ret));
+    }
+}
+    

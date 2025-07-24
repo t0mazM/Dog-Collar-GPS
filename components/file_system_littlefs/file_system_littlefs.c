@@ -1,6 +1,5 @@
 #include "file_system_littlefs.h"
 
-
 static const char *LFS_TAG = "LFS_INTEGRATION";
 
 // LittleFS configuration structure
@@ -392,7 +391,6 @@ static bool lfs_file_exsists(const char* filename) {
 
 esp_err_t lfs_create_new_csv_file(char* filename) {
     lfs_file_t file;
-    char filename[LFS_MAX_FILE_NAME_SIZE]; // Buffer for the new file name
     const char* file_prefix = "dog_run";
     const char* file_suffix = ".csv";
     const char* header = "timestamp,latitude,longitude,altitude,speed\n";

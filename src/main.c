@@ -28,13 +28,5 @@ void app_main() {
     }
 
 
-    //lfs_delete_file("/dog_run__353.csv");
-    lfs_list_directory("/", NULL, 0); 
-    //gps_l96_go_to_standby_mode();
-    // gps_l96_go_to_back_up_mode();
-    // vTaskDelay(5000 / portTICK_PERIOD_MS); 
-    gps_l96_read_task();
-    gps_l96_start_recording();
-
 
 }

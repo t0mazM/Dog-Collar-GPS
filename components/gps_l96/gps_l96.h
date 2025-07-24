@@ -98,16 +98,6 @@ esp_err_t gps_l96_go_to_back_up_mode(void);
 esp_err_t gps_l96_send_command(const char *nmea_sentence);
 
 /**
- * @brief Task to read data from the GPS module.
- *
- * This function reads data from the GPS module via UART and processes the received NMEA sentences.
- * It should be called periodically to ensure that the GPS data is read and processed.
- * Currently, it is a dummy task to test the GPS module.
- */
-void gps_l96_read_task(void);
-
-
-/**
  * @brief Extracts-parses GPS data from a NMEA sentence.
  *
  * This function extracts-parses GPS data from NMEA sentence and stores struct gps_rcm_data.

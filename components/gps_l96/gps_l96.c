@@ -138,32 +138,7 @@ esp_err_t gps_l96_extract_and_process_nmea_sentences(const uint8_t *buffer, size
     
 }
 
-void gps_l96_read_task(char *gps_file_name) { 
-    uint8_t rx_buffer[UART_RX_BUF_SIZE];
-    memset(rx_buffer, 0, sizeof(rx_buffer));
-    size_t read_len = 0;
-    char NMEA_sentence[NMEA_SENTENCE_BUF_SIZE] = {0};
 
-    // 1) Read uart buffer
-    esp_err_t ret = uart_receive_cmd(rx_buffer, sizeof(rx_buffer), &read_len);
-    if (ret == ESP_OK && read_len > 0) {
-    // 2) Extract the received buffer and save data to global struct gps_rcm_data
-        ret = gps_l96_extract_and_process_nmea_sentences(rx_buffer, read_len);
-
-        // 3) Process data -> make file line from the data in gps_rcm_data
-        //TODO
-        }
-
-        if( ret == ESP_OK) {
-    // 4) Append the NMEA sentence to the file
-            gps_l96_append_to_file(gps_file_name, NMEA_sentence); // Append the NMEA sentence to the file
-            
-        }
-        else {
-            ESP_LOGE(TAG, "Failed to extract and process NMEA sentences: %s", esp_err_to_name(ret));
-        }
-    }
-}
 
 esp_err_t gps_l96_extract_data_from_nmea_sentence(const char *nmea_sentence) {
 
