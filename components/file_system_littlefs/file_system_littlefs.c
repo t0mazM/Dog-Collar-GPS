@@ -364,12 +364,8 @@ static esp_err_t lfs_create_new_file_name(const char* prefix, const char* suffix
     time_t current_time = time(NULL);
     // Format: prefix + current_time(for randomness) + suffix (.csv)
     int err = snprintf(filename, filename_size, "%s_%lu%s", prefix, (unsigned long)current_time, suffix);
-
-    /* 
-    Check if snprintf was successful
-    it returns the number of characters written, or a negative value on error
-    But all that matters (to me) is that it returns a value less than buffer_size
-    */
+    
+    // snprintf returns the number of characters written, or a negative value on error
     if(err < 0) {
         ESP_LOGE(LFS_TAG, "Failed to create new file name");
         return ESP_FAIL;
@@ -394,7 +390,7 @@ static bool lfs_file_exsists(const char* filename) {
     return false;
 }
 
-esp_err_t lfs_create_new_csv_file(void) {
+esp_err_t lfs_create_new_csv_file(char* filename) {
     lfs_file_t file;
     char filename[LFS_MAX_FILE_NAME_SIZE]; // Buffer for the new file name
     const char* file_prefix = "dog_run";
@@ -430,8 +426,8 @@ esp_err_t lfs_create_new_csv_file(void) {
             return ESP_FAIL;
         }
     }
-    // 3) Create new file
 
+    // 3) Create new file
     ESP_RETURN_ON_ERROR(
     lfs_file_open(&lfs, &file, filename, LFS_O_WRONLY | LFS_O_CREAT | LFS_O_TRUNC),
         LFS_TAG,

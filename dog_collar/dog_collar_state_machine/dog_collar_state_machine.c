@@ -5,8 +5,9 @@ static void enter_light_sleep(uint64_t sleep_time_us);
 
 static const char *TAG = "DOG_COLLAR_STATE_MACHINE";
 
-/* Default state at startup is to initialize the system */
+/* Global variables for dog collar state machine */
 static dog_collar_state_t current_state = DOG_COLLAR_STATE_INITIALIZING;
+static char gps_file_name[GPS_FILE_NAME_MAX_LENGTH] = {0}; 
 
 dog_collar_state_t dog_collar_state_machine_run(void) {
 

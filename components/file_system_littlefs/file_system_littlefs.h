@@ -31,7 +31,15 @@ esp_err_t lfs_list_directory(const char *path, char *file_name_buffer, size_t bu
 esp_err_t wifi_get_file_list_as_html(char *buffer, size_t buffer_size);
 void file_system_test(void);
 esp_err_t lfs_append_to_file(const char* data, const char* filename);
-esp_err_t lfs_create_new_csv_file(void);
+
+/**
+ * @brief Creates a new CSV file with a unique random with random numbers
+ *  Generates random file name and cheks if it alredy excist, add -1, -2, etc. if it does.
+ *  Creates file and adds cvs header to it -> "timestamp,latitude,longitude,altitude,speed\n"
+ * 
+ * @param filename Pointer to a buffer where the new file name will be stored. The buffer should be at least LFS_MAX_FILE_NAME_SIZE bytes long.
+ */
+esp_err_t lfs_create_new_csv_file(char* filename);
 esp_err_t lfs_delete_file(const char* filename);
 
 
