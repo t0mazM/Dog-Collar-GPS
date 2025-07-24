@@ -201,3 +201,7 @@ esp_err_t gps_l96_format_csv_line_from_data(char *file_line, size_t file_line_si
 
     return ESP_OK;
 }
+
+bool gps_l96_has_fix(void) {
+    return gps_rcm_data.valid;
+}

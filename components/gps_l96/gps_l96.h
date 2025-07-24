@@ -124,5 +124,13 @@ esp_err_t gps_l96_start_activity_tracking(void);
  */
 esp_err_t gps_l96_format_csv_line_from_data(char *file_line, size_t file_line_size);
 
+/**
+ * @brief Checks if the GPS module has a valid fix.
+ *
+ * This function checks if the GPS module has a valid fix based on the validity of the GPS data.
+ *
+ * @return true if the GPS module has a valid fix, false otherwise.
+ */
+bool gps_l96_has_fix(void);
 
 #endif // GPS_L96_H
