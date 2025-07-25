@@ -24,11 +24,6 @@ esp_err_t gps_l96_init(void) {
                         TAG, 
                         "Failed to send GNSS_SET_UPDATE_RATE_1HZ command");
 
-    vTaskDelay(pdMS_TO_TICKS(GPS_L96_INIT_WAIT_TIME_MS)); //TODO: check if this is needed
-
-    ESP_RETURN_ON_ERROR(gps_l96_send_command(ONLY_GNRMC), 
-                        TAG, 
-                        "Failed to send ONLY_GNRMC command");
     return ESP_OK;
 }
 

@@ -314,19 +314,26 @@ static void enter_light_sleep(uint64_t sleep_time_us) {
     /* The light sleep functionality is currently disabled as after 
     waking up the usb uart is not reinitialized properly and is not working*/
 
-    vTaskDelay(pdMS_TO_TICKS(sleep_time_us)); // Simulate light sleep with delay
+    vTaskDelay(pdMS_TO_TICKS(sleep_time_us / 1000)); // Simulate light sleep with delay
 
-    
 }
 
 esp_err_t gps_tracking_task(char *gps_file_name) { 
-    static uint8_t rx_buffer[UART_RX_BUF_SIZE];
-    memset(rx_buffer, 0, sizeof(rx_buffer));
-    size_t read_len = 0;
+
     static char NMEA_sentence[NMEA_SENTENCE_BUF_SIZE] = {0};
+    static uint8_t rx_buffer[UART_RX_BUF_SIZE] = {0};
+
+    size_t read_len = 0;
 
     esp_err_t ret = uart_receive_cmd(rx_buffer, sizeof(rx_buffer), &read_len);
+
+    if( ret == ESP_ERR_TIMEOUT) {
+        ESP_LOGW(TAG, "UART read timed out, no data received");
+        return ESP_OK; // No data to process, just return
+    }
+
     if (ret != ESP_OK || read_len == 0) {
+
         ESP_LOGE(TAG, "UART read failed: %s", esp_err_to_name(ret));
         return ret;
     }
