@@ -65,30 +65,36 @@ dog_collar_state_t battery_management_routine(dog_collar_state_t current_state) 
     static uint32_t last_battery_check = 0;
     uint32_t now = xTaskGetTickCount();
 
+    // 1) Check if it's time to check the battery
     if( (now - last_battery_check) < BATTERY_CHECK_INTERVAL_MS / portTICK_PERIOD_MS) {
         return current_state; // Not time to check battery yet
     }
 
+    // 2) Update battery data
     esp_err_t ret = battery_monitor_update_battery_data();
     if (ret != ESP_OK) {
         ESP_LOGE(TAG, "Failed to update battery data");
         return DOG_COLLAR_STATE_ERROR;
     }
 
+    // 3) Return correct state based on battery data:
+    // a) CHARGING
     if (battery_status_flags.charging && current_state != DOG_COLLAR_STATE_CHARGING) {
         ESP_LOGI(TAG, "Battery is charging");
         // return DOG_COLLAR_STATE_CHARGING; commened out for easy testing
     }
 
+    // b) CRITICAL (battery is about to be empty)
     if (battery_data.soc >= 0.0f && battery_data.soc <= 10.0f && current_state != DOG_COLLAR_STATE_CRITICAL_LOW_BATTERY) {
         ESP_LOGW(TAG, "Battery is critically low");
         return DOG_COLLAR_STATE_CRITICAL_LOW_BATTERY;
-    } else if (battery_data.soc > 10.0f && battery_data.soc <= 20.0f && current_state != DOG_COLLAR_STATE_LOW_BATTERY) {
+    }
+    // c) LOW (battery is low, but not critical)
+    if (battery_data.soc > 10.0f && battery_data.soc <= 20.0f && current_state != DOG_COLLAR_STATE_LOW_BATTERY) {
         ESP_LOGW(TAG, "Battery is low");
         return DOG_COLLAR_STATE_LOW_BATTERY;
     }
-
-    // If battery is OK, stay in the current state (do not go to NORMAL)
+    // d) NORMAL If battery is OK, stay in the current state (do not go to NORMAL)
     return current_state;
 }
 
