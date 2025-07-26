@@ -56,7 +56,10 @@ dog_collar_state_t dog_collar_state_machine_run(void) {
             // Handle unexpected state
             current_state = DOG_COLLAR_STATE_ERROR;
     }
+
     current_state = battery_management_routine(current_state);
+    led_management_set_pattern(current_state);
+
     return current_state;
 }
 
@@ -84,7 +87,7 @@ dog_collar_state_t battery_management_routine(dog_collar_state_t current_state) 
     } else{
         battery_check_interval = BATTERY_CHECK_INTERVAL_MS_LOW;
     }
-    
+
     // 4) Return correct state based on battery data:
     // a) CHARGING
     if (battery_status_flags.charging && current_state != DOG_COLLAR_STATE_CHARGING) {
@@ -148,8 +151,6 @@ dog_collar_state_t handle_normal_state(void) {
     /** 3) If nothing happened, go to light sleep and stay in NORMAL state 
         Set normal_started to false so that we can start the timer again on next entry */
     enter_light_sleep(SLEEP_TIME_S * 1000 * 1000);
-
-    gpio_toggle_leds(LED_GREEN); //used to debug. TODO: add a proper LED blinking routine
 
     return DOG_COLLAR_STATE_NORMAL;
 }
@@ -276,20 +277,7 @@ dog_collar_state_t handle_wifi_sync_state(void) {
 
 
 dog_collar_state_t handle_error_state(void) {
-        gpio_toggle_leds(LED_RED);
-        vTaskDelay(pdMS_TO_TICKS(500));
-        gpio_toggle_leds(LED_RED);
-        vTaskDelay(pdMS_TO_TICKS(500));
-        gpio_toggle_leds(LED_RED);
-        vTaskDelay(pdMS_TO_TICKS(500));
-        gpio_toggle_leds(LED_RED);
-        vTaskDelay(pdMS_TO_TICKS(500));
-        gpio_toggle_leds(LED_RED);
-        vTaskDelay(pdMS_TO_TICKS(500));
-        gpio_toggle_leds(LED_RED);
-        vTaskDelay(pdMS_TO_TICKS(500));
-        gpio_toggle_leds(LED_RED);
-        vTaskDelay(pdMS_TO_TICKS(500));
+
     return DOG_COLLAR_STATE_INITIALIZING;
 }
 

@@ -16,12 +16,14 @@
 
 
 #include "../dog_collar/dog_collar_state_machine/components_init/components_init.h"
+#include "../dog_collar/dog_collar_state_machine/led_management/LED_management.h"
 
 
 void app_main() {
 
     vTaskDelay(pdMS_TO_TICKS(5000)); 
 
+    xTaskCreate(led_task, "led_task", 2048, NULL, 2, NULL);
     while(true) {
         dog_collar_state_machine_run();
     }

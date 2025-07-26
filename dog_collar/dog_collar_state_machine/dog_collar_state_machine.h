@@ -11,6 +11,7 @@
 #include "../components/battery_monitor/battery_monitor.h"
 #include "../components/button_interupt/button_interrupt.h"
 #include "../components/file_system_littlefs/file_system_littlefs.h"
+#include "led_management/led_management.h" // Have to include this here to avoid circular dependency
 
 #define BATTERY_SOC_HIGH 60.0f      // Battery is considered high if SOC is above this value
 #define BATTERY_SOC_LOW 20.0f       // Battery is considered low if SOC is below this value
@@ -43,6 +44,8 @@ typedef enum {
 
     DOG_COLLAR_STATE_ERROR
 } dog_collar_state_t;
+
+
 
 dog_collar_state_t dog_collar_state_machine_run(void);
 

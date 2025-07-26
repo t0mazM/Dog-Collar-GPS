@@ -11,6 +11,13 @@ TODO:
 
 static volatile dog_collar_state_t led_current_state = DOG_COLLAR_STATE_NORMAL;
 
+static void led_set_charging_pattern();
+static void led_blink_low_battery();
+static void led_blink_error();
+static void led_blink_normal();
+
+
+
 void led_management_set_pattern(dog_collar_state_t state) {
     led_current_state = state;
 }
@@ -22,10 +29,10 @@ void led_task(void *pvParameters) {
                 led_set_charging_pattern();
                 break;
             case DOG_COLLAR_STATE_LOW_BATTERY:
-                led_blink_low_battery();
+                //led_blink_low_battery();
                 break;
             case DOG_COLLAR_STATE_ERROR:
-                led_blink_error();
+                //led_blink_error();
                 break;
             default:
                 led_blink_normal();
@@ -36,14 +43,14 @@ void led_task(void *pvParameters) {
 }
 static void led_set_charging_pattern(){
 
-    gpio_set_leds(LED_GREEN); // Example: turn on green LED
+    gpio_turn_on_leds(LED_GREEN); // Example: turn on green LED
     vTaskDelay(pdMS_TO_TICKS(500)); // Adjust delay as needed
-    gpio_clear_leds(LED_GREEN);
+    gpio_turn_on_leds(LED_GREEN);
 
 }
 
 
-void led_blink_normal() {
+static void led_blink_normal() {
     
     gpio_turn_on_leds(LED_GREEN);
     vTaskDelay(pdMS_TO_TICKS(100));
