@@ -63,10 +63,11 @@ dog_collar_state_t dog_collar_state_machine_run(void) {
 dog_collar_state_t battery_management_routine(dog_collar_state_t current_state) {
 
     static uint32_t last_battery_check = 0;
+    static uint32_t battery_check_interval = 0;
     uint32_t now = xTaskGetTickCount();
 
     // 1) Check if it's time to check the battery
-    if( (now - last_battery_check) < BATTERY_CHECK_INTERVAL_MS / portTICK_PERIOD_MS) {
+    if( (now - last_battery_check) < battery_check_interval / portTICK_PERIOD_MS) {
         return current_state; // Not time to check battery yet
     }
 
@@ -77,7 +78,14 @@ dog_collar_state_t battery_management_routine(dog_collar_state_t current_state) 
         return DOG_COLLAR_STATE_ERROR;
     }
 
-    // 3) Return correct state based on battery data:
+    // 3) Update next battery check time interval
+    if (battery_data.soc >= BATTERY_SOC_HIGH) {
+        battery_check_interval = BATTERY_CHECK_INTERVAL_MS_HIGH;
+    } else{
+        battery_check_interval = BATTERY_CHECK_INTERVAL_MS_LOW;
+    }
+    
+    // 4) Return correct state based on battery data:
     // a) CHARGING
     if (battery_status_flags.charging && current_state != DOG_COLLAR_STATE_CHARGING) {
         ESP_LOGI(TAG, "Battery is charging");

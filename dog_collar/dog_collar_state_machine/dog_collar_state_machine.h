@@ -12,6 +12,13 @@
 #include "../components/button_interupt/button_interrupt.h"
 #include "../components/file_system_littlefs/file_system_littlefs.h"
 
+#define BATTERY_SOC_HIGH 60.0f      // Battery is considered high if SOC is above this value
+#define BATTERY_SOC_LOW 20.0f       // Battery is considered low if SOC is below this value
+#define BATTERY_SOC_CRITICAL 10.0f  // Battery is considered critically low if SOC is below this value
+
+#define BATTERY_CHECK_INTERVAL_MS_HIGH       300000 // 5 minutes
+#define BATTERY_CHECK_INTERVAL_MS_LOW        60000  // 1 minute
+
 #define WIFI_SYNC_TIME_S 20             //Time for one sync in seconds
 #define WIFI_SYNC_PERIODIC_TIME_S 10    // Time between each Wi-Fi syncs in seconds
 
