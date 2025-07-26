@@ -61,6 +61,14 @@ dog_collar_state_t dog_collar_state_machine_run(void) {
 }
 
 dog_collar_state_t battery_management_routine(dog_collar_state_t current_state) {
+
+    static uint32_t last_battery_check = 0;
+    uint32_t now = xTaskGetTickCount();
+
+    if( (now - last_battery_check) < BATTERY_CHECK_INTERVAL_MS / portTICK_PERIOD_MS) {
+        return current_state; // Not time to check battery yet
+    }
+
     esp_err_t ret = battery_monitor_update_battery_data();
     if (ret != ESP_OK) {
         ESP_LOGE(TAG, "Failed to update battery data");
