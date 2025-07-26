@@ -7,6 +7,7 @@
 #include "esp_err.h"
 #include "esp_check.h"
 
+#include "../dog_collar_state_machine.h"
 
 
 
