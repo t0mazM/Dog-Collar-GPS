@@ -51,6 +51,8 @@ esp_err_t gpio_toggle_leds(uint8_t led_mask) {
     return ESP_OK;
 }
 
+//todo add function to clear all leds
+
 //TODO add this function to gps_l96 module
 void gpio_reset_gps(void) {
     // Reset GPS by setting pin to 0 for 100 ms
