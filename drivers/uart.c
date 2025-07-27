@@ -22,6 +22,8 @@ esp_err_t uart_init(void)
     ESP_RETURN_ON_ERROR(uart_param_config(UART_PORT_NUM, &cfg), TAG, "config fail");
     ESP_RETURN_ON_ERROR(uart_set_pin(UART_PORT_NUM, UART_TX_PIN, UART_RX_PIN, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE), TAG, "pin map fail");
     ESP_LOGI(TAG, "UART%d ready @ %d bps", UART_PORT_NUM, UART_BAUD_RATE);
+
+    uart_initialized = true;
     return ESP_OK;
 }
 
