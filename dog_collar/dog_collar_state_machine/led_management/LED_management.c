@@ -77,6 +77,7 @@ void led_task(void *pvParameters) {
                 ESP_LOGE("LED_TASK", "Unknown state: %d", led_current_state);
         }
   
+        vTaskDelay(pdMS_TO_TICKS(50)); // Delay to prevent I2C from being blocked all the time
     }
 }
 
@@ -117,13 +118,12 @@ static void charging_led_pattern() {
 
 static void gps_acquiring_led_pattern() {
     gpio_turn_on_leds(LED_YELLOW);
-    vTaskDelay(pdMS_TO_TICKS(1000));
-
+    vTaskDelay(pdMS_TO_TICKS(100));
 }
 
 static void gps_ready_led_pattern() {
     gpio_turn_on_leds(LED_GREEN);
-    vTaskDelay(pdMS_TO_TICKS(1000));
+    vTaskDelay(pdMS_TO_TICKS(100));
 }
 
 static void gps_file_creation_led_pattern() {
@@ -150,10 +150,10 @@ static void gps_paused_led_pattern() {
 static void wifi_sync_led_pattern() {
     gpio_turn_on_leds(LED_GREEN);
     gpio_turn_off_leds(LED_YELLOW);
-    vTaskDelay(pdMS_TO_TICKS(1000));
+    vTaskDelay(pdMS_TO_TICKS(100));
     gpio_turn_off_leds(LED_GREEN);
     gpio_turn_on_leds(LED_YELLOW);
-    vTaskDelay(pdMS_TO_TICKS(1000));
+    vTaskDelay(pdMS_TO_TICKS(100));
 }
 
 static void error_led_pattern() {
