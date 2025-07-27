@@ -24,11 +24,9 @@ static void debounce_timer_callback(void* arg) {
         if ((now - button_press_time) >= LONG_PRESS_TIME_MS) {
             button_long_pressed = true;
             ESP_LOGI(TAG, "Button long press detected");
-            gpio_toggle_leds(LED_YELLOW);
         } else {
             button_short_pressed = true;
             ESP_LOGI(TAG, "Button short press detected");
-            gpio_toggle_leds(LED_RED);
         }
     }
 }

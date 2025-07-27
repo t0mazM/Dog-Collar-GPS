@@ -1,8 +1,10 @@
 #include "ext_flash.h" // Include the header with definitions
 
 static const char *TAG = "EXT_FLASH";
-spi_device_handle_t spi;
 
+static bool spi_initialized = false;
+
+spi_device_handle_t spi;
 
 spi_bus_config_t get_spi_bus_config(void) {
     spi_bus_config_t spi_bus_config;
@@ -35,6 +37,11 @@ spi_device_interface_config_t get_spi_device_config(void) {
 
 esp_err_t ext_flash_init(void) {
 
+    if(spi_initialized) {
+        ESP_LOGW(TAG, "SPI is already initialized");
+        return ESP_OK;
+    }
+
     // Initialize GPIO expander so you can control HOLD and WP pins
     ESP_RETURN_ON_ERROR(gpio_init(), 
                         TAG, "Failed to initialize GPIO"
@@ -62,6 +69,8 @@ esp_err_t ext_flash_init(void) {
                         TAG, "Failed to unlock global block");
 
     ESP_LOGI(TAG, "External flash initialized successfully");
+
+    spi_initialized = true; // Set the flag to true after successful initialization
     return ESP_OK;
 }
 
