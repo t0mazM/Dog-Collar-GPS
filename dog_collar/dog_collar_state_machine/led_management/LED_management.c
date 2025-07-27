@@ -13,18 +13,16 @@ static volatile dog_collar_state_t led_current_state = DOG_COLLAR_STATE_NORMAL;
 
 static void initializing_led_pattern();
 static void normal_led_pattern();
-
 static void low_battery_led_pattern();
 static void critical_low_battery_led_pattern();
 static void charging_led_pattern();
-
 static void gps_acquiring_led_pattern();
 static void gps_ready_led_pattern();
 static void gps_file_creation_led_pattern();
 static void gps_tracking_led_pattern();
 static void gps_paused_led_pattern();
-
 static void wifi_sync_led_pattern();
+static void light_sleep_led_pattern();
 static void error_led_pattern();
 
 static void error_led_pattern();
@@ -155,6 +153,11 @@ static void wifi_sync_led_pattern() {
     gpio_turn_off_leds(LED_GREEN);
     gpio_turn_on_leds(LED_YELLOW);
     vTaskDelay(pdMS_TO_TICKS(100));
+}
+
+static void light_sleep_led_pattern() {
+    gpio_turn_off_leds(LED_RED | LED_YELLOW | LED_GREEN);
+
 }
 
 static void error_led_pattern() {
