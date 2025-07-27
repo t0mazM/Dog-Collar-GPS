@@ -172,14 +172,16 @@ dog_collar_state_t handle_charging_state(void) {
 
 dog_collar_state_t handle_gps_acquiring_state(void) {
     ESP_LOGI(TAG, "Waiting for GPS fix or user input");
-    vTaskDelay(pdMS_TO_TICKS(1000)); //Used to test if 1Hz is working or not
-    
+
     if (is_button_short_pressed()) { 
         return DOG_COLLAR_STATE_GPS_FILE_CREATION; // go and create a GPS file
     }
     if (is_button_long_pressed()) {
         return DOG_COLLAR_STATE_NORMAL;            // go back to normal state
     }
+
+    gps_l96_start_recording();
+    gps_tracking_task(NULL); // Just to check if we have GPS fix
 
     if(gps_l96_has_fix() ) {
         return DOG_COLLAR_STATE_GPS_READY;
@@ -190,8 +192,7 @@ dog_collar_state_t handle_gps_acquiring_state(void) {
 
 dog_collar_state_t handle_gps_ready_state(void) {
     ESP_LOGI(TAG, "GPS is ready. Waiting for user input");
-    gps_l96_start_recording();
-
+    
     if (is_button_short_pressed()) { 
         return DOG_COLLAR_STATE_GPS_FILE_CREATION; // go and create a GPS file
     }
@@ -199,13 +200,11 @@ dog_collar_state_t handle_gps_ready_state(void) {
         return DOG_COLLAR_STATE_NORMAL;            // go back to normal state
     }
 
-    //TODO: Add LED animation for GPS ready state
     return DOG_COLLAR_STATE_GPS_READY;
 }
 
 dog_collar_state_t handle_gps_file_creation_state(void) {
 
-    
     esp_err_t ret = lfs_create_new_csv_file(gps_file_name, sizeof(gps_file_name));
     if (ret != ESP_OK) {
         ESP_LOGE(TAG, "Failed to create GPS file");
@@ -328,7 +327,7 @@ static void enter_light_sleep(uint64_t sleep_time_us) {
 
 }
 
-esp_err_t gps_tracking_task(char *gps_file_name) { 
+esp_err_t gps_tracking_task(char* gps_file_name) { 
 
     static char NMEA_sentence[NMEA_SENTENCE_BUF_SIZE] = {0};
     static uint8_t rx_buffer[UART_RX_BUF_SIZE] = {0};
@@ -357,6 +356,11 @@ esp_err_t gps_tracking_task(char *gps_file_name) {
     if (gps_l96_has_fix() == false) {
         ESP_LOGW(TAG, "No valid GPS fix, not logging data.");
         return ESP_FAIL;
+    }
+
+    if( gps_file_name == NULL || strlen(gps_file_name) == 0) { // Add NULL for gps_file_name to just check if we have GPS fix
+        ESP_LOGE(TAG, "GPS file name is not set");
+        return ESP_ERR_INVALID_ARG;
     }
 
     ret = gps_l96_format_csv_line_from_data(NMEA_sentence, sizeof(NMEA_sentence));

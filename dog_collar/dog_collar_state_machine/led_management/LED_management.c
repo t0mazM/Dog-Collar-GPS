@@ -123,6 +123,7 @@ static void gps_acquiring_led_pattern() {
 
 static void gps_ready_led_pattern() {
     gpio_turn_on_leds(LED_GREEN);
+    gpio_turn_off_leds(LED_YELLOW);
     vTaskDelay(pdMS_TO_TICKS(100));
 }
 
