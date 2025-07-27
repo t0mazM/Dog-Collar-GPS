@@ -83,6 +83,15 @@ esp_err_t gps_l96_go_to_standby_mode(void);
  */
 esp_err_t gps_l96_start_recording(void);
 
+/**
+ * @brief Puts the GPS module into back-up mode - deep sleep mode.
+ *
+ * This function sends the command to put the GPS module into back-up mode, which is a low-power state.
+ * During this mode, the GPS module will draw 7 μA.
+ * 
+ * @note To wake up the GPS module, call gps_l96_go_to_standby_mode() or gps_l96_start_recording()
+ * @return ESP_OK on success, or an error code if the command fails.
+ */
 esp_err_t gps_l96_go_to_back_up_mode(void);
 
 
