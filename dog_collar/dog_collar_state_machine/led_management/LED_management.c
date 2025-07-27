@@ -157,7 +157,6 @@ static void wifi_sync_led_pattern() {
 
 static void light_sleep_led_pattern() {
     gpio_turn_off_leds(LED_RED | LED_YELLOW | LED_GREEN);
-
 }
 
 static void error_led_pattern() {
