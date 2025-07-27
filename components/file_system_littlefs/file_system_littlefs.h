@@ -40,6 +40,13 @@ esp_err_t lfs_append_to_file(const char* data, const char* filename);
  * @param filename Pointer to a buffer where the new file name will be stored. The buffer should be at least LFS_MAX_FILE_NAME_SIZE bytes long.
  */
 esp_err_t lfs_create_new_csv_file(char* filename, size_t filename_size);
+
+/**
+ * @brief Deletes a file from the LittleFS filesystem.
+ * 
+ * @param filename The name of the file to delete.
+ * @return esp_err_t ESP_OK on success, or an error code on failure.
+ */
 esp_err_t lfs_delete_file(const char* filename);
 
 

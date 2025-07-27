@@ -9,6 +9,7 @@ static esp_err_t list_files_get_handler(httpd_req_t *req);
 static esp_err_t download_file_get_handler(httpd_req_t *req);
 static esp_err_t init_status_get_handler(httpd_req_t *req);
 static esp_err_t battery_data_get_handler(httpd_req_t *req);
+static esp_err_t delete_file_handler(httpd_req_t *req);
 
 esp_err_t http_server_start(void) {
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
@@ -61,6 +62,15 @@ esp_err_t http_server_start(void) {
             .user_ctx   = NULL
         };
         httpd_register_uri_handler(server, &battery_data_uri);
+
+        /* Delete file */
+        httpd_uri_t delete_file_uri = {
+            .uri        = "/delete",
+            .method     = HTTP_GET,
+            .handler    = delete_file_handler,
+            .user_ctx   = NULL
+        };
+        httpd_register_uri_handler(server, &delete_file_uri);
 
         ESP_LOGI(TAG, "HTTP server started on port %d", config.server_port);
         return ESP_OK;
@@ -223,6 +233,32 @@ static esp_err_t battery_data_get_handler(httpd_req_t *req) {
     return ESP_OK;
 }
 
+static esp_err_t delete_file_handler(httpd_req_t *req) {
+    char *query_string = strchr(req->uri, '?');
+    if (query_string == NULL) {
+        ESP_LOGE(TAG, "No query string found in URI");
+        httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "Missing 'file' parameter");
+        return ESP_FAIL;
+    }
+    query_string++; // Move pointer past the '?' character
+    ESP_LOGI(TAG, "Query string found: %s", query_string);
+
+    query_string = query_string + 5; // Skip "file=" part
+
+    ESP_LOGI(TAG, "Filename extracted: %s", query_string);
+
+    esp_err_t err = lfs_delete_file(query_string);
+    if (err) {
+        ESP_LOGE(TAG, "Failed to delete file %s (%d)", query_string, err);
+        httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to delete file");
+        return ESP_FAIL;
+    }
+
+    httpd_resp_send(req, "File deleted successfully", HTTPD_RESP_USE_STRLEN);
+    return ESP_OK;
+}
+
+
 esp_err_t http_server_stop(void) {
     if (server != NULL) {
         ESP_LOGI(TAG, "Stopping HTTP server");
@@ -239,3 +275,4 @@ esp_err_t http_server_stop(void) {
         return ESP_OK;  // Not an error if already stopped
     }
 }
+

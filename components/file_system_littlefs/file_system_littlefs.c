@@ -448,8 +448,7 @@ esp_err_t lfs_create_new_csv_file(char* filename, size_t filename_size) {
 }
 
 esp_err_t lfs_delete_file(const char* filename) {
-    ESP_LOGI(LFS_TAG, "Attempting to delete file: %s", filename);
-    
+
     ESP_RETURN_ON_ERROR(
         lfs_remove(&lfs, filename), 
         LFS_TAG, "Failed to remove file %s", filename

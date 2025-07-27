@@ -13,7 +13,7 @@ static char gps_file_name[LFS_MAX_FILE_NAME_SIZE] = {0};
 dog_collar_state_t dog_collar_state_machine_run(void) {
 
 
-    printf("Current state: %s\n", get_current_state_string(current_state));
+    //printf("Current state: %s\n", get_current_state_string(current_state));
 
     switch (current_state) {
         case DOG_COLLAR_STATE_INITIALIZING:
