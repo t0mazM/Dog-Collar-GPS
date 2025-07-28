@@ -318,6 +318,7 @@ static char *get_current_state_string(dog_collar_state_t state) {
 
 dog_collar_state_t  handle_light_sleep_state(void) {
 
+    gpio_turn_off_leds(LED_RED | LED_YELLOW | LED_GREEN);
     gps_l96_go_to_back_up_mode();
 
     esp_sleep_enable_timer_wakeup((uint64_t)LIGHT_SLEEP_TIME_S * 1000000); 
@@ -335,7 +336,7 @@ dog_collar_state_t  handle_light_sleep_state(void) {
 }
 
 dog_collar_state_t  handle_deep_sleep_state(void) {
-
+    gpio_turn_off_leds(LED_RED | LED_YELLOW | LED_GREEN);
     gps_l96_go_to_back_up_mode();
     esp_sleep_enable_timer_wakeup((uint64_t)DEEP_SLEEP_TIME_S * 1000000);
     esp_deep_sleep_start();
