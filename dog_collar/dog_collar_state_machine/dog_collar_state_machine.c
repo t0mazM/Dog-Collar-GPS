@@ -141,11 +141,10 @@ dog_collar_state_t handle_normal_state(void) {
     }
 
     // 2) Start enter wifi_sync state every WIFI_SYNC_PERIODIC_TIME_S seconds
-    // 2.a) On first normal state entry, set the start time and go to wifi_sync state - when waking up from deep sleep ESP32 restarts so we sync
+    // 2.a) On first normal state entry, set the start time
     if (!normal_started) {
         normal_start_time_us = now_us;
         normal_started = true;
-        return DOG_COLLAR_STATE_WIFI_SYNC;
     }
 
     // 2.b) If time is up, go to WIFI_SYNC state
@@ -256,6 +255,7 @@ dog_collar_state_t handle_wifi_sync_state(void) {
         wifi_manager_reconnect(); 
         sync_start_time_us = now;
         sync_started = true;
+        clear_button_press_states(); // For some reason we need to clear button press states here
     }
 
     // Allow button press to interrupt Wi-Fi sync and go to GPS acquiring state
@@ -283,8 +283,8 @@ dog_collar_state_t  handle_light_sleep_state(void) {
     * escalate to deep sleep to save more power.
     */
     static uint8_t consecutive_light_sleeps = 0;
-    if(consecutive_light_sleeps >= LIGHT_SLEEP_MAX_COUNT) {
-        consecutive_light_sleeps = 0; // Reset count after reaching max
+    if(consecutive_light_sleeps > LIGHT_SLEEP_MAX_COUNT) {
+        consecutive_light_sleeps = 0; 
         return DOG_COLLAR_STATE_DEEP_SLEEP; // Go to deep sleep if max count reached
     }
 
@@ -300,6 +300,7 @@ dog_collar_state_t  handle_light_sleep_state(void) {
 
     esp_light_sleep_start();
 
+    consecutive_light_sleeps++; 
 
     return DOG_COLLAR_STATE_NORMAL;
     /* The light sleep functionality is currently disabled as after 

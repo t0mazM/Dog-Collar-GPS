@@ -43,13 +43,13 @@ typedef enum {
 #define BATTERY_CHECK_INTERVAL_MS_HIGH       5000 //300000 // 5 minutes -for testing 5s
 #define BATTERY_CHECK_INTERVAL_MS_LOW        5000 //60000  // 1 minute -for testing 5s
 
-#define WIFI_SYNC_TIME_S 20             //Time for one sync in seconds
+#define WIFI_SYNC_TIME_S 5             //Time for one sync in seconds
 #define WIFI_SYNC_PERIODIC_TIME_S 10    // Time between each Wi-Fi syncs in seconds
 
-#define LIGHT_SLEEP_MAX_COUNT 10        // After LIGHT_SLEEP_MAX_COUNT light sleeps, we will go for longer deep sleep.
+#define LIGHT_SLEEP_MAX_COUNT 2        // After LIGHT_SLEEP_MAX_COUNT light sleeps, we will go for longer deep sleep.
 
-#define LIGHT_SLEEP_TIME_S 10
-#define DEEP_SLEEP_TIME_S 60 * 60
+#define LIGHT_SLEEP_TIME_S 5
+#define DEEP_SLEEP_TIME_S 5
 
 #define WAIT_AFTER_USER_PRESS_MS 500    // Wait after user press in milliseconds
 
