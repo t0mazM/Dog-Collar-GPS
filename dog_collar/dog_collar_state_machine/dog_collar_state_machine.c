@@ -141,10 +141,11 @@ dog_collar_state_t handle_normal_state(void) {
     }
 
     // 2) Start enter wifi_sync state every WIFI_SYNC_PERIODIC_TIME_S seconds
-    // 2.a) On first normal state entry, set the start time
+    // 2.a) On first normal state entry, set the start time and go to wifi_sync state - when waking up from deep sleep ESP32 restarts so we sync
     if (!normal_started) {
         normal_start_time_us = now_us;
         normal_started = true;
+        return DOG_COLLAR_STATE_WIFI_SYNC;
     }
 
     // 2.b) If time is up, go to WIFI_SYNC state
