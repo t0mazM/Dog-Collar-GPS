@@ -321,12 +321,15 @@ dog_collar_state_t  handle_light_sleep_state(void) {
     gpio_turn_off_leds(LED_RED | LED_YELLOW | LED_GREEN);
     gps_l96_go_to_back_up_mode();
 
+    /* Use this with a RTC capable button GPIO0-5 */
+    //esp_sleep_enable_gpio_wakeup();
+    //gpio_wakeup_enable(BUTTON_GPIO, GPIO_INTR_LOW_LEVEL); 
+
     esp_sleep_enable_timer_wakeup((uint64_t)LIGHT_SLEEP_TIME_S * 1000000); 
-    esp_sleep_enable_gpio_wakeup();
-    gpio_wakeup_enable(BUTTON_GPIO, GPIO_INTR_LOW_LEVEL); // Wake on button press (active low)
     esp_sleep_enable_uart_wakeup(UART_PORT_NUM);          // Wake on UART activity TODO:test this with sleep while gps is tracking
 
     esp_light_sleep_start();
+
 
     return DOG_COLLAR_STATE_NORMAL;
     /* The light sleep functionality is currently disabled as after 
@@ -338,6 +341,11 @@ dog_collar_state_t  handle_light_sleep_state(void) {
 dog_collar_state_t  handle_deep_sleep_state(void) {
     gpio_turn_off_leds(LED_RED | LED_YELLOW | LED_GREEN);
     gps_l96_go_to_back_up_mode();
+
+    /* Use this with a RTC capable button GPIO0-5 */
+    //esp_sleep_enable_gpio_wakeup();
+    //gpio_wakeup_enable(BUTTON_GPIO, GPIO_INTR_LOW_LEVEL); 
+
     esp_sleep_enable_timer_wakeup((uint64_t)DEEP_SLEEP_TIME_S * 1000000);
     esp_deep_sleep_start();
 
