@@ -9,6 +9,8 @@ TODO:
 - Implement LED pattern for charging
 */
 
+static const char *TAG = "LED_MANAGEMENT";
+
 static volatile dog_collar_state_t led_current_state = DOG_COLLAR_STATE_NORMAL;
 
 static void initializing_led_pattern();
@@ -32,6 +34,11 @@ void led_management_set_pattern(dog_collar_state_t state) {
 }
 
 void led_task(void *pvParameters) {
+    esp_err_t ret = i2c_init();
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to initialize I2C");
+        vTaskDelete(NULL); // Terminate this task
+    }
     for (;;) {
         switch (led_current_state) {
             case DOG_COLLAR_STATE_INITIALIZING:
