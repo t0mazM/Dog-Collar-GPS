@@ -317,6 +317,16 @@ static char *get_current_state_string(dog_collar_state_t state) {
 }
 
 dog_collar_state_t  handle_light_sleep_state(void) {
+    /*
+    * If the device has entered light sleep LIGHT_SLEEP_MAX_COUNT times in a row
+    * (e.g., after several failed attempts to sync or no user activity),
+    * escalate to deep sleep to save more power.
+    */
+    static uint8_t consecutive_light_sleeps = 0;
+    if(consecutive_light_sleeps >= LIGHT_SLEEP_MAX_COUNT) {
+        consecutive_light_sleeps = 0; // Reset count after reaching max
+        return DOG_COLLAR_STATE_DEEP_SLEEP; // Go to deep sleep if max count reached
+    }
 
     gpio_turn_off_leds(LED_RED | LED_YELLOW | LED_GREEN);
     gps_l96_go_to_back_up_mode();

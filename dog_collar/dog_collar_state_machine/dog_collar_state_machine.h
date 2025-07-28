@@ -46,6 +46,8 @@ typedef enum {
 #define WIFI_SYNC_TIME_S 20             //Time for one sync in seconds
 #define WIFI_SYNC_PERIODIC_TIME_S 10    // Time between each Wi-Fi syncs in seconds
 
+#define LIGHT_SLEEP_MAX_COUNT 10        // After LIGHT_SLEEP_MAX_COUNT light sleeps, we will go for longer deep sleep.
+
 #define LIGHT_SLEEP_TIME_S 10
 #define DEEP_SLEEP_TIME_S 60 * 60
 
