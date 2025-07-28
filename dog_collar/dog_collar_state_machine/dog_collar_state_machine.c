@@ -275,47 +275,6 @@ dog_collar_state_t handle_wifi_sync_state(void) {
     return DOG_COLLAR_STATE_WIFI_SYNC;
 }
 
-
-dog_collar_state_t handle_error_state(void) {
-
-    return DOG_COLLAR_STATE_INITIALIZING;
-}
-
-static char *get_current_state_string(dog_collar_state_t state) {
-    switch (state) {
-        case DOG_COLLAR_STATE_INITIALIZING:
-            return "INITIALIZING";
-        case DOG_COLLAR_STATE_NORMAL:
-            return "NORMAL";
-        case DOG_COLLAR_STATE_LOW_BATTERY:
-            return "LOW_BATTERY";
-        case DOG_COLLAR_STATE_CRITICAL_LOW_BATTERY:
-            return "CRITICAL_LOW_BATTERY";
-        case DOG_COLLAR_STATE_CHARGING:
-            return "CHARGING";
-        case DOG_COLLAR_STATE_GPS_ACQUIRING:
-            return "GPS_ACQUIRING";
-        case DOG_COLLAR_STATE_GPS_READY:
-            return "GPS_READY";
-        case DOG_COLLAR_STATE_GPS_FILE_CREATION:
-            return "GPS_FILE_CREATION";
-        case DOG_COLLAR_STATE_GPS_TRACKING:
-            return "GPS_TRACKING";
-        case DOG_COLLAR_STATE_GPS_PAUSED:
-            return "GPS_PAUSED";
-        case DOG_COLLAR_STATE_WIFI_SYNC:
-            return "WIFI_SYNC";
-        case DOG_COLLAR_STATE_LIGHT_SLEEP:
-            return "LIGHT_SLEEP";
-        case DOG_COLLAR_STATE_DEEP_SLEEP:
-            return "DEEP_SLEEP";
-        case DOG_COLLAR_STATE_ERROR:
-            return "ERROR";
-        default:
-            return "UNKNOWN";
-    }
-}
-
 dog_collar_state_t  handle_light_sleep_state(void) {
     /*
     * If the device has entered light sleep LIGHT_SLEEP_MAX_COUNT times in a row
@@ -360,6 +319,46 @@ dog_collar_state_t  handle_deep_sleep_state(void) {
     esp_deep_sleep_start();
 
     return DOG_COLLAR_STATE_NORMAL; // Code won't reach this point, ESP32 will restart completly
+}
+
+dog_collar_state_t handle_error_state(void) {
+
+    return DOG_COLLAR_STATE_INITIALIZING;
+}
+
+static char *get_current_state_string(dog_collar_state_t state) {
+    switch (state) {
+        case DOG_COLLAR_STATE_INITIALIZING:
+            return "INITIALIZING";
+        case DOG_COLLAR_STATE_NORMAL:
+            return "NORMAL";
+        case DOG_COLLAR_STATE_LOW_BATTERY:
+            return "LOW_BATTERY";
+        case DOG_COLLAR_STATE_CRITICAL_LOW_BATTERY:
+            return "CRITICAL_LOW_BATTERY";
+        case DOG_COLLAR_STATE_CHARGING:
+            return "CHARGING";
+        case DOG_COLLAR_STATE_GPS_ACQUIRING:
+            return "GPS_ACQUIRING";
+        case DOG_COLLAR_STATE_GPS_READY:
+            return "GPS_READY";
+        case DOG_COLLAR_STATE_GPS_FILE_CREATION:
+            return "GPS_FILE_CREATION";
+        case DOG_COLLAR_STATE_GPS_TRACKING:
+            return "GPS_TRACKING";
+        case DOG_COLLAR_STATE_GPS_PAUSED:
+            return "GPS_PAUSED";
+        case DOG_COLLAR_STATE_WIFI_SYNC:
+            return "WIFI_SYNC";
+        case DOG_COLLAR_STATE_LIGHT_SLEEP:
+            return "LIGHT_SLEEP";
+        case DOG_COLLAR_STATE_DEEP_SLEEP:
+            return "DEEP_SLEEP";
+        case DOG_COLLAR_STATE_ERROR:
+            return "ERROR";
+        default:
+            return "UNKNOWN";
+    }
 }
 
 esp_err_t gps_tracking_task(char* gps_file_name) { 
