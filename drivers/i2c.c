@@ -46,7 +46,7 @@ esp_err_t i2c_init(void) {
 }
 
 esp_err_t i2c_write_byte(uint8_t dev_addr, int8_t write_register, uint8_t data) {
-    if(xSemaphoreTake(i2c_mutex, pdMS_TO_TICKS(100))){
+    if(xSemaphoreTake(i2c_mutex, pdMS_TO_TICKS(I2C_MUTEX_TIMEOUT_MS))){
 
         i2c_cmd_handle_t cmd = i2c_cmd_link_create();
 
@@ -72,7 +72,7 @@ esp_err_t i2c_write_byte(uint8_t dev_addr, int8_t write_register, uint8_t data) 
 
 esp_err_t i2c_read_16bit(uint8_t dev_addr, int8_t reg_addr, uint16_t *data) {
     
-    if(xSemaphoreTake(i2c_mutex, pdMS_TO_TICKS(100))){
+    if(xSemaphoreTake(i2c_mutex, pdMS_TO_TICKS(I2C_MUTEX_TIMEOUT_MS))){
         uint8_t buffer[2]; //16-bit-> 8*2 bytes
 
         i2c_cmd_handle_t cmd = i2c_cmd_link_create();
@@ -105,7 +105,7 @@ esp_err_t i2c_read_16bit(uint8_t dev_addr, int8_t reg_addr, uint16_t *data) {
 
 esp_err_t i2c_read_8bit(uint8_t dev_addr, int8_t reg_addr, uint8_t *data) {
 
-    if(xSemaphoreTake(i2c_mutex, pdMS_TO_TICKS(100))){
+    if(xSemaphoreTake(i2c_mutex, pdMS_TO_TICKS(I2C_MUTEX_TIMEOUT_MS))) {
         i2c_cmd_handle_t cmd = i2c_cmd_link_create();
 
         RETURN_ON_ERROR_I2C(i2c_master_start(cmd), TAG, "Start failed", cmd);

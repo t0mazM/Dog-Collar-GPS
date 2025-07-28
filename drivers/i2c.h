@@ -13,6 +13,8 @@
 #define I2C_SDA  GPIO_NUM_6
 #define I2C_SCL  GPIO_NUM_7
 
+#define I2C_MUTEX_TIMEOUT_MS 100
+
 #define REG_ADDR_NOT_USED -1
 
 // Config constants
