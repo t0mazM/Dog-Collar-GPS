@@ -1,7 +1,6 @@
 #include "dog_collar_state_machine.h"
 
 static char *get_current_state_string(dog_collar_state_t state);
-static void enter_light_sleep(uint64_t sleep_time_us);
 static esp_err_t gps_tracking_task(char *gps_file_name);
 
 static const char *TAG = "DOG_COLLAR_STATE_MACHINE";
@@ -13,7 +12,7 @@ static char gps_file_name[LFS_MAX_FILE_NAME_SIZE] = {0};
 dog_collar_state_t dog_collar_state_machine_run(void) {
 
 
-    //printf("Current state: %s\n", get_current_state_string(current_state));
+    printf("Current state: %s\n", get_current_state_string(current_state));
 
     switch (current_state) {
         case DOG_COLLAR_STATE_INITIALIZING:
@@ -48,6 +47,12 @@ dog_collar_state_t dog_collar_state_machine_run(void) {
             break;
         case DOG_COLLAR_STATE_WIFI_SYNC:
             current_state = handle_wifi_sync_state();
+            break;
+        case DOG_COLLAR_STATE_LIGHT_SLEEP:
+            current_state = handle_light_sleep_state();
+            break;
+        case DOG_COLLAR_STATE_DEEP_SLEEP:
+            current_state = handle_deep_sleep_state();
             break;
         case DOG_COLLAR_STATE_ERROR:
             current_state = handle_error_state();
@@ -150,9 +155,8 @@ dog_collar_state_t handle_normal_state(void) {
 
     /** 3) If nothing happened, go to light sleep and stay in NORMAL state 
         Set normal_started to false so that we can start the timer again on next entry */
-    enter_light_sleep(SLEEP_TIME_S * 1000 * 1000);
 
-    return DOG_COLLAR_STATE_NORMAL;
+    return DOG_COLLAR_STATE_LIGHT_SLEEP;
 }
 
 dog_collar_state_t handle_low_battery_state(void) {
@@ -217,14 +221,11 @@ dog_collar_state_t handle_gps_file_creation_state(void) {
 dog_collar_state_t handle_gps_tracking_state(void) {
 
     ESP_LOGI(TAG, "Tracking GPS");
-
     if (is_button_short_pressed()) { 
         return DOG_COLLAR_STATE_GPS_PAUSED; 
     }
 
-
     gps_tracking_task(gps_file_name);
-    enter_light_sleep( 500 * 1000); //500ms //TODO test sleep. Test if uart wakes up the sleep
 
     return DOG_COLLAR_STATE_GPS_TRACKING;
 }
@@ -304,6 +305,10 @@ static char *get_current_state_string(dog_collar_state_t state) {
             return "GPS_PAUSED";
         case DOG_COLLAR_STATE_WIFI_SYNC:
             return "WIFI_SYNC";
+        case DOG_COLLAR_STATE_LIGHT_SLEEP:
+            return "LIGHT_SLEEP";
+        case DOG_COLLAR_STATE_DEEP_SLEEP:
+            return "DEEP_SLEEP";
         case DOG_COLLAR_STATE_ERROR:
             return "ERROR";
         default:
@@ -311,22 +316,31 @@ static char *get_current_state_string(dog_collar_state_t state) {
     }
 }
 
-static void enter_light_sleep(uint64_t sleep_time_us) {
+dog_collar_state_t  handle_light_sleep_state(void) {
 
     gps_l96_go_to_back_up_mode();
 
-    esp_sleep_enable_timer_wakeup(sleep_time_us);
+    esp_sleep_enable_timer_wakeup((uint64_t)LIGHT_SLEEP_TIME_S * 1000000); 
     esp_sleep_enable_gpio_wakeup();
     gpio_wakeup_enable(BUTTON_GPIO, GPIO_INTR_LOW_LEVEL); // Wake on button press (active low)
-    esp_sleep_enable_uart_wakeup(UART_PORT_NUM); // Wake on UART activity TODO:test this with sleep while gps is tracking
+    esp_sleep_enable_uart_wakeup(UART_PORT_NUM);          // Wake on UART activity TODO:test this with sleep while gps is tracking
 
     esp_light_sleep_start();
 
+    return DOG_COLLAR_STATE_NORMAL;
     /* The light sleep functionality is currently disabled as after 
     waking up the usb uart is not reinitialized properly and is not working*/
 
     //vTaskDelay(pdMS_TO_TICKS(sleep_time_us / 1000)); // Simulate light sleep with delay
-    gps_l96_start_recording(); //for testing
+}
+
+dog_collar_state_t  handle_deep_sleep_state(void) {
+
+    gps_l96_go_to_back_up_mode();
+    esp_sleep_enable_timer_wakeup((uint64_t)DEEP_SLEEP_TIME_S * 1000000);
+    esp_deep_sleep_start();
+
+    return DOG_COLLAR_STATE_NORMAL; // Code won't reach this point, ESP32 will restart completly
 }
 
 esp_err_t gps_tracking_task(char* gps_file_name) { 

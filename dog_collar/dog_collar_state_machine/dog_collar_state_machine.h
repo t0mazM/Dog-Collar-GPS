@@ -17,6 +17,9 @@ typedef enum {
     
     DOG_COLLAR_STATE_WIFI_SYNC, 
 
+    DOG_COLLAR_STATE_LIGHT_SLEEP,
+    DOG_COLLAR_STATE_DEEP_SLEEP,
+
     DOG_COLLAR_STATE_ERROR
 } dog_collar_state_t;
 
@@ -43,7 +46,9 @@ typedef enum {
 #define WIFI_SYNC_TIME_S 20             //Time for one sync in seconds
 #define WIFI_SYNC_PERIODIC_TIME_S 10    // Time between each Wi-Fi syncs in seconds
 
-#define SLEEP_TIME_S 10
+#define LIGHT_SLEEP_TIME_S 10
+#define DEEP_SLEEP_TIME_S 60 * 60
+
 #define WAIT_AFTER_USER_PRESS_MS 500    // Wait after user press in milliseconds
 
 
@@ -192,6 +197,10 @@ dog_collar_state_t handle_gps_paused_state(void);
  * @return dog_collar_state_t normal_state 
  */
 dog_collar_state_t handle_wifi_sync_state(void);
+
+dog_collar_state_t  handle_light_sleep_state(void);
+
+dog_collar_state_t  handle_deep_sleep_state(void);
 
 /**
  * @brief Handles the error state of the dog collar.
