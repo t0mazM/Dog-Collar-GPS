@@ -15,3 +15,11 @@ class LocalStorageManager:
     def delete_file_locally(self, file_name):
         if os.path.exists(file_name):
             os.remove(file_name)
+
+if __name__ == "__main__":
+
+    storage_manager = LocalStorageManager()
+
+    content = storage_manager.get_file_locally("dog_run_173.csv")
+    print(content.decode())
+    storage_manager.delete_file_locally("dog_run_173.csv")
