@@ -25,13 +25,18 @@ class DogCollarClient:
         return file_names
 
     def download_file(self, file_name):
-        response = requests.get(f"{self.esp_32_server_url}/download?file={file_name}")
-        if response.status_code == HTTP_OK:
-            self.storage_manager.save_file_locally(file_name, response.content)
-            return True
-        else:
-            print(f"Failed to download file {file_name}: {response.status_code}")
-        return False
+        try:
+            response = requests.get(f"{self.esp_32_server_url}/download?file={file_name}", timeout=10)
+            if response.status_code == HTTP_OK:
+                self.storage_manager.save_file_locally(file_name, response.content)
+                print(f"Downloaded {file_name}")
+                return True
+            else:
+                print(f"Failed to download file {file_name}: {response.status_code}")
+                return False
+        except requests.exceptions.RequestException as e:
+            print(f"Connection error while downloading {file_name}: {e}")
+            return False
 
 if __name__ == "__main__":
     client = DogCollarClient("http://dogcollar.local")
