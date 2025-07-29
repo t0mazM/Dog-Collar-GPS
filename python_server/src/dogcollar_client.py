@@ -25,6 +25,9 @@ class DogCollarClient:
         return file_names
 
     def download_file(self, file_name):
+        if self.storage_manager.file_exists(file_name):
+            print(f"File {file_name} already exists locally. Skipping download.")
+            return True
         try:
             response = requests.get(f"{self.esp_32_server_url}/download?file={file_name}", timeout=10)
             if response.status_code == HTTP_OK:
@@ -37,6 +40,7 @@ class DogCollarClient:
         except requests.exceptions.RequestException as e:
             print(f"Connection error while downloading {file_name}: {e}")
             return False
+        
 
 if __name__ == "__main__":
     client = DogCollarClient("http://dogcollar.local")

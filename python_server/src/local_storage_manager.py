@@ -28,6 +28,9 @@ class LocalStorageManager:
         except Exception as e:
             print(f"Unexpected error while deleting {file_name}, error: {e}")
         return None
+    
+    def file_exists(self, file_name):
+        return os.path.exists(os.path.join(GPS_FILES_DIR, file_name))
 
 if __name__ == "__main__":
 
