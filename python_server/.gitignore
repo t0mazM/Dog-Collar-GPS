@@ -5,5 +5,5 @@ env_server/
 __pycache__/
 *.pyc
 
-# VS Code settings (if you use VS Code)
+# VS Code settings
 .vscode/
