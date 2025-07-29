@@ -27,7 +27,7 @@ class DogCollarClient:
     def download_file(self, file_name):
         response = requests.get(f"{self.esp_32_server_url}/download?file={file_name}")
         if response.status_code == 200:
-            self.storage_manager.save_file(file_name, response.content)
+            self.storage_manager.save_file_locally(file_name, response.content)
             return True
         else:
             print(f"Failed to download file {file_name}: {response.status_code}")
