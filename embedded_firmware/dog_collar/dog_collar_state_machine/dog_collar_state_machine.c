@@ -12,7 +12,7 @@ static char gps_file_name[LFS_MAX_FILE_NAME_SIZE] = {0};
 dog_collar_state_t dog_collar_state_machine_run(void) {
 
 
-    printf("Current state: %s\n", get_current_state_string(current_state));
+    //printf("Current state: %s\n", get_current_state_string(current_state));
 
     switch (current_state) {
         case DOG_COLLAR_STATE_INITIALIZING:
@@ -156,6 +156,7 @@ dog_collar_state_t handle_normal_state(void) {
     /** 3) If nothing happened, go to light sleep and stay in NORMAL state 
         Set normal_started to false so that we can start the timer again on next entry */
 
+    return DOG_COLLAR_STATE_WIFI_SYNC;
     return DOG_COLLAR_STATE_LIGHT_SLEEP;
 }
 
