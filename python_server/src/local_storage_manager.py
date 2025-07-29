@@ -1,16 +1,17 @@
 import os
 
+GPS_FILES_DIR = "gps_files"
 class LocalStorageManager:
     def __init__(self):
-        pass
+        os.makedirs(GPS_FILES_DIR, exist_ok=True)
 
     def save_file_locally(self, file_name, file_content):
-        with open(file_name, 'wb') as file:
+        with open(os.path.join(GPS_FILES_DIR, file_name), 'wb') as file:
             file.write(file_content)
 
     def get_file_locally(self, file_name):
         try:
-            with open(file_name, 'rb') as file:
+            with open(os.path.join(GPS_FILES_DIR, file_name), 'rb') as file:
                 return file.read()
         except FileNotFoundError:
             print(f"File {file_name} does not exist. Cannot read.")
@@ -20,7 +21,7 @@ class LocalStorageManager:
         return None
     def delete_file_locally(self, file_name):
         try:
-            os.remove(file_name)
+            os.remove(os.path.join(GPS_FILES_DIR, file_name))
             print(f"File {file_name} deleted successfully.")
         except FileNotFoundError:
             print(f"File {file_name} does not exist. Cannot delete.")

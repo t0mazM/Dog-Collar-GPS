@@ -2,7 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import local_storage_manager
 
-
+HTTP_OK = 200   
 class DogCollarClient:
     def __init__(self, esp_32_server_url):
         self.storage_manager = local_storage_manager.LocalStorageManager()
@@ -10,7 +10,7 @@ class DogCollarClient:
 
     def get_file_list(self):
         response = requests.get(f"{self.esp_32_server_url}/files")
-        if response.status_code == 200:
+        if response.status_code == HTTP_OK:
             return self.parse_file_list(response.content)
         else:
             raise print(f"Failed to retrieve file list: {response.status_code}")
@@ -26,7 +26,7 @@ class DogCollarClient:
 
     def download_file(self, file_name):
         response = requests.get(f"{self.esp_32_server_url}/download?file={file_name}")
-        if response.status_code == 200:
+        if response.status_code == HTTP_OK:
             self.storage_manager.save_file_locally(file_name, response.content)
             return True
         else:
