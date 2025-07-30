@@ -2,7 +2,8 @@
 env_server/
 
 # Local storage files
-gps_files/
+raw_esp32_files/
+gpx_files/
 
 # Python cache
 __pycache__/
