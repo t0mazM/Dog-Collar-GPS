@@ -9,6 +9,14 @@ class DogCollarClient:
         self.storage_manager = local_storage_manager.LocalStorageManager()
         self.esp_32_server_url = esp_32_server_url
 
+    def is_connected(self):
+        try:
+            response = requests.get(self.esp_32_server_url, timeout=DOWNLOAD_TIMEOUT)
+            return response.status_code == HTTP_OK
+        except requests.exceptions.RequestException as e:
+            print(f"Error connecting to ESP32 server: {e}")
+            return False
+
     def get_file_list(self):
         response = requests.get(f"{self.esp_32_server_url}/files")
         if response.status_code == HTTP_OK:
