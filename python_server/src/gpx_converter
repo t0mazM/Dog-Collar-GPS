@@ -2,18 +2,18 @@
 
 
 class GPXConverter:
-    def __init__(self):
-        pass
+    def __init__(self, creator="Dog Collar GPS"):
+        self.creator = creator
 
     def add_gpx_xml_declaration(self):
         return '<?xml version="1.0" encoding="UTF-8"?>\n'
     
     def add_gpx_root_element(self):
-        return '<gpx version="1.1" creator="Dog Collar GPS" xmlns="http://www.topografix.com/GPX/1/1">\n'
+        return f'<gpx version="1.1" creator="{self.creator}" xmlns="http://www.topografix.com/GPX/1/1">\n'
 
-    def add_gpx_start_trk_element(self, trk_data):
+    def add_gpx_start_trk_element(self, file_name):
         return f'  <trk> \n' \
-               f'    <name>{trk_data["name"]}</name>\n' \
+               f'    <name>{file_name}</name>\n' \
                f'    <trkseg>\n'
     
     def add_gpx_trkpt_element(self, lat, lon, time):
