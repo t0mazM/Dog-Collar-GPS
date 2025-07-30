@@ -178,16 +178,19 @@ esp_err_t gps_l96_start_activity_tracking(void) {
 
 esp_err_t gps_l96_format_csv_line_from_data(char *file_line, size_t file_line_size) {
 
-    // Format: timestamp,latitude,longitude,altitude,speed
+    // Format: ISO 8601 timestamp,latitude,longitude,altitude,speed
     int written = snprintf(file_line, file_line_size,
-                           "%02d:%02d:%02d,%f,%f,%f,%f\n",
-                           gps_rcm_data.time.hours,
-                           gps_rcm_data.time.minutes,
-                           gps_rcm_data.time.seconds,
-                           minmea_tocoord(&gps_rcm_data.latitude),
-                           minmea_tocoord(&gps_rcm_data.longitude),
-                           minmea_tofloat(&gps_rcm_data.speed),
-                           0.0); 
+        "%04d-%02d-%02dT%02d:%02d:%02dZ,%f,%f,%f,%f\n",
+        gps_rcm_data.date.year + 2000,
+        gps_rcm_data.date.month,
+        gps_rcm_data.date.day,
+        gps_rcm_data.time.hours,
+        gps_rcm_data.time.minutes,
+        gps_rcm_data.time.seconds,
+        minmea_tocoord(&gps_rcm_data.latitude),
+        minmea_tocoord(&gps_rcm_data.longitude),
+        minmea_tofloat(&gps_rcm_data.speed),
+        0.0);
 
     if (written < 0 || (size_t)written >= file_line_size) {
         ESP_LOGE(TAG, "Failed to format GPS data into file line");
