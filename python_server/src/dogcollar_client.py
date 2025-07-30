@@ -4,6 +4,8 @@ import local_storage_manager
 
 HTTP_OK = 200   
 DOWNLOAD_TIMEOUT = 10 
+FILE_LIST_ENDPOINT = "/gps_files"
+
 class DogCollarClient:
     def __init__(self, esp_32_server_url):
         self.storage_manager = local_storage_manager.LocalStorageManager()
@@ -14,15 +16,33 @@ class DogCollarClient:
             response = requests.get(self.esp_32_server_url, timeout=DOWNLOAD_TIMEOUT)
             return response.status_code == HTTP_OK
         except requests.exceptions.RequestException as e:
-            print(f"Error connecting to ESP32 server: {e}")
             return False
-
+        
     def get_file_list(self):
-        response = requests.get(f"{self.esp_32_server_url}/files")
-        if response.status_code == HTTP_OK:
+        if not self.is_connected():
+            print("Cannot retrieve file list: Not connected to ESP32 server.")
+            return []
+
+        url = f"{self.esp_32_server_url}{FILE_LIST_ENDPOINT}"
+
+        try:
+            response = requests.get(url, timeout=DOWNLOAD_TIMEOUT)
+            response.raise_for_status()  # Raises HTTPError for bad responses
+        except requests.exceptions.HTTPError as e:
+            print(f"HTTP error while retrieving file list: {e.response.status_code}")
+            return []
+        except requests.exceptions.RequestException as e:
+            print(f"Network error while retrieving file list: {str(e)}")
+            return []
+        except Exception as e:
+            print(f"Unexpected error while retrieving file list: {str(e)}")
+            return []
+
+        try:
             return self.parse_file_list(response.content)
-        else:
-            raise print(f"Failed to retrieve file list: {response.status_code}")
+        except Exception as e:
+            print(f"Failed to parse file list: {str(e)}")
+            return []
 
     def parse_file_list(self, response_content):
         soup = BeautifulSoup(response_content, "html.parser")
@@ -34,11 +54,22 @@ class DogCollarClient:
         return file_names
 
     def download_file(self, file_name):
+
+        # Ensure the file name is valid
+        if not file_name or not isinstance(file_name, str):
+            print("Invalid or empty file name provided.")
+            return False
+
+        # Check if the file already exists locally
         if self.storage_manager.file_exists(file_name):
             print(f"File '{file_name}' already exists locally. Skipping download.")
             return True
 
         url = f"{self.esp_32_server_url}/download?file={file_name}"
+
+        # Check if the client is connected before attempting to download
+        if not self.is_connected():
+            return False
 
         try:
             response = requests.get(url, timeout=DOWNLOAD_TIMEOUT)
