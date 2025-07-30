@@ -5,7 +5,7 @@ class GPXConverter:
     def __init__(self):
         pass
 
-    def add_gpx_XML_declaration(self):
+    def add_gpx_xml_declaration(self):
         return '<?xml version="1.0" encoding="UTF-8"?>\n'
     
     def add_gpx_root_element(self):
