@@ -63,7 +63,7 @@ class DogCollarClient:
         # Check if the file already exists locally
         if self.storage_manager.file_exists(file_name):
             print(f"File '{file_name}' already exists locally. Skipping download.")
-            return True
+            return False
 
         url = f"{self.esp_32_server_url}/download?file={file_name}"
 
@@ -99,7 +99,8 @@ if __name__ == "__main__":
         for file_name in file_names:
 
             # 2) Download each file 
-            client.download_file(file_name)
+            if not client.download_file(file_name):
+                continue
 
             # 3) Open file
             file = client.storage_manager.get_file_locally(file_name)
