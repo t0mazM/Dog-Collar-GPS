@@ -96,10 +96,9 @@ if __name__ == "__main__":
 
     # 1) Get the list of files 
     while True:
-        # file_names = client.get_file_list()
+        file_names = client.get_file_list()
 
-        #for file_name in file_names:
-            file_name = "dog_run_3026.csv"
+        for file_name in file_names:
 
             # 2) Download each file 
             if not client.download_file(file_name):
@@ -110,9 +109,11 @@ if __name__ == "__main__":
             file = client.storage_manager.get_file_locally(file_name)
 
             # 4) Convert to gpx
-            client.GPXConverter.convert_to_gpx(file, file_name)
+            gpx_file = client.GPXConverter.convert_to_gpx(file, file_name)
 
+            # 5) Save gpx file locally
+            client.storage_manager.save_file_locally(file_name.replace('.csv', '.gpx'), gpx_file)
 
-
-            # 5)upload to strava
+            
+            # 6) Upload to Strava
             pass

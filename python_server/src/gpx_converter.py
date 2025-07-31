@@ -58,6 +58,15 @@ class GPXConverter:
 
         success, points = self.parse_csv_file(file, file_name)
 
+        if not success:
+            print(f"Failed to parse file {file_name}.")
+            return None
+        if not points:
+            print(f"No points found in file {file_name}.")
+            return None
+
+
+
         gpx_content = self.add_gpx_xml_declaration()
         gpx_content += self.add_gpx_root_element()
         gpx_content += self.add_gpx_start_trk_element(file_name)
@@ -68,5 +77,7 @@ class GPXConverter:
         
         gpx_content += self.add_gpx_end_trk_element()
         gpx_content += self.add_gpx_end_element()
+
+
         
         return gpx_content
