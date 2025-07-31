@@ -4,7 +4,7 @@ import local_storage_manager
 
 HTTP_OK = 200   
 DOWNLOAD_TIMEOUT = 10 
-FILE_LIST_ENDPOINT = "/gps_files"
+FILE_LIST_ENDPOINT = "/files"
 
 class DogCollarClient:
     def __init__(self, esp_32_server_url):
@@ -93,17 +93,18 @@ if __name__ == "__main__":
     client = DogCollarClient("http://dogcollar.local")
 
     # 1) Get the list of files 
-    file_names = client.get_file_list()
+    while True:
+        file_names = client.get_file_list()
 
-    for file_name in file_names:
+        for file_name in file_names:
 
-        # 2) Download each file 
-        client.download_file(file_name)
+            # 2) Download each file 
+            client.download_file(file_name)
 
-        # 3) Open file
-        file = client.storage_manager.get_file_locally(file_name)
+            # 3) Open file
+            file = client.storage_manager.get_file_locally(file_name)
 
-        # 4) Convert to gpx
-        # process file - convert to gpx
-        # upload to strava
-        pass
+            # 4) Convert to gpx
+            # process file - convert to gpx
+            # upload to strava
+            pass
