@@ -9,5 +9,8 @@ gpx_files/
 __pycache__/
 *.pyc
 
+strava_credentials.py
+strava_tokens.json
+
 # VS Code settings
 .vscode/
