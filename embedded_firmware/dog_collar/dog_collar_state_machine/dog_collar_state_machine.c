@@ -95,7 +95,7 @@ dog_collar_state_t battery_management_routine(dog_collar_state_t current_state) 
 
     // 4) Return correct state based on battery data:
     // a) CHARGING
-    if (battery_status_flags.charging && current_state != DOG_COLLAR_STATE_CHARGING) {
+    if (battery_data.current > 0 && current_state != DOG_COLLAR_STATE_CHARGING) {
         ESP_LOGI(TAG, "Battery is charging");
         return DOG_COLLAR_STATE_CHARGING;  // commented out for easy testing
     }
@@ -175,7 +175,7 @@ dog_collar_state_t handle_charging_state(void) {
 
     wifi_manager_reconnect(); 
 
-    if(battery_status_flags.charging == false) {
+    if(battery_data.current < 0) {
         return DOG_COLLAR_STATE_NORMAL; // If battery is not charging, go back to normal state
     }
 
