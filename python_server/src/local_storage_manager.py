@@ -1,5 +1,6 @@
 import os
 
+FILE_LIST_ENDPOINT = "/files"
 RAW_ESP32_FILES_DIR = "raw_esp32_files"
 GPX_FILES_DIR = "gpx_files"
 

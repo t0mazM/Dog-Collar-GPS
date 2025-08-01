@@ -106,5 +106,5 @@ if __name__ == "__main__":
     strava_uploader.refresh_access_token()
 
     # Example usage: Upload a GPX file
-    gpx_file_path = "gpx_files/FARTLEK_15_1min.gpx"  # Replace with your actual GPX file path
+    gpx_file_path = "gpx_files/dog_run_85.gpx"  # Replace with your actual GPX file path
     response = strava_uploader.upload_gpx_file(gpx_file_path)

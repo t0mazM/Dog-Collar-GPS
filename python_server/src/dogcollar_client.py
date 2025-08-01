@@ -1,16 +1,19 @@
 import requests
 from bs4 import BeautifulSoup
-from local_storage_manager import LocalStorageManager
+from local_storage_manager import LocalStorageManager, FILE_LIST_ENDPOINT, GPX_FILES_DIR
 from gpx_converter import GPXConverter
+from strava_uploader import StravaUploader
+import os
 
 HTTP_OK = 200   
 DOWNLOAD_TIMEOUT = 10 
-FILE_LIST_ENDPOINT = "/files"
+
 
 class DogCollarClient:
     def __init__(self, esp_32_server_url):
         self.storage_manager = LocalStorageManager()
         self.GPXConverter = GPXConverter()
+        self.strava_uploader = StravaUploader()
         self.esp_32_server_url = esp_32_server_url
 
     def is_connected(self):
@@ -59,12 +62,12 @@ class DogCollarClient:
 
         # Ensure the file name is valid
         if not file_name or not isinstance(file_name, str):
-            print("Invalid or empty file name provided.")
+            #print("Invalid or empty file name provided.")
             return False
 
         # Check if the file already exists locally
         if self.storage_manager.file_exists(file_name):
-            print(f"File '{file_name}' already exists locally. Skipping download.")
+            #print(f"File '{file_name}' already exists locally. Skipping download.")
             return False
 
         url = f"{self.esp_32_server_url}/download?file={file_name}"
@@ -102,8 +105,7 @@ if __name__ == "__main__":
 
             # 2) Download each file 
             if not client.download_file(file_name):
-                # continue commented for debugging
-                pass
+                continue # If file was already downloaded, we don't do any operations
 
             # 3) Open file
             file = client.storage_manager.get_file_locally(file_name)
@@ -112,8 +114,8 @@ if __name__ == "__main__":
             gpx_file = client.GPXConverter.convert_to_gpx(file, file_name)
 
             # 5) Save gpx file locally
-            client.storage_manager.save_file_locally(file_name.replace('.csv', '.gpx'), gpx_file)
+            gpx_file_name = file_name.replace('.csv', '.gpx')
+            client.storage_manager.save_file_locally(gpx_file_name, gpx_file)
 
-            
             # 6) Upload to Strava
-            pass
+            client.strava_uploader.upload_gpx_file(os.path.join(GPX_FILES_DIR, gpx_file_name))
