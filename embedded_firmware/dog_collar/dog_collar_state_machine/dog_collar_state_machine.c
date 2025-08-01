@@ -175,6 +175,10 @@ dog_collar_state_t handle_charging_state(void) {
 
     wifi_manager_reconnect(); 
 
+    if(battery_status_flags.charging == false) {
+        return DOG_COLLAR_STATE_NORMAL; // If battery is not charging, go back to normal state
+    }
+
     return DOG_COLLAR_STATE_CHARGING; 
 }
 
