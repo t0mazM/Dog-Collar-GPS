@@ -51,8 +51,6 @@ static void wifi_event_handler(void* arg, esp_event_base_t event_base,
             esp_wifi_connect();
             s_retry_num++;
             ESP_LOGI(TAG, "Retrying to connect to SSID:%s, attempt %d", ssid, s_retry_num);
-        } else {
-            xEventGroupSetBits(s_wifi_event_group, WIFI_FAIL_BIT);
         }
     // Connected to Wi-Fi network
     } else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP) {
