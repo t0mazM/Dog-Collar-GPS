@@ -11,7 +11,8 @@ typedef enum {
 
     DOG_COLLAR_STATE_GPS_ACQUIRING,     
     DOG_COLLAR_STATE_GPS_READY,  
-    DOG_COLLAR_STATE_GPS_FILE_CREATION,      
+    DOG_COLLAR_STATE_GPS_FILE_CREATION,
+    DOG_COLLAR_STATE_WAITING_FOR_GPS_FIX,  // We need to wait for fix to receive the data from gps to create a file and then start recording
     DOG_COLLAR_STATE_GPS_TRACKING,      
     DOG_COLLAR_STATE_GPS_PAUSED,  
     

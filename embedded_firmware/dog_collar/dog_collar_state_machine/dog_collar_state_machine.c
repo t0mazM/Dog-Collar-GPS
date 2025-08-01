@@ -36,6 +36,9 @@ dog_collar_state_t dog_collar_state_machine_run(void) {
         case DOG_COLLAR_STATE_GPS_READY:
             current_state = handle_gps_ready_state();
             break;
+        case DOG_COLLAR_STATE_WAITING_FOR_GPS_FIX:
+            current_state = handle_waiting_for_gps_fix_state();
+            break;
         case DOG_COLLAR_STATE_GPS_FILE_CREATION:
             current_state = handle_gps_file_creation_state();
             break;
@@ -226,6 +229,16 @@ dog_collar_state_t handle_gps_file_creation_state(void) {
     return DOG_COLLAR_STATE_GPS_TRACKING;
 }
 
+dog_collar_state_t handle_waiting_for_gps_fix_state(void) {
+    ESP_LOGI(TAG, "Waiting for GPS fix to create a file");
+
+    if(gps_l96_has_fix() ) {
+        return DOG_COLLAR_STATE_GPS_TRACKING;
+    }
+
+    return DOG_COLLAR_STATE_WAITING_FOR_GPS_FIX; // Loop back to WAITING_FOR_GPS_FIX
+}
+
 dog_collar_state_t handle_gps_tracking_state(void) {
 
     ESP_LOGI(TAG, "Tracking GPS");
@@ -354,6 +367,8 @@ static char *get_current_state_string(dog_collar_state_t state) {
             return "GPS_READY";
         case DOG_COLLAR_STATE_GPS_FILE_CREATION:
             return "GPS_FILE_CREATION";
+        case DOG_COLLAR_STATE_WAITING_FOR_GPS_FIX:
+            return "WAITING_FOR_GPS_FIX";
         case DOG_COLLAR_STATE_GPS_TRACKING:
             return "GPS_TRACKING";
         case DOG_COLLAR_STATE_GPS_PAUSED:
