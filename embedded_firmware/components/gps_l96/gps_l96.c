@@ -43,7 +43,7 @@ esp_err_t gps_l96_go_to_standby_mode(void) {
 
 esp_err_t gps_l96_start_recording(void) {
 
-    gpio_reset_gps();
+    //gpio_reset_gps();
     gps_force_on_set(true); //Crucial to set it to HIGH
 
     
@@ -67,7 +67,7 @@ esp_err_t gps_l96_start_recording(void) {
 
 esp_err_t gps_l96_go_to_back_up_mode(void) { // same as deep sleep mode
     gps_force_on_set(false); 
-    //note: we can't check if if was send succesfull becouse gps modeule goes into deep sleep and it does not respond to any commands
+    //note: we can't check if if was send succesfull because gps modeule goes into deep sleep and it does not respond to any commands
     gps_l96_send_command(GPS_DEEP_SLEEP_MODE); 
     
     return ESP_OK;

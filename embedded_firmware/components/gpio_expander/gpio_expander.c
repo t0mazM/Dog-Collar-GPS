@@ -68,6 +68,14 @@ esp_err_t gpio_read_inputs(uint8_t *input_state) {
     return ESP_OK;
 }
 
+/**
+ * Set the FORCE_ON pin state for the GPS module.
+ * FORCE_ON pin is used to wake up the GPS module from deep sleep mode/backup mode.
+ * It is good practice to set it to high before sending any commands to the GPS module.
+ * 
+ * @param enable true to set FORCE_ON pin high, false to set it low.
+ * @return ESP_OK on success, or an error code on failure.
+ */
 esp_err_t gps_force_on_set(bool enable){
     //Calculcate the new state
     uint8_t new_state = enable
