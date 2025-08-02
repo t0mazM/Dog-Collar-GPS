@@ -1,13 +1,16 @@
+/*
+ * Copyright © 2025 Tomaz Miklavcic
+ *
+ * Use this code for whatever you want. No restrictions, no warranty.
+ * Attribution appreciated but not required.
+ */
+
 #ifndef COMPONENTS_INIT_H
 #define COMPONENTS_INIT_H
 
-/* Includes from standard libraries */
+
 #include <stdbool.h>
-
-/* Includes from ESP-IDF */
 #include "esp_err.h"
-
-/* Includes from dog collar components */
 #include "../components/battery_monitor/battery_monitor.h"
 #include "../components/external_flash/ext_flash.h"
 #include "../components/file_system_littlefs/file_system_littlefs.h"

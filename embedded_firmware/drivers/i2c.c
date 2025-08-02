@@ -1,3 +1,10 @@
+/*
+ * Copyright © 2025 Tomaz Miklavcic
+ *
+ * Use this code for whatever you want. No restrictions, no warranty.
+ * Attribution appreciated but not required.
+ */
+
 #include "i2c.h"
 
 SemaphoreHandle_t i2c_mutex = NULL; // Mutex for I2C operations, to prevent simultaneous access by multiple tasks

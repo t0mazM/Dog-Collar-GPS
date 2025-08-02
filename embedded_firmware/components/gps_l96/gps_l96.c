@@ -1,3 +1,10 @@
+/*
+ * Copyright © 2025 Tomaz Miklavcic
+ *
+ * Use this code for whatever you want. No restrictions, no warranty.
+ * Attribution appreciated but not required.
+ */
+
 #include "gps_l96.h"
 
 static const char *TAG = "GPS_L96";

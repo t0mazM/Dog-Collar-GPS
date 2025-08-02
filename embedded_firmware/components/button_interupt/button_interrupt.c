@@ -1,3 +1,11 @@
+/*
+ * Copyright © 2025 Tomaz Miklavcic
+ *
+ * Use this code for whatever you want. No restrictions, no warranty.
+ * Attribution appreciated but not required.
+ */
+
+
 #include "button_interrupt.h"
 
 
