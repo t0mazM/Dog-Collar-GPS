@@ -12,8 +12,6 @@ static char gps_file_name[LFS_MAX_FILE_NAME_SIZE] = {0};
 dog_collar_state_t dog_collar_state_machine_run(void) {
 
 
-    printf("Current state: %s\n", get_current_state_string(current_state));
-
     switch (current_state) {
         case DOG_COLLAR_STATE_INITIALIZING:
             current_state = handle_initializing_state();
@@ -65,6 +63,8 @@ dog_collar_state_t dog_collar_state_machine_run(void) {
             current_state = DOG_COLLAR_STATE_ERROR;
     }
 
+
+    current_state = get_initial_state_from_wakeup(current_state);
     current_state = battery_management_routine(current_state);
     led_management_set_pattern(current_state);
 
@@ -122,12 +122,11 @@ dog_collar_state_t handle_initializing_state(void) {
 
     esp_err_t init_result = dog_collar_components_init();
 
-    if (init_result == ESP_OK) {
-        return DOG_COLLAR_STATE_NORMAL;
-    } else {
-        /* We can check the specific component that failed in global struct collar_init_state */
-        return DOG_COLLAR_STATE_ERROR; 
+    if (init_result != ESP_OK) {
+        return DOG_COLLAR_STATE_ERROR;
     }
+
+    return DOG_COLLAR_STATE_NORMAL; 
 }
 
 dog_collar_state_t handle_normal_state(void) {
@@ -341,6 +340,16 @@ dog_collar_state_t handle_deep_sleep_state(void) {
 dog_collar_state_t handle_error_state(void) {
 
     return DOG_COLLAR_STATE_INITIALIZING;
+}
+
+dog_collar_state_t get_initial_state_from_wakeup(dog_collar_state_t input_state) {
+    /* If the device was woken up from deep sleep by a GPIO interrupt, go to GPS_ACQUIRING state */
+    esp_sleep_wakeup_cause_t wakeup_reason = esp_sleep_get_wakeup_cause();
+    if (wakeup_reason == ESP_SLEEP_WAKEUP_GPIO) {
+        return DOG_COLLAR_STATE_GPS_ACQUIRING;
+    }
+    return input_state;
+
 }
 
 static char *get_current_state_string(dog_collar_state_t state) {

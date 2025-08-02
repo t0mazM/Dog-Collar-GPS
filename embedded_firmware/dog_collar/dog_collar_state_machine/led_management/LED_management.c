@@ -27,7 +27,6 @@ static void gps_paused_led_pattern();
 static void wifi_sync_led_pattern();
 static void error_led_pattern();
 
-static void error_led_pattern();
 
 
 void led_management_set_pattern(dog_collar_state_t state) {

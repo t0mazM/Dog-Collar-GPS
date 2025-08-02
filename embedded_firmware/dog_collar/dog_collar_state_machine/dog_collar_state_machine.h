@@ -217,6 +217,15 @@ dog_collar_state_t  handle_deep_sleep_state(void);
 dog_collar_state_t handle_error_state(void);
 
 
+/**
+ * @brief Check if the device was woken up from sleep and return the GPS_ACQUIRING state if it was.
+ *
+ *
+ * @param input_state The current state.
+ * @return GPS_ACQUIRING if woken up by GPIO, otherwise returns the input state.
+ */
+dog_collar_state_t get_initial_state_from_wakeup(dog_collar_state_t input_state);
+
 
 
 #endif // DOG_COLLAR_STATE_MACHINE_H
