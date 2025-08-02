@@ -49,8 +49,8 @@ typedef enum {
 
 #define LIGHT_SLEEP_MAX_COUNT 2        // After LIGHT_SLEEP_MAX_COUNT light sleeps, we will go for longer deep sleep.
 
-#define LIGHT_SLEEP_TIME_S 5
-#define DEEP_SLEEP_TIME_S 5
+#define LIGHT_SLEEP_TIME_S 15
+#define DEEP_SLEEP_TIME_S 15
 
 #define WAIT_AFTER_USER_PRESS_MS 500    // Wait after user press in milliseconds
 

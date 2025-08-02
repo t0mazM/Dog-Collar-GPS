@@ -12,7 +12,7 @@
 #include "../components/gpio_expander/gpio_expander.h"
 
 
-#define BUTTON_GPIO         9    
+#define BUTTON_GPIO         2    
 #define DEBOUNCE_TIME_MS    50
 #define LONG_PRESS_TIME_MS  1000
 

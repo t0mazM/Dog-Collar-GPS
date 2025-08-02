@@ -301,6 +301,8 @@ dog_collar_state_t  handle_light_sleep_state(void) {
     * (e.g., after several failed attempts to sync or no user activity),
     * escalate to deep sleep to save more power.
     */
+
+    return DOG_COLLAR_STATE_DEEP_SLEEP;
     static uint8_t consecutive_light_sleeps = 0;
     if(consecutive_light_sleeps > LIGHT_SLEEP_MAX_COUNT) {
         consecutive_light_sleeps = 0; 
@@ -311,8 +313,8 @@ dog_collar_state_t  handle_light_sleep_state(void) {
     gps_l96_go_to_back_up_mode();
 
     /* Use this with a RTC capable button GPIO0-5 */
-    //esp_sleep_enable_gpio_wakeup();
-    //gpio_wakeup_enable(BUTTON_GPIO, GPIO_INTR_LOW_LEVEL); 
+    esp_sleep_enable_gpio_wakeup();
+    gpio_wakeup_enable(BUTTON_GPIO, GPIO_INTR_LOW_LEVEL); 
 
     esp_sleep_enable_timer_wakeup((uint64_t)LIGHT_SLEEP_TIME_S * 1000000); 
     esp_sleep_enable_uart_wakeup(UART_PORT_NUM);          // Wake on UART activity TODO:test this with sleep while gps is tracking
@@ -328,18 +330,19 @@ dog_collar_state_t  handle_light_sleep_state(void) {
     //vTaskDelay(pdMS_TO_TICKS(sleep_time_us / 1000)); // Simulate light sleep with delay
 }
 
-dog_collar_state_t  handle_deep_sleep_state(void) {
+dog_collar_state_t handle_deep_sleep_state(void) {
     gpio_turn_off_leds(LED_RED | LED_YELLOW | LED_GREEN);
     gps_l96_go_to_back_up_mode();
 
-    /* Use this with a RTC capable button GPIO0-5 */
-    //esp_sleep_enable_gpio_wakeup();
-    //gpio_wakeup_enable(BUTTON_GPIO, GPIO_INTR_LOW_LEVEL); 
+    // Configure RTC GPIO wakeup before entering deep sleep
+    esp_deep_sleep_enable_gpio_wakeup(1ULL << BUTTON_GPIO, ESP_GPIO_WAKEUP_GPIO_LOW);
 
+    // Optional: timer wakeup for periodic wake-ups
     esp_sleep_enable_timer_wakeup((uint64_t)DEEP_SLEEP_TIME_S * 1000000);
+
     esp_deep_sleep_start();
 
-    return DOG_COLLAR_STATE_NORMAL; // Code won't reach this point, ESP32 will restart completly
+    return DOG_COLLAR_STATE_NORMAL; // Never reached
 }
 
 dog_collar_state_t handle_error_state(void) {
