@@ -66,6 +66,9 @@ void led_task(void *pvParameters) {
             case DOG_COLLAR_STATE_GPS_FILE_CREATION:
                 gps_file_creation_led_pattern();
                 break;
+            case DOG_COLLAR_STATE_WAITING_FOR_GPS_FIX:
+                gps_waiting_for_fix_led_pattern();
+                break;
             case DOG_COLLAR_STATE_GPS_TRACKING:
                 gps_tracking_led_pattern();
                 break;

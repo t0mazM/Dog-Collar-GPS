@@ -175,6 +175,9 @@ dog_collar_state_t handle_gps_file_creation_state(void);
  *
  * @return dog_collar_state_t gps_paused state if button is pressed, gps_tracking state if no button press.
  */
+
+dog_collar_state_t handle_waiting_for_gps_fix_state(void);
+
 dog_collar_state_t handle_gps_tracking_state(void);
 
 /**
