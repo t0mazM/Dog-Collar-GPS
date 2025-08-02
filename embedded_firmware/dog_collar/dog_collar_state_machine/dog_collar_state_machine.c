@@ -206,7 +206,6 @@ dog_collar_state_t handle_gps_acquiring_state(void) {
 }
 
 dog_collar_state_t handle_gps_ready_state(void) {
-    ESP_LOGI(TAG, "GPS is ready. Waiting for user input");
     
     if (is_button_short_pressed()) { 
         return DOG_COLLAR_STATE_GPS_FILE_CREATION; // go and create a GPS file
@@ -230,10 +229,9 @@ dog_collar_state_t handle_gps_file_creation_state(void) {
 }
 
 dog_collar_state_t handle_waiting_for_gps_fix_state(void) {
-    ESP_LOGI(TAG, "Waiting for GPS fix to create a file");
 
     if(gps_l96_has_fix() ) {
-        return DOG_COLLAR_STATE_GPS_TRACKING;
+        return DOG_COLLAR_STATE_GPS_FILE_CREATION;
     }
 
     return DOG_COLLAR_STATE_WAITING_FOR_GPS_FIX; // Loop back to WAITING_FOR_GPS_FIX
