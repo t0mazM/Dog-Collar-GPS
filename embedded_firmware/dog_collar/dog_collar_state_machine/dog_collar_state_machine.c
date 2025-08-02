@@ -302,7 +302,6 @@ dog_collar_state_t  handle_light_sleep_state(void) {
     * escalate to deep sleep to save more power.
     */
 
-    return DOG_COLLAR_STATE_DEEP_SLEEP;
     static uint8_t consecutive_light_sleeps = 0;
     if(consecutive_light_sleeps > LIGHT_SLEEP_MAX_COUNT) {
         consecutive_light_sleeps = 0; 
@@ -318,13 +317,6 @@ dog_collar_state_t  handle_light_sleep_state(void) {
     esp_light_sleep_start();
 
     consecutive_light_sleeps++; 
-
-    gpio_turn_on_leds(LED_GREEN); // Indicate that we woke up from light sleep
-    vTaskDelay(pdMS_TO_TICKS(1000)); // Wait for a second to indicate that we woke up
-    gpio_turn_on_leds(LED_YELLOW); // Indicate that we woke up from light sleep
-    vTaskDelay(pdMS_TO_TICKS(1000)); // Wait for a second to indicate that we woke up
-    gpio_turn_on_leds(LED_RED); // Indicate that we woke up from light sleep
-    vTaskDelay(pdMS_TO_TICKS(1000)); // Wait for a second to indicate that we woke up
 
     return DOG_COLLAR_STATE_NORMAL;
     /* The light sleep functionality is currently disabled as after 
