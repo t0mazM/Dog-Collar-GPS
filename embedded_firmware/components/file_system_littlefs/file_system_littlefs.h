@@ -3,7 +3,8 @@
 
 
 #include "../../drivers/littlefs/lfs.h"    
-#include "external_flash/ext_flash.h"    
+#include "external_flash/ext_flash.h" 
+#include "../gps_l96/gps_l96.h" 
 #include "esp_err.h" 
 #include "esp_check.h"
 #include "esp_log.h"

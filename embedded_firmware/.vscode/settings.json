@@ -1,5 +1,7 @@
 {
     "files.associations": {
-        "esp_timer.h": "c"
+        "esp_timer.h": "c",
+        "gps_l96.h": "c",
+        "minmea.h": "c"
     }
 }

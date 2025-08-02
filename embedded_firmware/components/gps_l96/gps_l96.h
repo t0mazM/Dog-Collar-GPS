@@ -142,4 +142,15 @@ esp_err_t gps_l96_format_csv_line_from_data(char *file_line, size_t file_line_si
  */
 bool gps_l96_has_fix(void);
 
+/**
+ * @brief Gets the date string from the GPS data.
+ *
+ * This function formats the date from the global struct gps_rcm_data into a string in the format "YYYY-MM-DD".
+ *
+ * @param date_string Pointer to the buffer where the formatted date string will be stored.
+ * @param date_string_size Size of the buffer.
+ * @return ESP_OK on success, or an error code if formatting fails.
+ */
+esp_err_t gps_l96_get_date_string_from_data(char *date_string, size_t date_string_size);
+
 #endif // GPS_L96_H

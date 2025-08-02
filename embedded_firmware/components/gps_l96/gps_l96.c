@@ -203,3 +203,18 @@ esp_err_t gps_l96_format_csv_line_from_data(char *file_line, size_t file_line_si
 bool gps_l96_has_fix(void) {
     return gps_rcm_data.valid;
 }
+
+esp_err_t gps_l96_get_date_string_from_data(char *date_string, size_t date_string_size) {
+
+    int written = snprintf(date_string, date_string_size, "%04d-%02d-%02d",
+                           gps_rcm_data.date.year,
+                           gps_rcm_data.date.month,
+                           gps_rcm_data.date.day);
+
+    if (written < 0 || (size_t)written >= date_string_size) {
+        ESP_LOGE(TAG, "Failed to format date string");
+        return ESP_ERR_NO_MEM;
+    }
+
+    return ESP_OK;
+}

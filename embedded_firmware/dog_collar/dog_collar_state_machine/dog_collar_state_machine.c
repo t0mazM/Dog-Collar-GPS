@@ -189,7 +189,7 @@ dog_collar_state_t handle_gps_acquiring_state(void) {
     ESP_LOGI(TAG, "Waiting for GPS fix or user input");
 
     if (is_button_short_pressed()) { 
-        return DOG_COLLAR_STATE_GPS_FILE_CREATION; // go and create a GPS file
+        return DOG_COLLAR_STATE_WAITING_FOR_GPS_FIX; 
     }
     if (is_button_long_pressed()) {
         return DOG_COLLAR_STATE_NORMAL;            // go back to normal state

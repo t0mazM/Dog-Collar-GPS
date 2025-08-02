@@ -358,18 +358,23 @@ esp_err_t wifi_get_file_list_as_html(char *buffer, size_t buffer_size) {
 
 static esp_err_t lfs_create_new_file_name(const char* prefix, const char* suffix, char* filename, size_t filename_size) {
 
-    //Time from with the eps32 system started (in seconds)
-    // TODO: get current date from gps module. Save it somwhere in flash
-    time_t current_time = time(NULL);
-    // Format: prefix + current_time(for randomness) + suffix (.csv)
-    int err = snprintf(filename, filename_size, "%s_%lu%s", prefix, (unsigned long)current_time, suffix);
-    
+
+    char current_date[128];
+
+    ESP_RETURN_ON_ERROR(
+        gps_l96_get_date_string_from_data(current_date, sizeof(current_date)),
+        LFS_TAG,
+        "Failed to get current date string for filename creation"
+    );
+
+    // Format: prefix + current_date + suffix (.csv)
+    int err = snprintf(filename, filename_size, "%s_%s%s", prefix, current_date, suffix);
+
     // snprintf returns the number of characters written, or a negative value on error
     if(err < 0) {
         ESP_LOGE(LFS_TAG, "Failed to create new file name");
         return ESP_FAIL;
     }
-    ESP_LOGI(LFS_TAG, "Generated filename: '%s' , from prefix: %s , current time: %lu , suffix: %s ", filename, prefix, (unsigned long)current_time, suffix);
     return ESP_OK;
 }
 
