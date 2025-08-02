@@ -47,10 +47,11 @@ static void wifi_event_handler(void* arg, esp_event_base_t event_base,
         esp_wifi_connect();
     // Failed to connect to Wi-Fi network
     } else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_DISCONNECTED) {
-        if (s_retry_num < WIFI_RECONNECT_RETRIES_NUM) { 
+        if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_DISCONNECTED) {
             esp_wifi_connect();
             s_retry_num++;
             ESP_LOGI(TAG, "Retrying to connect to SSID:%s, attempt %d", ssid, s_retry_num);
+            // Do not set WIFI_FAIL_BIT, so it never gives up
         }
     // Connected to Wi-Fi network
     } else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP) {
@@ -239,7 +240,6 @@ return error;
 }
 
 esp_err_t wifi_manager_reconnect(void) {
-    ESP_LOGI(TAG, "Reconnecting to WiFi...");
 
     if(wifi_manager_is_initialized_and_connected()){
         return ESP_OK;
