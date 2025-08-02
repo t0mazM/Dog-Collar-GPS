@@ -145,9 +145,9 @@ static void gps_file_creation_led_pattern() {
 
 static void gps_waiting_for_fix_led_pattern() {
     gpio_turn_on_leds(LED_YELLOW | LED_GREEN);
-    vTaskDelay(pdMS_TO_TICKS(500));
+    vTaskDelay(pdMS_TO_TICKS(100));
     gpio_turn_off_leds(LED_YELLOW | LED_GREEN);
-    vTaskDelay(pdMS_TO_TICKS(500));
+    vTaskDelay(pdMS_TO_TICKS(100));
 }
 
 static void gps_tracking_led_pattern() {
