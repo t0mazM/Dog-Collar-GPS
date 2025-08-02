@@ -84,7 +84,7 @@ void led_task(void *pvParameters) {
                 ESP_LOGE("LED_TASK", "Unknown state: %d", led_current_state);
         }
   
-        vTaskDelay(pdMS_TO_TICKS(50)); // Delay to prevent I2C from being blocked all the time by the led task
+        vTaskDelay(pdMS_TO_TICKS(200)); // Delay to prevent I2C from being blocked all the time by the led task
     }
 }
 

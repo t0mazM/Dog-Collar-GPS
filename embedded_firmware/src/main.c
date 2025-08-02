@@ -21,13 +21,10 @@
 
 void app_main() {
 
-    vTaskDelay(pdMS_TO_TICKS(5000)); 
-
+    /* Create FreeRTOS tasks */
+    xTaskCreate(state_machine_task, "state_machine_task", 4096, NULL, 1, NULL);
     xTaskCreate(led_task, "led_task", 2048, NULL, 2, NULL);
-    while(true) {
-        dog_collar_state_machine_run();
-    }
 
-
-
+    /* Delete the main task */
+    vTaskDelete(NULL);
 }

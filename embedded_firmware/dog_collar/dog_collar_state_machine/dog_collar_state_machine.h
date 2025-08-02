@@ -54,6 +54,10 @@ typedef enum {
 
 #define WAIT_AFTER_USER_PRESS_MS 500    // Wait after user press in milliseconds
 
+/**
+ * @brief Task for freeRTOS that runs the dog collar state machine.
+ */
+void state_machine_task(void *pvParameters);
 
 dog_collar_state_t dog_collar_state_machine_run(void);
 

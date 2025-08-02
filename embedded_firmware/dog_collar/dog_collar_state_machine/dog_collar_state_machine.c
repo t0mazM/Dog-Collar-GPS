@@ -9,6 +9,13 @@ static const char *TAG = "DOG_COLLAR_STATE_MACHINE";
 static dog_collar_state_t current_state = DOG_COLLAR_STATE_INITIALIZING;
 static char gps_file_name[LFS_MAX_FILE_NAME_SIZE] = {0};
 
+void state_machine_task(void *pvParameters) {
+    while (true) {
+        dog_collar_state_machine_run();
+        vTaskDelay(pdMS_TO_TICKS(100));  
+    }
+}
+
 dog_collar_state_t dog_collar_state_machine_run(void) {
 
     switch (current_state) {
@@ -62,7 +69,7 @@ dog_collar_state_t dog_collar_state_machine_run(void) {
             current_state = DOG_COLLAR_STATE_ERROR;
     }
 
-
+    printf("Current state: %s\n", get_current_state_string(current_state));
     current_state = get_initial_state_from_wakeup(current_state);
     current_state = battery_management_routine(current_state);
     led_management_set_pattern(current_state);
