@@ -2,6 +2,9 @@
     "files.associations": {
         "esp_timer.h": "c",
         "gps_l96.h": "c",
-        "minmea.h": "c"
+        "minmea.h": "c",
+        "button_interrupt.h": "c",
+        "gpio_expander.h": "c",
+        "esp_log.h": "c"
     }
 }
