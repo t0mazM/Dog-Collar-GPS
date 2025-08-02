@@ -26,8 +26,8 @@
     do { \
         if ((err) != ESP_OK) { \
             ESP_LOGE(tag, "%s: %s", msg, esp_err_to_name(err));\
-            i2c_cmd_link_delete(cmd); \ 
-            xSemaphoreGive(i2c_mutex); \ 
+            i2c_cmd_link_delete(cmd);\
+            xSemaphoreGive(i2c_mutex);\
             return err; \
         } \
     } while (0)

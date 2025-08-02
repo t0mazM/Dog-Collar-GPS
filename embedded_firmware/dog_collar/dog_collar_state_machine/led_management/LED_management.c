@@ -5,8 +5,7 @@ This module is responsible for managing the LEDS
 So the blinking and other visual indications will be handled here.
 
 TODO: 
-- Implement LED blinking for difrent states:
-- Implement LED pattern for charging
+ Make the led patterns non-blocking, so the led task can run in parallel with the state machine task
 */
 
 static const char *TAG = "LED_MANAGEMENT";
@@ -82,9 +81,11 @@ void led_task(void *pvParameters) {
                 break;
             default:
                 ESP_LOGE("LED_TASK", "Unknown state: %d", led_current_state);
+                vTaskDelay(pdMS_TO_TICKS(1000)); 
+                break;
         }
   
-        vTaskDelay(pdMS_TO_TICKS(200)); // Delay to prevent I2C from being blocked all the time by the led task
+        vTaskDelay(pdMS_TO_TICKS(50)); // Delay to prevent I2C from being blocked all the time by the led task
     }
 }
 
