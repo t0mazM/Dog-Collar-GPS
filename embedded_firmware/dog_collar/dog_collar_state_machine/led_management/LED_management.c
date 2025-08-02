@@ -92,7 +92,7 @@ void led_task(void *pvParameters) {
 static void initializing_led_pattern() {
     gpio_turn_on_leds(LED_YELLOW);
     vTaskDelay(pdMS_TO_TICKS(100));
-    gpio_turn_off_leds(LED_YELLOW);
+    gpio_turn_off_leds(LED_YELLOW | LED_RED | LED_GREEN);
     vTaskDelay(pdMS_TO_TICKS(100));
 }
 
@@ -107,17 +107,15 @@ static void normal_led_pattern() {
 static void low_battery_led_pattern() {
     gpio_turn_on_leds(LED_YELLOW);
     vTaskDelay(pdMS_TO_TICKS(2000));
-    gpio_turn_off_leds(LED_YELLOW);
+    gpio_turn_off_leds(LED_YELLOW | LED_RED | LED_GREEN);
     vTaskDelay(pdMS_TO_TICKS(1000));
 }
 
 static void critical_low_battery_led_pattern() {
-    gpio_turn_on_leds(LED_YELLOW);
     gpio_turn_on_leds(LED_RED);
-    vTaskDelay(pdMS_TO_TICKS(500));
-    gpio_turn_off_leds(LED_RED);
-    gpio_turn_on_leds(LED_YELLOW);
-    vTaskDelay(pdMS_TO_TICKS(500));
+    vTaskDelay(pdMS_TO_TICKS(100));
+    gpio_turn_off_leds(LED_RED | LED_YELLOW | LED_GREEN);
+    vTaskDelay(pdMS_TO_TICKS(2000));
 }
 static void charging_led_pattern() {
     gpio_turn_on_leds(LED_GREEN | LED_YELLOW | LED_RED);
@@ -127,48 +125,48 @@ static void charging_led_pattern() {
 static void gps_acquiring_led_pattern() {
     gpio_turn_on_leds(LED_YELLOW);
     vTaskDelay(pdMS_TO_TICKS(500));
-    gpio_turn_off_leds(LED_YELLOW);
+    gpio_turn_off_leds(LED_YELLOW | LED_RED | LED_GREEN);
 }
 
 static void gps_ready_led_pattern() {
     gpio_turn_on_leds(LED_GREEN);
-    gpio_turn_off_leds(LED_YELLOW);
+    gpio_turn_off_leds(LED_YELLOW | LED_RED | LED_GREEN);
     vTaskDelay(pdMS_TO_TICKS(100));
 }
 
 static void gps_file_creation_led_pattern() {
     gpio_turn_on_leds(LED_YELLOW);
     vTaskDelay(pdMS_TO_TICKS(100));
-    gpio_turn_off_leds(LED_YELLOW);
+    gpio_turn_off_leds(LED_YELLOW | LED_RED | LED_GREEN);
     vTaskDelay(pdMS_TO_TICKS(100));
 }
 
 static void gps_waiting_for_fix_led_pattern() {
     gpio_turn_on_leds(LED_YELLOW | LED_GREEN);
     vTaskDelay(pdMS_TO_TICKS(100));
-    gpio_turn_off_leds(LED_YELLOW | LED_GREEN);
+    gpio_turn_off_leds(LED_YELLOW | LED_GREEN | LED_RED);
     vTaskDelay(pdMS_TO_TICKS(100));
 }
 
 static void gps_tracking_led_pattern() {
     gpio_turn_on_leds(LED_GREEN);
     vTaskDelay(pdMS_TO_TICKS(100));
-    gpio_turn_off_leds(LED_GREEN);
+    gpio_turn_off_leds(LED_GREEN | LED_YELLOW | LED_RED);
     vTaskDelay(pdMS_TO_TICKS(500));
 }
 
 static void gps_paused_led_pattern() {
     gpio_turn_on_leds(LED_YELLOW);
     vTaskDelay(pdMS_TO_TICKS(2000));
-    gpio_turn_off_leds(LED_YELLOW);
+    gpio_turn_off_leds(LED_YELLOW | LED_RED | LED_GREEN);
     vTaskDelay(pdMS_TO_TICKS(1000));
 }
 
 static void wifi_sync_led_pattern() {
     gpio_turn_on_leds(LED_GREEN);
-    gpio_turn_off_leds(LED_YELLOW);
+    gpio_turn_off_leds(LED_YELLOW | LED_RED | LED_GREEN);
     vTaskDelay(pdMS_TO_TICKS(100));
-    gpio_turn_off_leds(LED_GREEN);
+    gpio_turn_off_leds(LED_GREEN | LED_YELLOW | LED_RED);
     gpio_turn_on_leds(LED_YELLOW);
     vTaskDelay(pdMS_TO_TICKS(100));
 }
@@ -176,6 +174,6 @@ static void wifi_sync_led_pattern() {
 static void error_led_pattern() {
     gpio_turn_on_leds(LED_RED);
     vTaskDelay(pdMS_TO_TICKS(500));
-    gpio_turn_off_leds(LED_RED);
+    gpio_turn_off_leds(LED_RED | LED_YELLOW | LED_GREEN);
     vTaskDelay(pdMS_TO_TICKS(500));
 }
