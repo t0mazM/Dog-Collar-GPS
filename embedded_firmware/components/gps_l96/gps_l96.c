@@ -142,6 +142,7 @@ esp_err_t gps_l96_extract_data_from_nmea_sentence(const char *nmea_sentence) {
     switch(nmea_id) {
         case MINMEA_SENTENCE_RMC:
             minmea_parse_rmc(&gps_rcm_data, nmea_sentence);
+            gps_rcm_data.date.year += 2000; // by default GPS module returns year as 0-99, so we add 2000 for correct year
             gps_l96_print_data();
             break;
         case MINMEA_SENTENCE_VTG:
@@ -161,7 +162,7 @@ void gps_l96_print_data(void){ // a DEBUG function to print GPS data
             printf("Latitude: %f\n", minmea_tocoord(&gps_rcm_data.latitude));
             printf("Longitude: %f\n", minmea_tocoord(&gps_rcm_data.longitude));
             printf("Speed (knots): %f\n", minmea_tofloat(&gps_rcm_data.speed));
-            printf("Date: %02d/%02d/%04d\n", gps_rcm_data.date.day, gps_rcm_data.date.month, gps_rcm_data.date.year + 2000);
+            printf("Date: %02d/%02d/%04d\n", gps_rcm_data.date.day, gps_rcm_data.date.month, gps_rcm_data.date.year);
 
 }
 
@@ -181,7 +182,7 @@ esp_err_t gps_l96_format_csv_line_from_data(char *file_line, size_t file_line_si
     // Format: ISO 8601 timestamp,latitude,longitude,altitude,speed
     int written = snprintf(file_line, file_line_size,
         "%04d-%02d-%02dT%02d:%02d:%02dZ,%f,%f,%f,%f\n",
-        gps_rcm_data.date.year + 2000,
+        gps_rcm_data.date.year,
         gps_rcm_data.date.month,
         gps_rcm_data.date.day,
         gps_rcm_data.time.hours,
