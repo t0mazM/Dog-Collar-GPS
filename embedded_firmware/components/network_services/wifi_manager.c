@@ -41,28 +41,31 @@ esp_err_t wifi_init(void) {
  * Handles connection, disconnection, and IP acquisition.
  */
 static void wifi_event_handler(void* arg, esp_event_base_t event_base,
-                          int32_t event_id, void* event_data) {
-    
-    if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_START) {
-        esp_wifi_connect();
-    // Failed to connect to Wi-Fi network
-    } else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_DISCONNECTED) {
-        if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_DISCONNECTED) {
-            esp_wifi_connect();
-            s_retry_num++;
-            ESP_LOGI(TAG, "Retrying to connect to SSID:%s, attempt %d", ssid, s_retry_num);
-            // Do not set WIFI_FAIL_BIT, so it never gives up
+                               int32_t event_id, void* event_data) {
+    if (event_base == WIFI_EVENT) {
+        switch (event_id) {
+            case WIFI_EVENT_STA_START:
+                esp_wifi_connect();
+                break;
+
+            case WIFI_EVENT_STA_DISCONNECTED:
+                esp_wifi_connect();
+                s_retry_num++;
+                ESP_LOGI(TAG, "Retrying to connect to SSID:%s, attempt %d", ssid, s_retry_num);
+                break;
+
+            default:
+                break;
         }
-    // Connected to Wi-Fi network
     } else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP) {
         ip_event_got_ip_t* event = (ip_event_got_ip_t*) event_data;
         ESP_LOGI(TAG, "Got IP address: " IPSTR, IP2STR(&event->ip_info.ip));
         s_retry_num = 0;
         xEventGroupSetBits(s_wifi_event_group, WIFI_CONNECTED_BIT);
 
-
-        mdns_service_start(); //TODO: HANDLE ERRORS
-        http_server_start();  //TODO: HANDLE ERRORS
+        
+        mdns_service_start(); 
+        http_server_start();  
     }
 }
 
