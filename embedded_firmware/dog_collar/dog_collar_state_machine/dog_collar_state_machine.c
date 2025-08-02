@@ -11,7 +11,6 @@ static char gps_file_name[LFS_MAX_FILE_NAME_SIZE] = {0};
 
 dog_collar_state_t dog_collar_state_machine_run(void) {
 
-
     switch (current_state) {
         case DOG_COLLAR_STATE_INITIALIZING:
             current_state = handle_initializing_state();
