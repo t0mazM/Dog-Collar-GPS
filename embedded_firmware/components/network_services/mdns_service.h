@@ -12,7 +12,12 @@
 
 #define MDNS_HOST_NAME "dogcollar" 
 
-
+/** Start the mDNS service.
+ *
+ * This function initializes and starts the mDNS service.
+ *
+ * @return ESP_OK on success, or an error code on failure.
+ */
 esp_err_t mdns_service_start(void);
 
 

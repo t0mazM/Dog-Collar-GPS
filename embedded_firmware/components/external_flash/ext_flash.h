@@ -120,8 +120,40 @@ esp_err_t ext_flash_wait_for_idle(int timeout_ms);
  * @param size Number of bytes to read.
  * @return ESP_OK on success, or an error code on failure.
  */
+
+ /* --------------------------Functions for littlefs integration ---------------------------*/
+ /**
+  * @brief Read data from the external flash chip.
+  * This function reads a specified number of bytes from the external flash chip starting at a given address.
+  * @param address The starting address to read from.
+  * @param buffer Pointer to the buffer where the read data will be stored.
+  * @param size Number of bytes to read.
+  * @return ESP_OK on success, or an error code on failure.
+  */
 esp_err_t ext_flash_read(uint32_t address, uint8_t *buffer, uint32_t size);
+
+/**
+ * @brief Write data to the external flash chip.
+ * 
+ * This function writes a specified number of bytes to the external flash chip starting at a given address.
+ * @note size must be less than or equal to the page size (256 bytes for W25Q128JV).
+ * 
+ * @param address The starting address to write to.
+ * @param buffer Pointer to the buffer containing the data to write.
+ * @param size Number of bytes to write (must be <= 256).
+ * @return ESP_OK on success, or an error code on failure.
+ */
 esp_err_t ext_flash_write(uint32_t address, const uint8_t *buffer, uint32_t size);
+
+/**
+ * @brief Erase a sector of the external flash chip.
+ * 
+ * This function erases a 4KB sector of the external flash chip at the specified address.
+ * The address must be aligned to a 4KB boundary.
+ * 
+ * @param address The starting address of the sector to erase (must be sector-aligned).
+ * @return ESP_OK on success, or an error code on failure.
+ */
 esp_err_t ext_flash_erase_sector(uint32_t address);
 esp_err_t ext_flash_chip_erase(void);
 esp_err_t ext_flash_global_block_unlock(void);

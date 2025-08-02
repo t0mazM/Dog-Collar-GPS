@@ -165,6 +165,17 @@ dog_collar_state_t handle_gps_ready_state(void);
 dog_collar_state_t handle_gps_file_creation_state(void);
 
 /**
+ * @brief Handles the waiting for GPS fix state of the dog collar.
+ *
+ * This state is entered when we pressed the button from the GPS acquiring state.
+ * * It waits for the GPS to acquire a fix before starting the tracking session.
+ * When the fix is acquired, it transitions to the GPS ready state.
+ *
+ * @return dog_collar_state_t gps_acquiring state if GPS fix is not acquired, gps_ready state if GPS is ready.
+ */
+dog_collar_state_t handle_waiting_for_gps_fix_state(void);
+
+/**
  * @brief Handles the GPS tracking state of the dog collar.
  *
  * This state is entered when the button is pressed in the GPS ready state and after the file is created.
@@ -175,9 +186,6 @@ dog_collar_state_t handle_gps_file_creation_state(void);
  *
  * @return dog_collar_state_t gps_paused state if button is pressed, gps_tracking state if no button press.
  */
-
-dog_collar_state_t handle_waiting_for_gps_fix_state(void);
-
 dog_collar_state_t handle_gps_tracking_state(void);
 
 /**
@@ -204,8 +212,37 @@ dog_collar_state_t handle_gps_paused_state(void);
  */
 dog_collar_state_t handle_wifi_sync_state(void);
 
+/**
+ * @brief Handles the light sleep state of the dog collar.
+ *
+ * - Turns off all LEDs.
+ * - Puts the GPS L96 module into back-up mode.
+ * - Puts the device into light sleep to save power.
+ * - Wakes up on button press or after a certain period defined by LIGHT_SLEEP_TIME_S.
+ * 
+ *  After light sleep it will continue the state machine from the current state.
+ *  It will light sleep for MAX_LIGHT_SLEEP_MAX_COUNT times in a row, then it will go to deep sleep.
+ *  If it was woken up by a GPIO interrupt, it will enter the GPS_ACQUIRING state.
+ *
+ * @note Both light and deep sleep permanently turn off the USB UART, so we cannot use it to wake up the device.
+ * @return dog_collar_state_t deep_sleep state if we have been in light sleep for too long, normal state if button is pressed.
+ */
 dog_collar_state_t  handle_light_sleep_state(void);
 
+/**
+ * @brief Handles the deep sleep state of the dog collar.
+ *
+ * - Turns off all LEDs.
+ * - Puts the GPS L96 module into back-up mode.
+ * - Puts the device into deep sleep to save power.
+ * - Wakes up on timer or GPIO interrupt.
+ *
+ * After deep sleep the device will reset and start from the beginning of the program.
+ * If it was woken up by a GPIO interrupt, it will enter the GPS_ACQUIRING state.
+ *
+ * @note The device will reset when waking up from deep sleep, so we will not return to this state.
+ * @return dog_collar_state_t normal state, although we will not reach this point as we will reset the device.
+ */
 dog_collar_state_t  handle_deep_sleep_state(void);
 
 /**
@@ -215,7 +252,6 @@ dog_collar_state_t  handle_deep_sleep_state(void);
  * - Stops all operations and enters a safe state.
  */
 dog_collar_state_t handle_error_state(void);
-
 
 /**
  * @brief Check if the device was woken up from sleep and return the GPS_ACQUIRING state if it was.

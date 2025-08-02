@@ -24,7 +24,27 @@ typedef struct {
     bool filesystem_ready;
 } collar_init_state_t;
 
+/**
+ * @brief Initializes all components of the dog collar.
+ * 
+ * This function initializes the following components:
+ * - External Flash
+ * - GPS L96 module
+ * - Battery Monitor
+ * - File System (LittleFS)
+ * - GPIO Expander
+ * - Wi-Fi Manager
+ * - Button Interrupt
+ *
+ * @return ESP_OK on success, or an error code on failure.
+ */
 esp_err_t dog_collar_components_init(void);
+
+/**
+ * @brief Logs the current state.
+ * 
+ * This function logs the current state of each component to the ESP-IDF log system.
+ */
 int dog_collar_get_status_string(char *string_buffer, size_t string_buffer_size);
 
 

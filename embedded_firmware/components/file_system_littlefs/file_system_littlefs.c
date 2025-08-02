@@ -80,6 +80,7 @@ esp_err_t lfs_mount_filesystem(bool format_if_fail) {
     cfg.erase = lfs_erase;
     cfg.sync = lfs_sync;
 
+    /* LittleFS configuration */
     cfg.read_size = LFS_READ_SIZE;
     cfg.prog_size = LFS_PROG_SIZE;
     cfg.block_size = LFS_BLOCK_SIZE;
@@ -92,11 +93,11 @@ esp_err_t lfs_mount_filesystem(bool format_if_fail) {
     cfg.read_buffer = lfs_read_buffer;
     cfg.prog_buffer = lfs_prog_buffer;
     cfg.lookahead_buffer = lfs_lookahead_buffer;
-    cfg.name_max = 64; //TODO: Adjust it later
+    cfg.name_max = LFS_MAX_FILE_NAME_SIZE; 
     cfg.file_max = 0;  // No limit on file size
     cfg.attr_max = 0;  // No limit on file attributes
 
-    ESP_LOGI(LFS_TAG, "Attempting to mount LittleFS...");
+
     int err = lfs_mount(&lfs, &cfg);
 
     if (err) {
@@ -133,7 +134,7 @@ esp_err_t lfs_init(void) {
     ESP_RETURN_ON_ERROR(lfs_mount_filesystem(true), 
     LFS_TAG, "Failed to mount LittleFS"
     );
-    
+
     return ESP_OK;
 }
 

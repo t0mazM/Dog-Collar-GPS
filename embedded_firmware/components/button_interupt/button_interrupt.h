@@ -18,7 +18,11 @@
 #define LONG_PRESS_TIME_MS  1000
 
 /**
- * @brief Initializes the button interrupt service.
+ * @brief Initializes the button
+ * It initializes:
+ * - GPIO
+ * - interrupt service
+ * - configures the button to wake esp32 up from light and deep sleep
  * @return ESP_OK on success, or an error code on failure.
  */
 esp_err_t button_interrupt_init(void);

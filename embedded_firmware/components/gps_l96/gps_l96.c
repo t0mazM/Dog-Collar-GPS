@@ -82,7 +82,31 @@ esp_err_t gps_l96_send_command(const char *nmea_sentence) {
     return uart_send_cmd(nmea_sentence, strlen(nmea_sentence));
 }
 
+void gpio_reset_gps(void) {
+    uint8_t state = gpio_expander_get_output_state();
+    state &= ~GPS_RESET;
+    gpio_expander_update_output_state(state);
+    vTaskDelay(100 / portTICK_PERIOD_MS);
 
+    state |= GPS_RESET;
+    gpio_expander_update_output_state(state);
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    ESP_LOGI(TAG, "GPS reset done");
+}
+
+esp_err_t gps_force_on_set(bool enable){
+    uint8_t state = gpio_expander_get_output_state();
+    uint8_t new_state = enable
+                        ? (state |  GPS_FORCE_ON)
+                        : (state & ~GPS_FORCE_ON);
+
+    if (new_state == state) {
+        return ESP_OK;
+    }
+
+    gpio_expander_update_output_state(new_state);
+    return ESP_OK;
+}
 
 esp_err_t gps_l96_extract_and_process_nmea_sentences(const uint8_t *buffer, size_t read_len) {
 

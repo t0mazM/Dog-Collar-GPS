@@ -153,4 +153,17 @@ bool gps_l96_has_fix(void);
  */
 esp_err_t gps_l96_get_date_string_from_data(char *date_string, size_t date_string_size);
 
+void gpio_reset_gps(void);
+
+/**
+ * @brief Sets the FORCE_ON pin state for the GPS module.
+ * 
+ * This function sets the FORCE_ON pin to high or low to wake up the GPS module from deep sleep mode/backup mode.
+ * It is good practice to set it to high before sending any commands to the GPS module.
+ * 
+ * @param enable true to set FORCE_ON pin high, false to set it low.
+ * @return ESP_OK on success, or an error code on failure.
+ */
+esp_err_t gps_force_on_set(bool enable);
+
 #endif // GPS_L96_H

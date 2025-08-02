@@ -28,6 +28,10 @@
 
 /**
  * @brief Initializes UART peripheral.
+ * 
+ * This function configures the UART.
+ *
+ * @note If it was already initialized, it will not reinitialize it.
  *
  * @return
  * - ESP_OK on success

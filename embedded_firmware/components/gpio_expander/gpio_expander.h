@@ -17,6 +17,20 @@ typedef enum {
     GPS_FORCE_ON = 0b00001000, // GP3 -> Output
 } led_colour_t;
 
+/** Get the current output state of the GPIO expander.
+ * @return The current output state.
+ */
+uint8_t gpio_expander_get_output_state(void);
+
+/**
+ * @brief Sets the output state of the GPIO expander.
+ * 
+ * This function updates the global variable `gpio_output_state` with the new state.
+ * It also writes the new state to the PCF8574 GPIO expander.
+ * 
+ * @param state The new output state to set.
+ */
+void gpio_expander_update_output_state(uint8_t state);
 
 esp_err_t gpio_init(void);
 /**
@@ -39,9 +53,48 @@ esp_err_t gpio_sync_state(void);
  */
 esp_err_t gpio_toggle_leds(uint8_t led_mask);
 
+/**
+ * @brief Turns on the LEDs specified by the led_mask.
+ * 
+ * This function updates the global variable `gpio_output_state` 
+ * and turns on the LEDs specified by the `led_mask`.
+ * 
+ * @note You can turn on multiple LEDs at once by: gpio_turn_on_leds(LED_GREEN | LED_YELLOW | LED_RED);
+ * 
+ * @param led_mask Bitmask specifying which LEDs to turn on
+ */
 void gpio_turn_on_leds(uint8_t led_mask);
+
+/**
+ * @brief Turns off the LEDs specified by the led_mask.
+ * 
+ * This function updates the global variable `gpio_output_state` 
+ * and turns off the LEDs specified by the `led_mask`.
+ * 
+ * @note You can turn off multiple LEDs at once by: gpio_turn_off_leds(LED_GREEN | LED_YELLOW | LED_RED);
+ * 
+ * @param led_mask Bitmask specifying which LEDs to turn off
+ */
 void gpio_turn_off_leds(uint8_t led_mask);
+
+/**
+ * @brief Reads the state of the inputs from the GPIO expander.
+ * 
+ * This function reads the state of the inputs from the PCF8574 GPIO expander
+ * and updates the global variable `gpio_input_state` with the current state.
+ * 
+ * @param input_state Pointer to a variable where the input state will be stored.
+ * @return ESP_OK on success, or an error code on failure.
+ */
 esp_err_t gpio_read_inputs(uint8_t *input_state);
-void gpio_reset_gps(void);
-esp_err_t gps_force_on_set(bool enable);
+
+/**
+ * @brief Resets the GPS module by toggling the GPS_RESET pin.
+ * 
+ * This function toggles the GPS_RESET pin to reset the GPS module.
+ * It first sets the pin low, waits 100 ms and then sets it high again. It also waits 1 second to allow the GPS module to reset.
+ * 
+ * @note The waits are necessary to ensure the GPS module has enough time to reset.
+ */
+
 #endif // GPIO_EXPANDER_H

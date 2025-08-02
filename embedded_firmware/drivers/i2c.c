@@ -46,6 +46,7 @@ esp_err_t i2c_init(void) {
 }
 
 esp_err_t i2c_write_byte(uint8_t dev_addr, int8_t write_register, uint8_t data) {
+    /* Take I2C mutex */
     if(xSemaphoreTake(i2c_mutex, pdMS_TO_TICKS(I2C_MUTEX_TIMEOUT_MS))){
 
         i2c_cmd_handle_t cmd = i2c_cmd_link_create();
@@ -62,6 +63,7 @@ esp_err_t i2c_write_byte(uint8_t dev_addr, int8_t write_register, uint8_t data) 
         RETURN_ON_ERROR_I2C(i2c_master_cmd_begin(I2C_PORT, cmd, WAIT_TIME), TAG, "Command failed", cmd);
         i2c_cmd_link_delete(cmd);
 
+        /* Release I2C mutex */
         xSemaphoreGive(i2c_mutex);
         return ESP_OK;
     } else {
