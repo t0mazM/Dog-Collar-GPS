@@ -61,8 +61,13 @@ I am a passionate trail/ultra runner and my dog, Kali, often joins me on the run
 
 ---
 
+## SYSTEM OVERVIEW FLOWCHART
 
 ![Flowchart](system-overview-flowchart.png)
+
+## STATE MACHINE FLOWCHART
+
+![Flowchart](state_machine_flowchart.png)
 
 ## Example Usage
 
