@@ -71,7 +71,7 @@ The system is structured around three main FreeRTOS tasks and one interrupt:
 - **LED Task** – Controls status indication via LEDs
 - **Button Interrupt (Independent)** – Monitors button input and classifies presses as short or long; runs outside of the main tasks
 
-> For detailed state transitions and internal logic, see the [State Machine Flowchart](#-state-machine-flowchart).
+> For detailed state transitions and internal logic, see the [State Machine Flowchart](#state-machine-flowchart) 
 
 ![System Overview Flowchart](system-overview-flowchart.png)
 ---
@@ -79,7 +79,7 @@ The system is structured around three main FreeRTOS tasks and one interrupt:
 ## STATE MACHINE FLOWCHART
 
 This flowchart explains the **core state machine logic** that controls the behavior of the ESP32.  
-**Note:** If any component fails, the system transitions to the **Error** state and remains there.  
+> **Note:** If any component fails, the system transitions to the **Error** state and remains there.  
 This transition is not shown in the flowchart to avoid cluttering.
 
 ![State Machine Flowchart](state_machine_flowchart.png)
