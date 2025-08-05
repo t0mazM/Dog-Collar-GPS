@@ -198,13 +198,6 @@ pio device monitor
 
 ---
 
-## Documentation
-
-- Each component and driver is documented in its header file.
-- See [components/README.md](embedded_firmware/components/) for hardware-specific notes.
-- See [python_server/README.md](python_server/) for Python client/server usage.
-
----
 
 ## Potential Improvements & Future Work
 
