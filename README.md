@@ -53,6 +53,17 @@ Here’s how the finished board looks:
 
 ## Result
 
+Since Kali likes to cool down in rivers, I decided **not** to mount the case with the PCB and battery on her collar — I didn’t make it waterproof enough for that.  
+Instead, I designed the case to be compatible with the **GoPro dog harness**, which allows me to mount it safely on her back, away from splash zones and closer to dry airflow. This way, the electronics are less likely to be water-damaged.
+
+Here are some photos of the final mounted case with everything assembled and ready to track:
+
+<div align="center">
+  <img src="media/case_top.jpg" alt="Case Top View" width="300"/>
+  <img src="media/case_side.jpg" alt="Case Side View" width="300"/>
+</div>
+
+
 **See Kali’s real GPS activity on Strava:** 
 [Kali's Strava account](https://www.strava.com/athletes/179438346?num_entries=10)  
 And please give her some Kudos :)
@@ -120,7 +131,7 @@ The system is structured around three main FreeRTOS tasks and one interrupt:
 
 > For detailed state transitions and internal logic, see the [State Machine Flowchart](#state-machine-flowchart) 
 
-![System Overview Flowchart](system-overview-flowchart.png)
+![System Overview Flowchart](media/system-overview-flowchart.png)
 ---
 
 ## STATE MACHINE FLOWCHART
@@ -129,7 +140,7 @@ This flowchart explains the **core state machine logic** that controls the behav
 > **Note:** If any component fails, the system transitions to the **Error** state and remains there.  
 This transition is not shown in the flowchart to avoid cluttering.
 
-![State Machine Flowchart](state_machine_flowchart.png)
+![State Machine Flowchart](media/state_machine_flowchart.png)
 
 ## Hardware
 
