@@ -13,7 +13,7 @@ A complete ESP32-C3 based dog collar GPS tracker project with:
 I am a passionate trail/ultra runner and my dog, Kali, often joins me on the runs. While she runs beside me in busy areas, she roams freely on trails. This led to a joking thought: if I ran 30km, she must have run like 50km or more. This sparked the idea for a custom GPS tracker for her, functioning like my own watch and uploading activities to Strava, so I could finally see just how much further she really runs.
 
 **See Kali’s real GPS activity on Strava:** 
-[https://www.strava.com/activities/your-activity-id]([https://www.strava.com/activities/your-activity-id](https://www.strava.com/athletes/179438346]))
+[Kali's Strava account](https://www.strava.com/athletes/179438346)  
 And please give her some Kudos :)
 
 
