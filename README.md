@@ -187,7 +187,8 @@ hardware/
 ### 1. Clone the Repository
 
 ```sh
-git clone https://github.com/yourusername/Dog-Collar-GPS.git
+
+git clone https://github.com/t0mazM/Dog-Collar-GPS
 cd Dog-Collar-GPS/embedded_firmware
 ```
 
