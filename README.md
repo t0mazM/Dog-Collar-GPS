@@ -40,7 +40,7 @@ The schematic and PCB layout were designed in **Altium Designer**, and I ordered
 Here’s how the finished board looks:
 
 <div align="center">
-  <img src="media/pcb_front.jpg" alt="Custom PCB Front View" width="300"/>
+  <img src="media/pcb_top.jpg" alt="Custom PCB Front View" width="300"/>
   <img src="media/pcb_back.jpg" alt="Custom PCB Back View" width="300"/>
 </div>
 
