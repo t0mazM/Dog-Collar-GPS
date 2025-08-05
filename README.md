@@ -84,18 +84,6 @@ This transition is not shown in the flowchart to avoid cluttering.
 
 ![State Machine Flowchart](state_machine_flowchart.png)
 
-## Example Usage
-
-```bash
-# Discover and connect to device
-python connect.py
-
-# Download and convert new files
-python sync.py
-
-# Upload to Strava (optional)
-python upload_to_strava.py
-
 ## Hardware
 
 - ESP32-C3-WROOM-02
@@ -137,6 +125,7 @@ python_server/
 hardware/
   ...                        # Schematics, datasheets, PDFs
 ```
+
 
 ---
 
