@@ -63,11 +63,26 @@ I am a passionate trail/ultra runner and my dog, Kali, often joins me on the run
 
 ## SYSTEM OVERVIEW FLOWCHART
 
-![Flowchart](system-overview-flowchart.png)
+This flowchart provides a **high-level overview of the system architecture** running on the **ESP32**, also known as the **DOG COLLAR**.  
+The system is structured around three main FreeRTOS tasks and one interrupt:
+
+- **Wi-Fi / mDNS / HTTP Server Task** – Handles wireless communication and web server functionality
+- **State Machine Task** – Manages core logic and system behavior
+- **LED Task** – Controls status indication via LEDs
+- **Button Interrupt (Independent)** – Monitors button input and classifies presses as short or long; runs outside of the main tasks
+
+> For detailed state transitions and internal logic, see the [State Machine Flowchart](#-state-machine-flowchart).
+
+![System Overview Flowchart](system-overview-flowchart.png)
+---
 
 ## STATE MACHINE FLOWCHART
 
-![Flowchart](state_machine_flowchart.png)
+This flowchart explains the **core state machine logic** that controls the behavior of the ESP32.  
+**Note:** If any component fails, the system transitions to the **Error** state and remains there.  
+This transition is not shown in the flowchart to avoid cluttering.
+
+![State Machine Flowchart](state_machine_flowchart.png)
 
 ## Example Usage
 
