@@ -12,9 +12,52 @@ A complete ESP32-C3 based dog collar GPS tracker project with:
 
 I am a passionate trail/ultra runner and my dog, Kali, often joins me on the runs. While she runs beside me in busy areas, she roams freely on trails. This led to a joking thought: if I ran 30km, she must have run like 50km or more. This sparked the idea for a custom GPS tracker for her, functioning like my own watch and uploading activities to Strava, so I could finally see just how much further she really runs.
 
+## Implementation
+
+I wanted to challenge myself, so I decided to add in as many features and protocols as I could.  
+The idea wasn’t just to make it work, but to also get some experience with full project development — from hardware and to firmware.
+
+### PCB Design
+
+I planned and designed a custom PCB from scratch where I integrated the following components:
+
+- **ESP32-C3-WROOM-02** — main MCU (Wi-Fi, UART, I2C, SPI)
+- **L96-M33 GPS module** — UART 
+- **BQ27441 battery monitor** — I2C
+- **PCF8574 GPIO expander** — I2C
+- **W25Q128JV NOR flash chip** — SPI
+- **Button, RGB LED, Li-ion battery and charging circuitry**
+
+
+To make it more challenging (and cheaper), I decided to go with a 2-layer board, where the back layer is 95% copper pour tied to GND.  
+Only a few traces are routed there due to tight spacing and EMI considerations.
+
+The schematic and PCB layout were designed in **Altium Designer**, and I ordered the boards from **JLCPCB**.
+
+### PCB Photos
+
+
+Here’s how the finished board looks:
+
+<div align="center">
+  <img src="media/pcb_top.jpg" alt="Custom PCB Front View" width="300"/>
+  <img src="media/pcb_back.jpg" alt="Custom PCB Back View" width="300"/>
+</div>
+
+<p align="center">
+  <em>Left: Front view &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Right: Back view with mostly GND plane</em>
+</p>
+
+---
+
+
+## Result
+
 **See Kali’s real GPS activity on Strava:** 
 [Kali's Strava account](https://www.strava.com/athletes/179438346?num_entries=10)  
 And please give her some Kudos :)
+
+
 
 
 ---
