@@ -36,13 +36,17 @@ The schematic and PCB layout were designed in **Altium Designer**, and I ordered
 
 ### PCB Photos
 
+
 Here’s how the finished board looks:
 
-![Custom PCB Front View](media/pcb_front.jpg)  
-*Custom PCB front view*
+<div align="center">
+  <img src="media/pcb_front.jpg" alt="Custom PCB Front View" width="300"/>
+  <img src="media/pcb_back.jpg" alt="Custom PCB Back View" width="300"/>
+</div>
 
-![Custom PCB Back View](media/pcb_back.jpg)  
-*Back view with mostly GND plane*
+<p align="center">
+  <em>Left: Front view &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Right: Back view with mostly GND plane</em>
+</p>
 
 ---
 
