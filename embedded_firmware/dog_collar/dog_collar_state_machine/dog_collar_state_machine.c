@@ -118,7 +118,7 @@ dog_collar_state_t battery_management_routine(dog_collar_state_t current_state) 
     // a) CHARGING
     if (battery_data.current > 0 && current_state != DOG_COLLAR_STATE_CHARGING) {
         ESP_LOGI(TAG, "Battery is charging");
-        //return DOG_COLLAR_STATE_CHARGING;  // commented out for easy testing
+        return DOG_COLLAR_STATE_CHARGING;
     }
 
     // b) CRITICAL (battery is about to be empty)
