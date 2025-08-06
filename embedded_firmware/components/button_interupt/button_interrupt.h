@@ -42,6 +42,9 @@ esp_err_t button_interrupt_init(void);
   * @brief Returns bool value if button was short pressed
   * The bool value is saved in static global variable and once read is set back to false
   */
+
+void button_interrupt_enable_wakeup(void);
+
 bool is_button_short_pressed(void);
 
  /**

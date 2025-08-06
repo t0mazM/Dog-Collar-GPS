@@ -9,6 +9,7 @@
 
 static char *get_current_state_string(dog_collar_state_t state);
 static esp_err_t gps_tracking_task(char *gps_file_name);
+static bool checked_wakeup = false;
 
 static const char *TAG = "DOG_COLLAR_STATE_MACHINE";
 
@@ -77,7 +78,11 @@ dog_collar_state_t dog_collar_state_machine_run(void) {
     }
 
     printf("Current state: %s\n", get_current_state_string(current_state));
-    current_state = get_initial_state_from_wakeup(current_state);
+
+    if (!checked_wakeup) {
+        current_state = get_initial_state_from_wakeup(current_state);
+        checked_wakeup = true;
+    }
     current_state = battery_management_routine(current_state);
     led_management_set_pattern(current_state);
 
@@ -113,7 +118,7 @@ dog_collar_state_t battery_management_routine(dog_collar_state_t current_state) 
     // a) CHARGING
     if (battery_data.current > 0 && current_state != DOG_COLLAR_STATE_CHARGING) {
         ESP_LOGI(TAG, "Battery is charging");
-        return DOG_COLLAR_STATE_CHARGING;  // commented out for easy testing
+        //return DOG_COLLAR_STATE_CHARGING;  // commented out for easy testing
     }
 
     // b) CRITICAL (battery is about to be empty)
@@ -198,7 +203,6 @@ dog_collar_state_t handle_charging_state(void) {
 }
 
 dog_collar_state_t handle_gps_acquiring_state(void) {
-    ESP_LOGI(TAG, "Waiting for GPS fix or user input");
 
     /* Check for user input */
     if (is_button_short_pressed()) { 
@@ -283,7 +287,6 @@ dog_collar_state_t handle_gps_paused_state(void) {
         return DOG_COLLAR_STATE_NORMAL;            // go back to normal state
     }
 
-    //TODO: Add LED animation for GPS paused state
     return DOG_COLLAR_STATE_GPS_PAUSED;
 }
 
@@ -319,13 +322,9 @@ dog_collar_state_t handle_wifi_sync_state(void) {
 }
 
 dog_collar_state_t  handle_light_sleep_state(void) {
-    /*
-    * If the device has entered light sleep LIGHT_SLEEP_MAX_COUNT times in a row
-    * (e.g., after several failed attempts to sync or no user activity),
-    * escalate to deep sleep to save more power.
-    */
 
     static uint8_t consecutive_light_sleeps = 0;
+    
     if(consecutive_light_sleeps > LIGHT_SLEEP_MAX_COUNT) {
         consecutive_light_sleeps = 0; 
         return DOG_COLLAR_STATE_DEEP_SLEEP; // Go to deep sleep if max count reached
@@ -337,15 +336,12 @@ dog_collar_state_t  handle_light_sleep_state(void) {
     esp_sleep_enable_timer_wakeup((uint64_t)LIGHT_SLEEP_TIME_S * 1000000); 
     esp_sleep_enable_uart_wakeup(UART_PORT_NUM);          // Wake on UART activity TODO:test this with sleep while gps is tracking
 
+    printf("Going light sleep\n");
     esp_light_sleep_start();
 
     consecutive_light_sleeps++; 
 
     return DOG_COLLAR_STATE_NORMAL;
-    /* The light sleep functionality is currently disabled as after 
-    waking up the usb uart is not reinitialized properly and is not working*/
-
-    //vTaskDelay(pdMS_TO_TICKS(sleep_time_us / 1000)); // Simulate light sleep with delay
 }
 
 dog_collar_state_t handle_deep_sleep_state(void) {
@@ -356,6 +352,8 @@ dog_collar_state_t handle_deep_sleep_state(void) {
     // timer wakeup for periodic wake-ups
     esp_sleep_enable_timer_wakeup((uint64_t)DEEP_SLEEP_TIME_S * 1000000);
 
+    button_interrupt_enable_wakeup();
+    printf("Going deeep sleep\n"); 
     esp_deep_sleep_start();
 
     return DOG_COLLAR_STATE_NORMAL; // Never reached

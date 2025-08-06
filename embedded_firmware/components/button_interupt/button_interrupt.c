@@ -12,8 +12,8 @@
 static const char *TAG = "BUTTON_HANDLER";
 static bool button_interrupt_initialized = false;
 
-volatile static bool button_short_pressed = false;
-volatile static bool button_long_pressed = false;
+static volatile bool button_short_pressed = false;
+static volatile bool button_long_pressed = false;
 
 static int64_t button_press_time = 0;
 static esp_timer_handle_t debounce_timer;
@@ -32,9 +32,11 @@ static void debounce_timer_callback(void* arg) {
         if ((now - button_press_time) >= LONG_PRESS_TIME_MS) {
             button_long_pressed = true;
             ESP_LOGI(TAG, "Button long press detected");
+            gpio_toggle_leds(LED_RED);
         } else {
             button_short_pressed = true;
             ESP_LOGI(TAG, "Button short press detected");
+            gpio_toggle_leds(LED_GREEN);
         }
     }
 }
@@ -55,11 +57,6 @@ esp_err_t button_interrupt_init(void) {
     ESP_ERROR_CHECK(gpio_config(&io_conf));
 
 
-    // Enable wakeup from light & deep sleep on button press
-    esp_sleep_enable_gpio_wakeup();
-    gpio_wakeup_enable(BUTTON_GPIO, GPIO_INTR_LOW_LEVEL); 
-    esp_deep_sleep_enable_gpio_wakeup(1ULL << BUTTON_GPIO, ESP_GPIO_WAKEUP_GPIO_LOW);
-
     // Debounce timer
     const esp_timer_create_args_t debounce_timer_args = {
         .callback = debounce_timer_callback,
@@ -75,6 +72,13 @@ esp_err_t button_interrupt_init(void) {
 
     button_interrupt_initialized = true;
     return ESP_OK;
+}
+void button_interrupt_enable_wakeup(void)
+{
+    // Enable wakeup from light & deep sleep on button press
+    esp_sleep_enable_gpio_wakeup();
+    gpio_wakeup_enable(BUTTON_GPIO, GPIO_INTR_LOW_LEVEL); 
+    esp_deep_sleep_enable_gpio_wakeup(1ULL << BUTTON_GPIO, ESP_GPIO_WAKEUP_GPIO_LOW);
 }
 
 bool is_button_short_pressed(void) {
@@ -94,6 +98,7 @@ bool is_button_long_pressed(void) {
 }
 
 void clear_button_press_states(void) {
+    printf("Clearing button press states\n");
     button_short_pressed = false;
     button_long_pressed = false;
 }

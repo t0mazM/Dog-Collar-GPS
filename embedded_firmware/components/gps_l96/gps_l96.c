@@ -85,7 +85,7 @@ esp_err_t gps_l96_send_command(const char *nmea_sentence) {
         ESP_LOGE(TAG, "Invalid NMEA sentence");
         return ESP_ERR_INVALID_ARG;
     }
-    ESP_LOGI(TAG, "Sending NMEA command: %s", nmea_sentence);
+    // ESP_LOGI(TAG, "Sending NMEA command: %s", nmea_sentence);
     return uart_send_cmd(nmea_sentence, strlen(nmea_sentence));
 }
 
@@ -155,7 +155,7 @@ esp_err_t gps_l96_extract_and_process_nmea_sentences(const uint8_t *buffer, size
                 reading_sentence = false; 
 
                 // 4. Process the complete NMEA sentence TODO
-                ESP_LOGI(TAG, "L96 Response: %s", NMEA_sentence);
+                // ESP_LOGI(TAG, "L96 Response: %s", NMEA_sentence);
                 gps_l96_extract_data_from_nmea_sentence(NMEA_sentence); 
             }
         }
@@ -174,7 +174,7 @@ esp_err_t gps_l96_extract_data_from_nmea_sentence(const char *nmea_sentence) {
         case MINMEA_SENTENCE_RMC:
             minmea_parse_rmc(&gps_rcm_data, nmea_sentence);
             gps_rcm_data.date.year += 2000; // by default GPS module returns year as 0-99, so we add 2000 for correct year
-            gps_l96_print_data();
+            //gps_l96_print_data();
             break;
         case MINMEA_SENTENCE_VTG:
             /*TODO: add parsing for all other sentences types
