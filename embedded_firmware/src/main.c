@@ -14,7 +14,6 @@
 
 void app_main() {
 
-    vTaskDelay(pdMS_TO_TICKS(5000)); // Wait for components to initialize
     /* Create FreeRTOS tasks */
     xTaskCreate(state_machine_task, "state_machine_task", 4096, NULL, 1, NULL);
     xTaskCreate(led_task, "led_task", 2048, NULL, 2, NULL);

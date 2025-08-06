@@ -160,23 +160,9 @@ dog_collar_state_t handle_normal_state(void) {
         return DOG_COLLAR_STATE_GPS_ACQUIRING;
     }
 
-    // 2) Start enter wifi_sync state every WIFI_SYNC_PERIODIC_TIME_S seconds
-    // 2.a) On first normal state entry, set the start time
-    if (!normal_started) {
-        normal_start_time_us = now_us;
-        normal_started = true;
-    }
-
-    // 2.b) If time is up, go to WIFI_SYNC state
-    if ((now_us - normal_start_time_us) >= WIFI_SYNC_PERIODIC_TIME_S * 1000 * 1000) {
-        normal_started = false; // Set flag to false so that we can start the timer again on next entry
-        return DOG_COLLAR_STATE_WIFI_SYNC;
-    }
-
-    /** 3) If nothing happened, go to light sleep and stay in NORMAL state 
-        Set normal_started to false so that we can start the timer again on next entry */
-
-    return DOG_COLLAR_STATE_LIGHT_SLEEP;
+    // 2.) Go to WIFI_SYNC state
+    return DOG_COLLAR_STATE_WIFI_SYNC;
+    
 }
 
 dog_collar_state_t handle_low_battery_state(void) {
@@ -278,8 +264,6 @@ dog_collar_state_t handle_gps_tracking_state(void) {
 
 dog_collar_state_t handle_gps_paused_state(void) {
     
-    ESP_LOGI(TAG, "GPS is paused. Waiting for user input");
-
     if (is_button_short_pressed()) { 
         return DOG_COLLAR_STATE_GPS_TRACKING; // go and create a GPS file
     }
@@ -310,11 +294,11 @@ dog_collar_state_t handle_wifi_sync_state(void) {
         return DOG_COLLAR_STATE_GPS_ACQUIRING;
     }
 
-    /* If time is up go back to normal state*/
+    /* If time is up go deep sleep*/
     if ((now - sync_start_time_us) >= WIFI_SYNC_TIME_S * 1000 * 1000) {
         sync_started = false;
         wifi_stop_all_services();
-        return DOG_COLLAR_STATE_NORMAL;
+        return DOG_COLLAR_STATE_DEEP_SLEEP;
     }
 
     // Stay in WIFI_SYNC until timeout or button press
@@ -336,7 +320,6 @@ dog_collar_state_t  handle_light_sleep_state(void) {
     esp_sleep_enable_timer_wakeup((uint64_t)LIGHT_SLEEP_TIME_S * 1000000); 
     esp_sleep_enable_uart_wakeup(UART_PORT_NUM);          // Wake on UART activity TODO:test this with sleep while gps is tracking
 
-    printf("Going light sleep\n");
     esp_light_sleep_start();
 
     consecutive_light_sleeps++; 
@@ -353,7 +336,7 @@ dog_collar_state_t handle_deep_sleep_state(void) {
     esp_sleep_enable_timer_wakeup((uint64_t)DEEP_SLEEP_TIME_S * 1000000);
 
     button_interrupt_enable_wakeup();
-    printf("Going deeep sleep\n"); 
+
     esp_deep_sleep_start();
 
     return DOG_COLLAR_STATE_NORMAL; // Never reached
