@@ -239,10 +239,6 @@ dog_collar_state_t handle_waiting_for_gps_fix_state(void) {
         return DOG_COLLAR_STATE_GPS_FILE_CREATION;
     }
 
-    /* Check for user input */
-    if (is_button_short_pressed()) { 
-        return DOG_COLLAR_STATE_GPS_PAUSED; 
-    }
     if (is_button_long_pressed()) {
         return DOG_COLLAR_STATE_NORMAL;            
     }
