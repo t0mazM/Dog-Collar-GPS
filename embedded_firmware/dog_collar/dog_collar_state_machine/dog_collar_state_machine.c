@@ -148,18 +148,14 @@ dog_collar_state_t handle_initializing_state(void) {
 }
 
 dog_collar_state_t handle_normal_state(void) {
-    static bool normal_started = false;
-    static int64_t normal_start_time_us = 0;
-    int64_t now_us = esp_timer_get_time();
 
     // 1) Check if button was pressed
     if (is_button_short_pressed()) {
         vTaskDelay(pdMS_TO_TICKS(WAIT_AFTER_USER_PRESS_MS)); // Wait a bit and clear the button state
         clear_button_press_states();
-        normal_started = false; // Set flag to false so that we can start the timer again on next entry
         return DOG_COLLAR_STATE_GPS_ACQUIRING;
     }
-
+    
     // 2.) Go to WIFI_SYNC state
     return DOG_COLLAR_STATE_WIFI_SYNC;
     
