@@ -34,17 +34,21 @@
 esp_err_t button_interrupt_init(void);
 
 /**
- * @brief Checks if the button is currently pressed.
- * @return true if the button is pressed, false otherwise.
+ * @brief Enables button wakeup for light and deep sleep
+ * This function configures the button to wake the ESP32 from deep sleep.
+ * It sets the GPIO wakeup configuration for the button GPIO.
+ *
+ * @note Don't call this function for light sleep, since the button won't function anymore -
+ * (short presses won't be recorded for some reason)
+ * 
+ * @return ESP_OK on success, or an error code on failure.
  */
+esp_err_t  button_interrupt_enable_wakeup(void);
 
  /**
   * @brief Returns bool value if button was short pressed
   * The bool value is saved in static global variable and once read is set back to false
   */
-
-void button_interrupt_enable_wakeup(void);
-
 bool is_button_short_pressed(void);
 
  /**
