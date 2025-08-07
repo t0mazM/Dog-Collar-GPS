@@ -8,10 +8,10 @@
 #include "ext_flash.h" // Include the header with definitions
 
 static const char *TAG = "EXT_FLASH";
-
 static bool spi_initialized = false;
 
-spi_device_handle_t spi;
+/* SPI device handle */
+static spi_device_handle_t spi;
 
 spi_bus_config_t get_spi_bus_config(void) {
     spi_bus_config_t spi_bus_config;
@@ -27,51 +27,54 @@ spi_bus_config_t get_spi_bus_config(void) {
     return spi_bus_config;
 }
 
-spi_device_interface_config_t get_spi_device_config(void) {
+/* Helper function to get SPI device configuration */
+static spi_device_interface_config_t get_spi_device_config(void) {
+
     spi_device_interface_config_t devcfg;
     memset(&devcfg, 0, sizeof(devcfg)); 
 
     devcfg.command_bits = 8; // All commands are 8-bit
-    devcfg.address_bits = 0;
-    devcfg.dummy_bits = 0;
-    devcfg.clock_speed_hz = SPI_CLOCK_SPEED; 
-    devcfg.mode = 0; 
-    devcfg.spics_io_num = SPI_PIN_CS; 
+    devcfg.address_bits = 0; // Are adjusted in each command
+    devcfg.dummy_bits = 0;   // Are adjusted in each command
     devcfg.queue_size = 1; // Only one transaction at a time
+    devcfg.clock_speed_hz = SPI_CLOCK_SPEED; 
+    devcfg.mode = W25Q128JV_MODE;        
+    devcfg.spics_io_num = SPI_PIN_CS; 
 
     return devcfg;
 }
 
 esp_err_t ext_flash_init(void) {
 
+    /* Guard against multiple initializations */
     if(spi_initialized) {
         ESP_LOGW(TAG, "SPI is already initialized");
         return ESP_OK;
     }
 
-    // Initialize GPIO expander so you can control HOLD and WP pins
-    ESP_RETURN_ON_ERROR(gpio_init(), 
-                        TAG, "Failed to initialize GPIO"
-    );
+    /* Initialize GPIO expander so you can control HOLD and WP pins */
+    ESP_RETURN_ON_ERROR(gpio_init(),
+                        TAG, "Failed to initialize GPIO for HOLD and WP control");
 
-    SPI_set_HOLD_WP_HIGH(); 
-    
+    ESP_RETURN_ON_ERROR(SPI_set_HOLD_WP_HIGH(),
+                        TAG, "Failed to set HOLD and WP pins high");
+
+    /* Initialize the SPI bus */
     spi_bus_config_t buscfg = get_spi_bus_config();
     spi_device_interface_config_t devcfg = get_spi_device_config();
 
-    // Initialize the SPI bus
     ESP_RETURN_ON_ERROR(spi_bus_initialize(SPI2_HOST, &buscfg, SPI_DMA_CH_AUTO),
                         TAG, "Failed to initialize SPI bus");
 
-    // Add the flash device to the bus
+    /* Add the flash device to the bus */
     ESP_RETURN_ON_ERROR(spi_bus_add_device(SPI2_HOST, &devcfg, &spi),
                         TAG, "Failed to add SPI device");
 
-    // Reset the external flash chip
+    /* Reset the external flash chip */
     ESP_RETURN_ON_ERROR(ext_flash_reset_chip(),
                         TAG, "Failed to reset external flash chip");
 
-    // Unlock the global block
+    /* Unlock the global block */
     ESP_RETURN_ON_ERROR(ext_flash_global_block_unlock(),
                         TAG, "Failed to unlock global block");
 
@@ -80,6 +83,8 @@ esp_err_t ext_flash_init(void) {
     spi_initialized = true; // Set the flag to true after successful initialization
     return ESP_OK;
 }
+
+/*-------------------- static private functions --------------------*/
 
 esp_err_t ext_flash_reset_chip(void) {
 
@@ -92,7 +97,7 @@ esp_err_t ext_flash_reset_chip(void) {
     t.dummy_bits = 0;       
     t.base.cmd = SPI_CMD_ENABLE_RESET;
 
-    // Send the Enable Reset command
+    /* Send the Enable Reset command */
     esp_err_t ret = spi_device_transmit(spi, (spi_transaction_t*)&t);
     if (ret != ESP_OK) {
         ESP_LOGE(TAG, "Failed to send Enable Reset (0x%02X) command: %s", SPI_CMD_ENABLE_RESET, esp_err_to_name(ret));
@@ -293,14 +298,11 @@ esp_err_t ext_flash_erase_sector(uint32_t address) {
     }
 
     spi_transaction_ext_t t = {0}; 
-
+    t.base.flags = SPI_TRANS_VARIABLE_ADDR | SPI_TRANS_VARIABLE_DUMMY;
     t.base.cmd = SPI_CMD_SECTOR_ERASE; // Command: Sector Erase (0x20)
     t.base.addr = address;             // 24-bit address of the sector to erase
-
     t.base.length = 0;     
     t.base.rxlength = 0;   
-
-    t.base.flags = SPI_TRANS_VARIABLE_ADDR | SPI_TRANS_VARIABLE_DUMMY;
     t.address_bits = 24; 
     t.dummy_bits = 0;    
 

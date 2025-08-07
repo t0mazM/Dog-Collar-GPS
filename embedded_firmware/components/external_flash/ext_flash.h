@@ -57,7 +57,7 @@
 #define W25Q128JV_PAGE_SIZE         256      // Bytes per page
 #define W25Q128JV_SECTOR_SIZE       4096     // Bytes per 4KB sector
 #define W25Q128JV_TOTAL_SIZE_BYTES  (16 * 1024 * 1024) // 128M-bit = 16M-byte
-
+#define W25Q128JV_MODE              0       // Mode 0
 esp_err_t ext_flash_init(void);
 
 /**
@@ -74,7 +74,7 @@ esp_err_t ext_flash_reset_chip(void);
 /**
  * @brief Read the JEDEC ID of the external flash chip.
  * 
- * This function sends the JEDEC ID command and reads and prints the 
+ * This function sends the JEDEC ID command and reads and logs the 
  * Manufacturer ID, Memory Type, and Capacity.
  * 
  * @note Used for testing and verification of the flash chip.
