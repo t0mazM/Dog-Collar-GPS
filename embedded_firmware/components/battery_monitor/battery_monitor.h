@@ -73,7 +73,7 @@ esp_err_t battery_monitor_update_battery_data(void);
  * 
  * @param string_buffer Pointer to the buffer to store the string
  * @param string_buffer_size Size of the string buffer
- * @return ESP_OK on success, or an error code on failure
+ * @return -1 on error, or if success the number of bytes written to the string buffer
  */
 int battery_monitor_get_data_string(char *string_buffer, size_t string_buffer_size);
 

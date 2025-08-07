@@ -5,10 +5,11 @@
  * Attribution appreciated but not required.
  */
 
-
 #include "battery_monitor.h"
 
 static const char *TAG = "BATTERY_MONITOR";
+
+/* Global battery measurement data and parsed status flags */
 battery_data_t battery_data = {0};
 battery_status_flags_t battery_status_flags = {0};
 
@@ -131,18 +132,14 @@ static esp_err_t read_temperature(float *temperature) {
 }
 
 static esp_err_t read_flags(uint16_t *flags) {
-    esp_err_t ret = i2c_read_16bit(BQ27441_ADDRESS, FLAGS_CMD, flags);
-    if (ret != ESP_OK){ 
-        return ret;
-    }
-    return ESP_OK;
+    return(i2c_read_16bit(BQ27441_ADDRESS, FLAGS_CMD, flags));
 }
 
 static esp_err_t read_current(int16_t *current) {
     return (i2c_read_16bit(BQ27441_ADDRESS, CURRENT_CMD, (uint16_t *)current));
 }
 static void battery_monitor_parse_flags(void) {
- 
+    /* Parse battery status flags */
     battery_status_flags.over_temp        = (battery_data.flags >> 15) & 0x01;
     battery_status_flags.under_temp       = (battery_data.flags >> 14) & 0x01;  
     battery_status_flags.full_charge      = (battery_data.flags >> 9)  & 0x01; 
@@ -151,10 +148,10 @@ static void battery_monitor_parse_flags(void) {
     battery_status_flags.soc1             = (battery_data.flags >> 2)  & 0x01; 
     battery_status_flags.socf             = (battery_data.flags >> 1)  & 0x01;  
     battery_status_flags.discharging      = (battery_data.flags >> 0)  & 0x01;  
-
 }
 
 int battery_monitor_get_data_string(char *string_buffer, size_t string_buffer_size) {
+    /* Format the battery data into a string */
     int written = snprintf(string_buffer, string_buffer_size,
         "\n============= Battery Monitor Data ==============\n"
         "Battery Data:\n"
@@ -188,6 +185,7 @@ int battery_monitor_get_data_string(char *string_buffer, size_t string_buffer_si
         battery_status_flags.discharging ? "Yes" : "No"
     );
 
+    /* Check for buffer size issues */
     if (written < 0 || (size_t)written >= string_buffer_size) {
         ESP_LOGW(TAG, "Buffer too small for battery data string");
         return -1;  // Indicate error
@@ -196,11 +194,14 @@ int battery_monitor_get_data_string(char *string_buffer, size_t string_buffer_si
 }
 
 static void battery_monitor_log_data(void) {
+
     char log_buffer[BAT_MON_LOG_BUF_SIZE];
-    if (battery_monitor_get_data_string(log_buffer, sizeof(log_buffer)) > 0) {
-        ESP_LOGI(TAG, "%s", log_buffer);
-    }
-    else {
+
+    /* Check if string formatting was successful */
+    if (battery_monitor_get_data_string(log_buffer, sizeof(log_buffer)) < 0) {
         ESP_LOGE(TAG, "Failed to get battery data string");
+        return;
     }
+    /* Log the formatted battery data */
+    ESP_LOGI(TAG, "%s", log_buffer);
 }

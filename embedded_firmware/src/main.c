@@ -5,8 +5,6 @@
  * Attribution appreciated but not required.
  */
 
-
-
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "../dog_collar/dog_collar_state_machine/dog_collar_state_machine.h"
