@@ -19,6 +19,8 @@ esp_err_t gps_l96_init(void) {
     ESP_RETURN_ON_ERROR(uart_init(), 
                         TAG, "Failed to initialize UART for GPS L96");
 
+    gpio_reset_gps(); 
+    
     /*Delay so that GPS module can initialize properly - MUST have.*/ 
     vTaskDelay(pdMS_TO_TICKS(GPS_L96_INIT_WAIT_TIME_MS));
 
