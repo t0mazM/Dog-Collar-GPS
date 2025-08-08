@@ -12,6 +12,8 @@
 
 void app_main() {
 
+    vTaskDelay(6000 / portTICK_PERIOD_MS); // Delay to allow system to stabilize
+
     /* Create FreeRTOS tasks */
     xTaskCreate(state_machine_task, "state_machine_task", 4096, NULL, 1, NULL);
     xTaskCreate(led_task, "led_task", 2048, NULL, 2, NULL);

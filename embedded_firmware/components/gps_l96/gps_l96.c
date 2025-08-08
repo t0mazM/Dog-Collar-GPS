@@ -33,6 +33,9 @@ esp_err_t gps_l96_init(void) {
                         TAG, 
                         "Failed to send GNSS_SET_UPDATE_RATE_1HZ command");
 
+    ESP_RETURN_ON_ERROR(nvs_flash_init(), 
+                        TAG, "Failed to initialize NVS flash");
+
     return ESP_OK;
 }
 
@@ -165,8 +168,6 @@ esp_err_t gps_l96_extract_and_process_nmea_sentences(const uint8_t *buffer, size
     
 }
 
-
-
 esp_err_t gps_l96_extract_data_from_nmea_sentence(const char *nmea_sentence) {
 
     enum minmea_sentence_id nmea_id = minmea_sentence_id(nmea_sentence, false);
@@ -214,10 +215,10 @@ esp_err_t gps_l96_start_activity_tracking(const char *filename) {  // Make const
 
 esp_err_t gps_l96_stop_activity_tracking(void) {  // Remove filename parameter - we don't need it
     // Stop recording
-    ESP_RETURN_ON_ERROR(gps_l96_go_to_standby_mode(), 
-                        TAG, 
-                        "Failed to stop GPS recording");
-
+    esp_err_t ret = gps_l96_go_to_standby_mode(); 
+    if(ret != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to stop GPS recording");
+    }
     // Mark session as completed - clear filename since session is done
     ESP_RETURN_ON_ERROR(gps_nvs_save_session_status("", 0, true), 
                         TAG, 
@@ -239,8 +240,8 @@ esp_err_t gps_check_recovery_needed(char *filename, size_t filename_size, bool *
 static esp_err_t gps_nvs_save_session_status(char* filename, size_t filename_size, bool completed_normally) {
     nvs_handle_t nvs_handle;
     esp_err_t ret;
+    gps_session_status_t gps_session_status = {0}; 
 
-    gps_session_status_t gps_session_status = {0};
 
     /* Add filename to struct*/
     if (filename != NULL) {
@@ -282,26 +283,39 @@ static esp_err_t gps_nvs_save_session_status(char* filename, size_t filename_siz
 }
 
 static esp_err_t gps_nvs_load_session_status(char *filename, size_t filename_size, bool *completed_normally) {
-    gps_session_status_t session_status; // Stack allocation instead of pointer
+    gps_session_status_t gps_session_status = {
+        .tracking_completed = true,
+        .filename = "default_file_name"
+    }; 
     nvs_handle_t nvs_handle;
     esp_err_t ret;
     size_t required_size = sizeof(gps_session_status_t);
 
-    // Initialize session status with safe defaults
-    memset(&session_status, 0, sizeof(gps_session_status_t));
-    session_status.tracking_completed = true; // Default to "no recovery needed"
-
     /* Open NVS */
     ret = nvs_open(NVS_NAMESPACE, NVS_READONLY, &nvs_handle);
+    
+    // Handle namespace not found (first boot)
+    if (ret == ESP_ERR_NVS_NOT_FOUND) {
+        gps_nvs_save_session_status(gps_session_status.filename, 
+                                    sizeof(gps_session_status.filename), 
+                                    gps_session_status.tracking_completed);
+        ESP_LOGE(TAG, "No nvs data found. Making new entry with filename='%s' and completed=%s",
+                 gps_session_status.filename,
+                 gps_session_status.tracking_completed ? "true" : "false"); 
+    }
+
+    /* again open NVS */
+    ret = nvs_open(NVS_NAMESPACE, NVS_READONLY, &nvs_handle);
+    
     if (ret != ESP_OK) {
         ESP_LOGW(TAG, "Failed to open NVS handle for reading: %s", esp_err_to_name(ret));
         *completed_normally = true; // Set safe default
         return ret;
     }
 
-    ret = nvs_get_blob(nvs_handle, NVS_GPS_RECOVERY_STRUCT_KEY, &session_status, &required_size);
+    ret = nvs_get_blob(nvs_handle, NVS_GPS_RECOVERY_STRUCT_KEY, &gps_session_status, &required_size);
     if (ret == ESP_ERR_NVS_NOT_FOUND) {
-        ESP_LOGI(TAG, "GPS session state not found in NVS, assuming first boot");
+        ESP_LOGD(TAG, "GPS session state key not found in NVS (first boot)");
         *completed_normally = true; // Set safe default
         nvs_close(nvs_handle);
         return ESP_OK; // Not an error, just first boot
@@ -315,15 +329,15 @@ static esp_err_t gps_nvs_load_session_status(char *filename, size_t filename_siz
     }
 
     ESP_LOGI(TAG, "Loaded GPS session state: file='%s', completed=%s",
-            session_status.filename,
-            session_status.tracking_completed ? "true" : "false");
+            gps_session_status.filename,
+            gps_session_status.tracking_completed ? "true" : "false");
     
     /* Update output parameters */
     if (filename != NULL && filename_size > 0) {
-        strncpy(filename, session_status.filename, filename_size - 1);
+        strncpy(filename, gps_session_status.filename, filename_size - 1);
         filename[filename_size - 1] = '\0';
     }
-    *completed_normally = session_status.tracking_completed;
+    *completed_normally = gps_session_status.tracking_completed;
 
     nvs_close(nvs_handle);
     return ESP_OK;

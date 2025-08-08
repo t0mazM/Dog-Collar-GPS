@@ -21,7 +21,7 @@
 
 /* NVS (Non-Volatile Storage) keys for GPS tracking state */
 #define NVS_NAMESPACE "dog_collar"
-#define NVS_GPS_RECOVERY_STRUCT_KEY "gps_recovery_data"
+#define NVS_GPS_RECOVERY_STRUCT_KEY "gps_recovery"
 
 typedef struct {
     char filename[64];  

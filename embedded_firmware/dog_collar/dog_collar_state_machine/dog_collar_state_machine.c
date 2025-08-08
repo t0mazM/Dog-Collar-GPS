@@ -10,7 +10,8 @@
 static char *get_current_state_string(dog_collar_state_t state);
 static esp_err_t gps_tracking_task(char *gps_file_name);
 static bool checked_wakeup = false;
-static bool gps_tracking_finished_normally = false; // Used to continue GPS activity if tracking is interrupted
+static bool gps_recovery_needed = false; // Used to continue GPS activity if tracking is interrupted
+static bool checked_gps_recovery = false;
 
 static const char *TAG = "DOG_COLLAR_STATE_MACHINE";
 
@@ -80,11 +81,31 @@ dog_collar_state_t dog_collar_state_machine_run(void) {
 
     printf("Current state: %s\n", get_current_state_string(current_state));
 
+
+
     if (!checked_wakeup) {
         current_state = get_initial_state_from_wakeup(current_state);
         checked_wakeup = true;
     }
     current_state = battery_management_routine(current_state);
+
+
+    if(checked_gps_recovery == false) {
+        checked_gps_recovery = true;
+
+        gps_check_recovery_needed(gps_file_name, sizeof(gps_file_name), &gps_recovery_needed);
+
+        printf("gps_recovery_needed: %d\n", gps_recovery_needed);
+        if (gps_recovery_needed) {
+            printf(" going to gps tracking\n");
+
+            gps_l96_start_activity_tracking(gps_file_name);
+            current_state = DOG_COLLAR_STATE_GPS_TRACKING;
+        }
+    }
+
+
+
     led_management_set_pattern(current_state);
 
     return current_state;
@@ -117,9 +138,9 @@ dog_collar_state_t battery_management_routine(dog_collar_state_t current_state) 
 
     // 4) Return correct state based on battery data:
     // a) CHARGING
-    if (battery_data.current > 0 && current_state != DOG_COLLAR_STATE_CHARGING) {
+    if (battery_data.current > 0) {
         ESP_LOGI(TAG, "Battery is charging");
-        return DOG_COLLAR_STATE_CHARGING;
+        //return DOG_COLLAR_STATE_CHARGING;
     }
 
     // b) CRITICAL (battery is about to be empty)
@@ -174,8 +195,6 @@ dog_collar_state_t handle_critical_low_battery_state(void) {
 
 dog_collar_state_t handle_charging_state(void) {
 
-    gps_l96_start_recording();
-
     wifi_manager_reconnect(); 
 
     if(battery_data.current < 0) {
@@ -202,14 +221,14 @@ dog_collar_state_t handle_gps_acquiring_state(void) {
         return DOG_COLLAR_STATE_GPS_READY;
     }
 
-    return DOG_COLLAR_STATE_GPS_ACQUIRING; // Loop back to GPS_ACQUIRING
+    return DOG_COLLAR_STATE_GPS_ACQUIRING; 
 }
 
 dog_collar_state_t handle_gps_ready_state(void) {
 
     /* Check for user input */
     if (is_button_short_pressed()) { 
-        return DOG_COLLAR_STATE_GPS_FILE_CREATION; // go and create a GPS file
+        return DOG_COLLAR_STATE_GPS_FILE_CREATION; 
     }
     if (is_button_long_pressed()) {
         return DOG_COLLAR_STATE_NORMAL;            // go back to normal state
@@ -225,6 +244,8 @@ dog_collar_state_t handle_gps_file_creation_state(void) {
         ESP_LOGE(TAG, "Failed to create GPS file");
         return DOG_COLLAR_STATE_ERROR;
     }
+
+    gps_l96_start_activity_tracking(gps_file_name);
 
     return DOG_COLLAR_STATE_GPS_TRACKING;
 }
@@ -245,7 +266,6 @@ dog_collar_state_t handle_waiting_for_gps_fix_state(void) {
 
 dog_collar_state_t handle_gps_tracking_state(void) {
 
-    ESP_LOGI(TAG, "Tracking GPS");
     if (is_button_short_pressed()) { 
         return DOG_COLLAR_STATE_GPS_PAUSED; 
     }
@@ -258,10 +278,11 @@ dog_collar_state_t handle_gps_tracking_state(void) {
 dog_collar_state_t handle_gps_paused_state(void) {
     
     if (is_button_short_pressed()) { 
-        return DOG_COLLAR_STATE_GPS_TRACKING; // go and create a GPS file
+        return DOG_COLLAR_STATE_GPS_TRACKING; 
     }
     if (is_button_long_pressed()) {
-        return DOG_COLLAR_STATE_NORMAL;            // go back to normal state
+        gps_l96_stop_activity_tracking();
+        return DOG_COLLAR_STATE_NORMAL; 
     }
 
     return DOG_COLLAR_STATE_GPS_PAUSED;
