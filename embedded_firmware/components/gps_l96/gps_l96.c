@@ -6,11 +6,13 @@
  */
 
 #include "gps_l96.h"
-
 static const char *TAG = "GPS_L96";
 
-
 struct minmea_sentence_rmc gps_rcm_data; // GPS RMC data structure to hold parsed data
+
+static esp_err_t gps_nvs_save_session_status(char* filename, size_t filename_size, bool completed_normally);
+static esp_err_t gps_nvs_load_session_status(char* filename, size_t filename_size, bool *completed_normally);
+
 
 esp_err_t gps_l96_init(void) {
 
@@ -50,7 +52,6 @@ esp_err_t gps_l96_go_to_standby_mode(void) {
 
 esp_err_t gps_l96_start_recording(void) {
 
-    //gpio_reset_gps();
     gps_force_on_set(true); //Crucial to set it to HIGH
 
     
@@ -197,14 +198,134 @@ void gps_l96_print_data(void){ // a DEBUG function to print GPS data
 
 }
 
-esp_err_t gps_l96_start_activity_tracking(void) {
-
+esp_err_t gps_l96_start_activity_tracking(const char *filename) {  // Make const since we're reading from it
     // Start recording
     ESP_RETURN_ON_ERROR(gps_l96_start_recording(), 
                         TAG, 
                         "Failed to start GPS recording");
+        
+    /* Save session state */
+    /* Set to false, so if we crash, we can see if we need to recover */
+    ESP_RETURN_ON_ERROR(gps_nvs_save_session_status((char*)filename, strlen(filename), false), 
+                        TAG,
+                        "Failed to save GPS session completion state");
+    return ESP_OK;
+}
 
+esp_err_t gps_l96_stop_activity_tracking(void) {  // Remove filename parameter - we don't need it
+    // Stop recording
+    ESP_RETURN_ON_ERROR(gps_l96_go_to_standby_mode(), 
+                        TAG, 
+                        "Failed to stop GPS recording");
 
+    // Mark session as completed - clear filename since session is done
+    ESP_RETURN_ON_ERROR(gps_nvs_save_session_status("", 0, true), 
+                        TAG, 
+                        "Failed to save GPS session completion state");
+    return ESP_OK;
+}
+
+esp_err_t gps_check_recovery_needed(char *filename, size_t filename_size, bool *recovery_needed) {  // Add missing parameter
+    bool session_completed_normally = true;
+
+    ESP_RETURN_ON_ERROR(gps_nvs_load_session_status(filename, filename_size, &session_completed_normally),
+                        TAG, "Failed to load GPS session status");
+
+    *recovery_needed = !session_completed_normally;
+        
+    return ESP_OK;
+}
+
+static esp_err_t gps_nvs_save_session_status(char* filename, size_t filename_size, bool completed_normally) {
+    nvs_handle_t nvs_handle;
+    esp_err_t ret;
+
+    gps_session_status_t gps_session_status = {0};
+
+    /* Add filename to struct*/
+    if (filename != NULL) {
+        strncpy(gps_session_status.filename, filename, sizeof(gps_session_status.filename) - 1);
+        gps_session_status.filename[sizeof(gps_session_status.filename) - 1] = '\0';
+    }
+    /* Add completion flag to struct */
+    gps_session_status.tracking_completed = completed_normally;
+
+    /* Open NVS */
+    ret = nvs_open(NVS_NAMESPACE, NVS_READWRITE, &nvs_handle);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to open NVS handle for writing: %s", esp_err_to_name(ret));
+        return ret;
+    }
+
+    /* Save struct to NVS */
+    ret = nvs_set_blob(nvs_handle, NVS_GPS_RECOVERY_STRUCT_KEY, &gps_session_status, sizeof(gps_session_status));
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to save GPS session status struct to NVS: %s", esp_err_to_name(ret));
+        nvs_close(nvs_handle);
+        return ret;
+    }
+
+    /* Commit changes */
+    ret = nvs_commit(nvs_handle);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to commit NVS changes: %s", esp_err_to_name(ret));
+        nvs_close(nvs_handle);
+        return ret;
+    }
+
+    ESP_LOGI(TAG, "Saved GPS session status struct: file='%s', completed=%s",
+             gps_session_status.filename,
+             gps_session_status.tracking_completed ? "true" : "false");
+
+    nvs_close(nvs_handle);
+    return ESP_OK;
+}
+
+static esp_err_t gps_nvs_load_session_status(char *filename, size_t filename_size, bool *completed_normally) {
+    gps_session_status_t session_status; // Stack allocation instead of pointer
+    nvs_handle_t nvs_handle;
+    esp_err_t ret;
+    size_t required_size = sizeof(gps_session_status_t);
+
+    // Initialize session status with safe defaults
+    memset(&session_status, 0, sizeof(gps_session_status_t));
+    session_status.tracking_completed = true; // Default to "no recovery needed"
+
+    /* Open NVS */
+    ret = nvs_open(NVS_NAMESPACE, NVS_READONLY, &nvs_handle);
+    if (ret != ESP_OK) {
+        ESP_LOGW(TAG, "Failed to open NVS handle for reading: %s", esp_err_to_name(ret));
+        *completed_normally = true; // Set safe default
+        return ret;
+    }
+
+    ret = nvs_get_blob(nvs_handle, NVS_GPS_RECOVERY_STRUCT_KEY, &session_status, &required_size);
+    if (ret == ESP_ERR_NVS_NOT_FOUND) {
+        ESP_LOGI(TAG, "GPS session state not found in NVS, assuming first boot");
+        *completed_normally = true; // Set safe default
+        nvs_close(nvs_handle);
+        return ESP_OK; // Not an error, just first boot
+    }
+
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to read GPS session state from NVS: %s", esp_err_to_name(ret));
+        *completed_normally = true; // Set safe default
+        nvs_close(nvs_handle);
+        return ret;
+    }
+
+    ESP_LOGI(TAG, "Loaded GPS session state: file='%s', completed=%s",
+            session_status.filename,
+            session_status.tracking_completed ? "true" : "false");
+    
+    /* Update output parameters */
+    if (filename != NULL && filename_size > 0) {
+        strncpy(filename, session_status.filename, filename_size - 1);
+        filename[filename_size - 1] = '\0';
+    }
+    *completed_normally = session_status.tracking_completed;
+
+    nvs_close(nvs_handle);
     return ESP_OK;
 }
 

@@ -10,6 +10,7 @@
 static char *get_current_state_string(dog_collar_state_t state);
 static esp_err_t gps_tracking_task(char *gps_file_name);
 static bool checked_wakeup = false;
+static bool gps_tracking_finished_normally = false; // Used to continue GPS activity if tracking is interrupted
 
 static const char *TAG = "DOG_COLLAR_STATE_MACHINE";
 

@@ -9,6 +9,7 @@
         "http_server.h": "c",
         "led_management.h": "c",
         "task.h": "c",
-        "rtc_io.h": "c"
+        "rtc_io.h": "c",
+        "file_system_littlefs.h": "c"
     }
 }

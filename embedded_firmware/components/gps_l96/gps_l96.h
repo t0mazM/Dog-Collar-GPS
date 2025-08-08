@@ -10,16 +10,24 @@
 
 #include "nmea_commands.h"
 #include "gpio_expander/gpio_expander.h"
+#include "../file_system_littlefs/file_system_littlefs.h" 
 #include "uart.h"
 #include "minmea.h"
+#include "nvs_flash.h"
+#include "nvs.h"
 
 #define GPS_L96_INIT_WAIT_TIME_MS 1000 // Time to wait for GPS module to process init commands
-
 #define NMEA_SENTENCE_BUF_SIZE 1024 
 
+/* NVS (Non-Volatile Storage) keys for GPS tracking state */
+#define NVS_NAMESPACE "dog_collar"
+#define NVS_GPS_RECOVERY_STRUCT_KEY "gps_recovery_data"
+
 typedef struct {
-    uint8_t gps_point[3];
-} gps_l96_data_t;
+    char filename[64];  
+    bool tracking_completed;
+} gps_session_status_t;
+
 
 /**
  * @brief Initializes the GPS L96 module.
@@ -126,9 +134,6 @@ esp_err_t gps_l96_extract_data_from_nmea_sentence(const char *nmea_sentence);
 
 void gps_l96_print_data(void);
 
-
-esp_err_t gps_l96_start_activity_tracking(void);
-
 /**
  * @brief Formats a CSV line from the GPS data.
  *
@@ -172,5 +177,33 @@ void gpio_reset_gps(void);
  * @return ESP_OK on success, or an error code on failure.
  */
 esp_err_t gps_force_on_set(bool enable);
+
+/**
+ * @brief Start GPS activity tracking with specified filename
+ * 
+ * @param filename Name of the GPS file being created
+ * @return ESP_OK on success, or an error code on failure
+ */
+esp_err_t gps_l96_start_activity_tracking(const char *filename);
+
+/**
+ * @brief Stop GPS activity tracking normally
+ * 
+ * @return ESP_OK on success, or an error code on failure
+ */
+esp_err_t gps_l96_stop_activity_tracking(void);
+
+/**
+ * @brief Check if GPS tracking recovery is needed and get interrupted filename
+ * 
+ * @param filename Buffer to store the interrupted filename
+ * @param filename_size Size of the filename buffer
+ * @param recovery_needed Pointer to store the recovery status
+ * @return ESP_OK on success, or an error code on failure
+ */
+esp_err_t gps_check_recovery_needed(char *filename, size_t filename_size, bool *recovery_needed);
+
+
+
 
 #endif // GPS_L96_H
