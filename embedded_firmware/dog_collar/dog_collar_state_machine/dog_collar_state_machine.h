@@ -56,7 +56,7 @@ typedef enum {
 
 #define LIGHT_SLEEP_MAX_COUNT 15        // After LIGHT_SLEEP_MAX_COUNT light sleeps, we will go for longer deep sleep.
 
-#define LIGHT_SLEEP_TIME_S 15     // 15 seconds
+#define LIGHT_SLEEP_TIME_S 5      // 5 seconds
 #define DEEP_SLEEP_TIME_S 60 * 60 // 60 minutes
 
 #define GPS_ACQUIRE_TIMEOUT_MS 5*60*1000 // 5 minutes

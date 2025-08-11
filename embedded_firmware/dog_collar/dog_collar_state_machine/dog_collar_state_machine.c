@@ -225,7 +225,7 @@ dog_collar_state_t handle_gps_acquiring_state(void) {
         return DOG_COLLAR_STATE_GPS_READY;
     }
 
-    return DOG_COLLAR_STATE_GPS_ACQUIRING; 
+    return DOG_COLLAR_STATE_LIGHT_SLEEP; 
 }
 
 dog_collar_state_t handle_gps_ready_state(void) {
@@ -238,7 +238,7 @@ dog_collar_state_t handle_gps_ready_state(void) {
         return DOG_COLLAR_STATE_NORMAL;            // go back to normal state
     }
 
-    return DOG_COLLAR_STATE_GPS_READY;
+    return DOG_COLLAR_STATE_LIGHT_SLEEP;
 }
 
 dog_collar_state_t handle_gps_file_creation_state(void) {
@@ -265,7 +265,7 @@ dog_collar_state_t handle_waiting_for_gps_fix_state(void) {
         return DOG_COLLAR_STATE_NORMAL;            
     }
 
-    return DOG_COLLAR_STATE_WAITING_FOR_GPS_FIX; // Loop back to WAITING_FOR_GPS_FIX
+    return DOG_COLLAR_STATE_LIGHT_SLEEP; 
 }
 
 dog_collar_state_t handle_gps_tracking_state(void) {
@@ -276,7 +276,7 @@ dog_collar_state_t handle_gps_tracking_state(void) {
 
     gps_tracking_task(gps_file_name);
 
-    return DOG_COLLAR_STATE_GPS_TRACKING;
+    return DOG_COLLAR_STATE_LIGHT_SLEEP;
 }
 
 dog_collar_state_t handle_gps_paused_state(void) {
@@ -289,7 +289,7 @@ dog_collar_state_t handle_gps_paused_state(void) {
         return DOG_COLLAR_STATE_NORMAL; 
     }
 
-    return DOG_COLLAR_STATE_GPS_PAUSED;
+    return DOG_COLLAR_STATE_LIGHT_SLEEP;
 }
 
 dog_collar_state_t handle_wifi_sync_state(void) {
