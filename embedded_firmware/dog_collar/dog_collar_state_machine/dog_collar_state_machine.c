@@ -18,7 +18,6 @@ static dog_collar_state_t current_state = DOG_COLLAR_STATE_INITIALIZING;
 static dog_collar_state_t previous_state = DOG_COLLAR_STATE_INITIALIZING;
 static uint32_t state_entry_time = 0;
 static char gps_file_name[LFS_MAX_FILE_NAME_SIZE] = {0};
-static bool checked_wakeup = false;      // Indicates if wakeup reason has been checked
 static bool gps_recovery_needed = false; // Used to continue GPS activity if tracking is interrupted
 static bool checked_gps_recovery = false;// Indicates if GPS recovery has been checked
 
@@ -92,28 +91,7 @@ dog_collar_state_t dog_collar_state_machine_run(void) {
     }
 
     printf("Current state: %s\n", get_current_state_string(current_state));
-
-    if (!checked_wakeup) {
-        current_state = get_initial_state_from_wakeup(current_state);
-        checked_wakeup = true;
-    }
     current_state = battery_management_routine(current_state);
-
-
-    if(checked_gps_recovery == false) {
-        checked_gps_recovery = true;
-
-        gps_check_recovery_needed(gps_file_name, sizeof(gps_file_name), &gps_recovery_needed);
-
-        printf("gps_recovery_needed: %d\n", gps_recovery_needed);
-        if (gps_recovery_needed) {
-            printf(" going to gps tracking\n");
-
-            gps_l96_start_activity_tracking(gps_file_name);
-            current_state = DOG_COLLAR_STATE_GPS_TRACKING;
-        }
-    }
-
     led_management_set_pattern(current_state);
 
     return current_state;
@@ -167,7 +145,6 @@ dog_collar_state_t battery_management_routine(dog_collar_state_t current_state) 
 
 dog_collar_state_t handle_initializing_state(void) {
    
-
     esp_err_t init_result = dog_collar_components_init();
 
     if (init_result != ESP_OK) {
@@ -178,6 +155,21 @@ dog_collar_state_t handle_initializing_state(void) {
 }
 
 dog_collar_state_t handle_normal_state(void) {
+
+    if (was_woken_by_button_press()) {
+        return DOG_COLLAR_STATE_GPS_ACQUIRING;
+    }
+
+    if(checked_gps_recovery == false) {
+        checked_gps_recovery = true;
+
+        gps_check_recovery_needed(gps_file_name, sizeof(gps_file_name), &gps_recovery_needed);
+
+        if (gps_recovery_needed) {
+            gps_l96_start_activity_tracking(gps_file_name);
+            return DOG_COLLAR_STATE_GPS_TRACKING;
+        }
+    }
 
     // 1) Check if button was pressed
     if (is_button_short_pressed()) {
@@ -333,24 +325,11 @@ dog_collar_state_t handle_wifi_sync_state(void) {
 
 dog_collar_state_t  handle_light_sleep_state(void) {
 
-    static uint8_t consecutive_light_sleeps = 0;
-    
-    if(consecutive_light_sleeps > LIGHT_SLEEP_MAX_COUNT) {
-        consecutive_light_sleeps = 0; 
-        return DOG_COLLAR_STATE_DEEP_SLEEP; // Go to deep sleep if max count reached
-    }
-
     gpio_turn_off_leds(LED_RED | LED_YELLOW | LED_GREEN);
-    gps_l96_go_to_back_up_mode();
-
-    esp_sleep_enable_timer_wakeup((uint64_t)LIGHT_SLEEP_TIME_S * 1000000); 
-    esp_sleep_enable_uart_wakeup(UART_PORT_NUM);          // Wake on UART activity TODO:test this with sleep while gps is tracking
-
+    esp_sleep_enable_timer_wakeup((uint64_t)LIGHT_SLEEP_TIME_S * 1000000);
     esp_light_sleep_start();
 
-    consecutive_light_sleeps++; 
-
-    return DOG_COLLAR_STATE_NORMAL;
+    return current_state; // Continues the work where it left off
 }
 
 dog_collar_state_t handle_deep_sleep_state(void) {
@@ -373,14 +352,23 @@ dog_collar_state_t handle_error_state(void) {
     return DOG_COLLAR_STATE_INITIALIZING;
 }
 
-dog_collar_state_t get_initial_state_from_wakeup(dog_collar_state_t input_state) {
-    /* If the device was woken up from deep sleep by a GPIO interrupt, go to GPS_ACQUIRING state */
+bool was_woken_by_button_press(void) {
+    static bool checked_wakeup = false;
+
+    /* First check if wakeup reason has been checked already*/
+    if(checked_wakeup) {
+        return false; // Already checked, no longer a wakeup event
+    }
+
+    /* Check the wakeup reason */
     esp_sleep_wakeup_cause_t wakeup_reason = esp_sleep_get_wakeup_cause();
     if (wakeup_reason == ESP_SLEEP_WAKEUP_GPIO) {
-        return DOG_COLLAR_STATE_GPS_ACQUIRING;
+        checked_wakeup = true;
+        return true;
     }
-    return input_state;
 
+    checked_wakeup = true; 
+    return false;   
 }
 
 static char *get_current_state_string(dog_collar_state_t state) {
