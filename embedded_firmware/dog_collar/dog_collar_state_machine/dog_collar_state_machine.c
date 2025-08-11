@@ -126,7 +126,7 @@ dog_collar_state_t battery_management_routine(dog_collar_state_t current_state) 
     // a) CHARGING
     if (battery_data.current > 0) {
         ESP_LOGI(TAG, "Battery is charging");
-        return DOG_COLLAR_STATE_CHARGING;
+        //return DOG_COLLAR_STATE_CHARGING;
     }
 
     // b) CRITICAL (battery is about to be empty)
@@ -206,6 +206,8 @@ dog_collar_state_t handle_charging_state(void) {
 
 dog_collar_state_t handle_gps_acquiring_state(void) {
 
+    printf("Acquiring GPS...\n");
+
     /* Check if time is up */
     if (xTaskGetTickCount() - state_entry_time > (GPS_ACQUIRE_TIMEOUT_MS / portTICK_PERIOD_MS) ) {
         return DOG_COLLAR_STATE_NORMAL;
@@ -225,7 +227,8 @@ dog_collar_state_t handle_gps_acquiring_state(void) {
         return DOG_COLLAR_STATE_GPS_READY;
     }
 
-    return DOG_COLLAR_STATE_LIGHT_SLEEP; 
+    go_to_light_sleep();
+    return DOG_COLLAR_STATE_GPS_ACQUIRING; 
 }
 
 dog_collar_state_t handle_gps_ready_state(void) {
@@ -238,7 +241,8 @@ dog_collar_state_t handle_gps_ready_state(void) {
         return DOG_COLLAR_STATE_NORMAL;            // go back to normal state
     }
 
-    return DOG_COLLAR_STATE_LIGHT_SLEEP;
+    go_to_light_sleep();
+    return DOG_COLLAR_STATE_GPS_READY;
 }
 
 dog_collar_state_t handle_gps_file_creation_state(void) {
@@ -265,7 +269,8 @@ dog_collar_state_t handle_waiting_for_gps_fix_state(void) {
         return DOG_COLLAR_STATE_NORMAL;            
     }
 
-    return DOG_COLLAR_STATE_LIGHT_SLEEP; 
+    go_to_light_sleep();
+    return DOG_COLLAR_STATE_WAITING_FOR_GPS_FIX;
 }
 
 dog_collar_state_t handle_gps_tracking_state(void) {
@@ -276,7 +281,8 @@ dog_collar_state_t handle_gps_tracking_state(void) {
 
     gps_tracking_task(gps_file_name);
 
-    return DOG_COLLAR_STATE_LIGHT_SLEEP;
+    go_to_light_sleep();
+    return DOG_COLLAR_STATE_GPS_TRACKING;
 }
 
 dog_collar_state_t handle_gps_paused_state(void) {
@@ -289,7 +295,8 @@ dog_collar_state_t handle_gps_paused_state(void) {
         return DOG_COLLAR_STATE_NORMAL; 
     }
 
-    return DOG_COLLAR_STATE_LIGHT_SLEEP;
+    go_to_light_sleep();
+    return DOG_COLLAR_STATE_GPS_PAUSED;
 }
 
 dog_collar_state_t handle_wifi_sync_state(void) {
@@ -325,12 +332,24 @@ dog_collar_state_t handle_wifi_sync_state(void) {
 
 dog_collar_state_t  handle_light_sleep_state(void) {
 
-    gpio_turn_off_leds(LED_RED | LED_YELLOW | LED_GREEN);
-    esp_sleep_enable_timer_wakeup((uint64_t)LIGHT_SLEEP_TIME_S * 1000000);
-    esp_light_sleep_start();
+    //gpio_turn_off_leds(LED_RED | LED_YELLOW | LED_GREEN);
+    esp_sleep_enable_timer_wakeup((uint64_t)LIGHT_SLEEP_TIME_MS * 1000);
+    //esp_light_sleep_start();
 
-    return current_state; // Continues the work where it left off
+    vTaskDelay(pdMS_TO_TICKS(1000));
+
+
+    return DOG_COLLAR_STATE_NORMAL; // You can't easily go back where you came from, so just use function go_to_light_sleep
 }
+
+esp_err_t go_to_light_sleep(void){
+
+    esp_sleep_enable_timer_wakeup((uint64_t)LIGHT_SLEEP_TIME_MS * 1000);
+    //esp_light_sleep_start(); // this line disables future uart comunications from d+ d- pins until next boot
+    vTaskDelay(pdMS_TO_TICKS(LIGHT_SLEEP_TIME_MS));
+    return ESP_OK;
+}
+
 
 dog_collar_state_t handle_deep_sleep_state(void) {
     
@@ -349,7 +368,7 @@ dog_collar_state_t handle_deep_sleep_state(void) {
 
 dog_collar_state_t handle_error_state(void) {
 
-    return DOG_COLLAR_STATE_INITIALIZING;
+    return DOG_COLLAR_STATE_ERROR;
 }
 
 bool was_woken_by_button_press(void) {

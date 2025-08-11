@@ -56,7 +56,7 @@ typedef enum {
 
 #define LIGHT_SLEEP_MAX_COUNT 15        // After LIGHT_SLEEP_MAX_COUNT light sleeps, we will go for longer deep sleep.
 
-#define LIGHT_SLEEP_TIME_S 5      // 5 seconds
+#define LIGHT_SLEEP_TIME_MS 500      // 0.5 seconds
 #define DEEP_SLEEP_TIME_S 60 * 60 // 60 minutes
 
 #define GPS_ACQUIRE_TIMEOUT_MS 5*60*1000 // 5 minutes
@@ -228,18 +228,23 @@ dog_collar_state_t handle_wifi_sync_state(void);
 /**
  * @brief Handles the light sleep state of the dog collar.
  *
- * - Turns off all LEDs.
- * - Puts the GPS L96 module into back-up mode.
- * - Puts the device into light sleep to save power.
- * - Wakes up on button press or after a certain period defined by LIGHT_SLEEP_TIME_S.
- * 
- *  After light sleep it will continue the state machine from the current state.
- *  It will light sleep for MAX_LIGHT_SLEEP_MAX_COUNT times in a row, then it will go to deep sleep.
- *  If it was woken up by a GPIO interrupt, it will enter the GPS_ACQUIRING state.
+ * Puts the device in light sleep for LIGHT_SLEEP_TIME_S seconds.
+ * After wake up it will go to normal state.
+ * It is recomended to use function go_to_light_sleep() if you want to continue the work.
  *
- * @note Both light and deep sleep permanently turn off the USB UART, so we cannot use it to wake up the device.
+ * @note Both light sleep permanently turn off the USB UART, so we cannot use it for debugging.
  * @return dog_collar_state_t deep_sleep state if we have been in light sleep for too long, normal state if button is pressed.
  */
+
+/**
+ * @brief Puts the device in light sleep for a specified time.
+ *
+ * Use this function to enter light sleep mode and save power.
+ *
+ * @return esp_err_t ESP_OK on success, or an error code on failure.
+ */
+ esp_err_t go_to_light_sleep(void);
+
 dog_collar_state_t  handle_light_sleep_state(void);
 
 /**

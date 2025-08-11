@@ -31,6 +31,8 @@ static void gps_waiting_for_fix_led_pattern();
 static void gps_tracking_led_pattern();
 static void gps_paused_led_pattern();
 static void wifi_sync_led_pattern();
+static void light_sleep_led_pattern();
+static void deep_sleep_led_pattern();
 static void error_led_pattern();
 
 
@@ -83,6 +85,12 @@ void led_task(void *pvParameters) {
             case DOG_COLLAR_STATE_WIFI_SYNC:
                 wifi_sync_led_pattern();
                 break;
+            case DOG_COLLAR_STATE_LIGHT_SLEEP:
+                light_sleep_led_pattern();
+                break;
+            case DOG_COLLAR_STATE_DEEP_SLEEP:
+                deep_sleep_led_pattern();
+                break;
             case DOG_COLLAR_STATE_ERROR:
                 error_led_pattern();
                 break;
@@ -120,7 +128,7 @@ static void low_battery_led_pattern() {
 
 static void critical_low_battery_led_pattern() {
     gpio_turn_on_leds(LED_RED);
-    vTaskDelay(pdMS_TO_TICKS(100));
+    vTaskDelay(pdMS_TO_TICKS(500));
     gpio_turn_off_leds(LED_RED | LED_YELLOW | LED_GREEN);
     vTaskDelay(pdMS_TO_TICKS(2000));
 }
@@ -179,9 +187,17 @@ static void wifi_sync_led_pattern() {
     vTaskDelay(pdMS_TO_TICKS(100));
 }
 
+static void light_sleep_led_pattern() {
+// we do nothing
+}
+
+static void deep_sleep_led_pattern() {
+// we do nothing
+}
+
 static void error_led_pattern() {
     gpio_turn_on_leds(LED_RED);
-    vTaskDelay(pdMS_TO_TICKS(500));
+    vTaskDelay(pdMS_TO_TICKS(2000));
     gpio_turn_off_leds(LED_RED | LED_YELLOW | LED_GREEN);
     vTaskDelay(pdMS_TO_TICKS(500));
 }
