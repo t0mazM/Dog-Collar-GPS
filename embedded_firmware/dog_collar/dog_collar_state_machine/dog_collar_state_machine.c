@@ -140,7 +140,7 @@ dog_collar_state_t battery_management_routine(dog_collar_state_t current_state) 
     // a) CHARGING
     if (battery_data.current > 0) {
         ESP_LOGI(TAG, "Battery is charging");
-        //return DOG_COLLAR_STATE_CHARGING;
+        return DOG_COLLAR_STATE_CHARGING;
     }
 
     // b) CRITICAL (battery is about to be empty)
@@ -214,7 +214,6 @@ dog_collar_state_t handle_gps_acquiring_state(void) {
         return DOG_COLLAR_STATE_NORMAL;            // go back to normal state
     }
 
-    gps_l96_start_recording();
     gps_tracking_task(NULL); // Just to check if we have GPS fix
 
     if(gps_l96_has_fix() ) {
