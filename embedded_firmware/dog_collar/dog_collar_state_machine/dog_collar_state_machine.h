@@ -59,6 +59,8 @@ typedef enum {
 #define LIGHT_SLEEP_TIME_S 15     // 15 seconds
 #define DEEP_SLEEP_TIME_S 60 * 60 // 60 minutes
 
+#define GPS_ACQUIRE_TIMEOUT_MS 5*60*1000 // 5 minutes
+
 #define WAIT_AFTER_USER_PRESS_MS 500    // Wait after user press in milliseconds
 
 /**

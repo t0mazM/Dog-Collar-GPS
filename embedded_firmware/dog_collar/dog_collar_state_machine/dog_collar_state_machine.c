@@ -7,17 +7,20 @@
 
 #include "dog_collar_state_machine.h"
 
+static const char *TAG = "DOG_COLLAR_STATE_MACHINE";
+
+/* Function Prototypes */
 static char *get_current_state_string(dog_collar_state_t state);
 static esp_err_t gps_tracking_task(char *gps_file_name);
-static bool checked_wakeup = false;
-static bool gps_recovery_needed = false; // Used to continue GPS activity if tracking is interrupted
-static bool checked_gps_recovery = false;
-
-static const char *TAG = "DOG_COLLAR_STATE_MACHINE";
 
 /* Global variables for dog collar state machine */
 static dog_collar_state_t current_state = DOG_COLLAR_STATE_INITIALIZING;
+static dog_collar_state_t previous_state = DOG_COLLAR_STATE_INITIALIZING;
+static uint32_t state_entry_time = 0;
 static char gps_file_name[LFS_MAX_FILE_NAME_SIZE] = {0};
+static bool checked_wakeup = false;      // Indicates if wakeup reason has been checked
+static bool gps_recovery_needed = false; // Used to continue GPS activity if tracking is interrupted
+static bool checked_gps_recovery = false;// Indicates if GPS recovery has been checked
 
 void state_machine_task(void *pvParameters) {
     while (true) {
@@ -27,6 +30,15 @@ void state_machine_task(void *pvParameters) {
 }
 
 dog_collar_state_t dog_collar_state_machine_run(void) {
+
+    // Track state entry time
+    if (current_state != previous_state) {
+        state_entry_time = xTaskGetTickCount();
+        ESP_LOGI(TAG, "State changed from %s to %s", 
+                 get_current_state_string(previous_state),
+                 get_current_state_string(current_state));
+        previous_state = current_state;
+    }
 
     switch (current_state) {
         case DOG_COLLAR_STATE_INITIALIZING:
@@ -81,8 +93,6 @@ dog_collar_state_t dog_collar_state_machine_run(void) {
 
     printf("Current state: %s\n", get_current_state_string(current_state));
 
-
-
     if (!checked_wakeup) {
         current_state = get_initial_state_from_wakeup(current_state);
         checked_wakeup = true;
@@ -103,8 +113,6 @@ dog_collar_state_t dog_collar_state_machine_run(void) {
             current_state = DOG_COLLAR_STATE_GPS_TRACKING;
         }
     }
-
-
 
     led_management_set_pattern(current_state);
 
@@ -206,16 +214,21 @@ dog_collar_state_t handle_charging_state(void) {
 
 dog_collar_state_t handle_gps_acquiring_state(void) {
 
+    /* Check if time is up */
+    if (xTaskGetTickCount() - state_entry_time > (GPS_ACQUIRE_TIMEOUT_MS / portTICK_PERIOD_MS) ) {
+        return DOG_COLLAR_STATE_NORMAL;
+    }
+
     /* Check for user input */
     if (is_button_short_pressed()) { 
         return DOG_COLLAR_STATE_WAITING_FOR_GPS_FIX; 
     }
     if (is_button_long_pressed()) {
-        return DOG_COLLAR_STATE_NORMAL;            // go back to normal state
+        return DOG_COLLAR_STATE_NORMAL;            
     }
 
-    gps_tracking_task(NULL); // Just to check if we have GPS fix
-
+    /* Check for GPS fix */
+    gps_tracking_task(NULL); 
     if(gps_l96_has_fix() ) {
         return DOG_COLLAR_STATE_GPS_READY;
     }
