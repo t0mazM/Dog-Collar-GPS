@@ -45,13 +45,17 @@ class StravaUploader:
             return None
         
     def refresh_access_token(self):
+
+        # Check if tokens are loaded
         if not self.tokens:
             self.tokens = self.load_tokens()
 
+        # Check if access token is valid - not expired
         if self.tokens['expires_at'] > time.time():
             print("Access token is still valid. No need to refresh it.")
             return None
-        
+
+        # Access token has expired, so refresh it
         print("Access token has expired. Refreshing the token...")
         response = requests.post(
             url='https://www.strava.com/oauth/token',
@@ -62,8 +66,10 @@ class StravaUploader:
                 'refresh_token': self.tokens['refresh_token']
             }
         )
-        
+
+        # Check if the response is valid
         if response.status_code == 200:
+            # Save the new token
             new_tokens = response.json()
             with open(STRAVA_TOKENS_JSON, 'w') as file:
                 json.dump(new_tokens, file)
@@ -74,37 +80,37 @@ class StravaUploader:
             print(f"Failed to refresh access token: {response.status_code} -> {response.text}")
             return None
         
-    def upload_gpx_file(self, gpx_file_path):
+    def upload_gpx_file(self, gpx_file_path: str):
+
+        # Refresh access token
         self.refresh_access_token()
+
         if not self.tokens:
             print("No valid Strava tokens available.")
             return None
-
         access_token = self.tokens.get("access_token")
+
+        # Prepare the upload file
         url = "https://www.strava.com/api/v3/uploads"
-        headers = {"Authorization": f"Bearer {access_token}"}
-        files = {
+        gpx_file_header = {"Authorization": f"Bearer {access_token}"}
+        gpx_file = {
             "file": (gpx_file_path, open(gpx_file_path, "rb"), "application/gpx+xml"),
             "data_type": (None, "gpx"),
         }
 
-        response = requests.post(url, headers=headers, files=files)
+        # Make the request to upload the GPX file
+        response = requests.post(url, headers=gpx_file_header, files=gpx_file)
         if response.status_code == 201 or response.status_code == 200:
-            print("GPX file uploaded to Strava. Response:", response.json())
+            print("GPX file uploaded to Strava.")
             return response.json()
         else:
             print(f"Failed to upload GPX file: {response.status_code} -> {response.text}")
             return None
-        
 
-
+# Example usage
 if __name__ == "__main__":
-
-
 
     strava_uploader = StravaUploader()
     strava_uploader.refresh_access_token()
-
-    # Example usage: Upload a GPX file
     gpx_file_path = "gpx_files/dog_run_85.gpx"  # Replace with your actual GPX file path
     response = strava_uploader.upload_gpx_file(gpx_file_path)

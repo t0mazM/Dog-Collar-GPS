@@ -27,6 +27,7 @@ if __name__ == "__main__":
                 client.storage_manager.save_file_locally(gpx_file_name, gpx_file)
 
                 # 6) Upload to Strava
+
                 client.strava_uploader.upload_gpx_file(os.path.join(GPX_FILES_DIR, gpx_file_name))
 
 
