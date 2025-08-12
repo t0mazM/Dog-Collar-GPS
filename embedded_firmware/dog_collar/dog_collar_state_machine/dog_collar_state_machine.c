@@ -90,7 +90,6 @@ dog_collar_state_t dog_collar_state_machine_run(void) {
             current_state = DOG_COLLAR_STATE_ERROR;
     }
 
-    printf("Current state: %s\n", get_current_state_string(current_state));
     current_state = battery_management_routine(current_state);
     led_management_set_pattern(current_state);
 
@@ -109,11 +108,8 @@ dog_collar_state_t battery_management_routine(dog_collar_state_t current_state) 
     }
 
     // 2) Update battery data
-    esp_err_t ret = battery_monitor_update_battery_data();
-    if (ret != ESP_OK) {
-        ESP_LOGE(TAG, "Failed to update battery data");
-        return DOG_COLLAR_STATE_ERROR;
-    }
+    ERROR_STATE_ON_FAILURE(battery_monitor_update_battery_data(), 
+                            TAG, "Failed to update battery data");
 
     // 3) Update next battery check time interval
     if (battery_data.soc >= BATTERY_SOC_HIGH) {
@@ -144,14 +140,11 @@ dog_collar_state_t battery_management_routine(dog_collar_state_t current_state) 
 }
 
 dog_collar_state_t handle_initializing_state(void) {
-   
-    esp_err_t init_result = dog_collar_components_init();
 
-    if (init_result != ESP_OK) {
-        return DOG_COLLAR_STATE_ERROR;
-    }
+    ERROR_STATE_ON_FAILURE(dog_collar_components_init(),
+                            TAG, "Failed to initialize dog collar components");
 
-    return DOG_COLLAR_STATE_NORMAL; 
+    return DOG_COLLAR_STATE_NORMAL;
 }
 
 dog_collar_state_t handle_normal_state(void) {
@@ -163,7 +156,8 @@ dog_collar_state_t handle_normal_state(void) {
     if(checked_gps_recovery == false) {
         checked_gps_recovery = true;
 
-        gps_check_recovery_needed(gps_file_name, sizeof(gps_file_name), &gps_recovery_needed);
+        ERROR_STATE_ON_FAILURE(gps_check_recovery_needed(gps_file_name, sizeof(gps_file_name), &gps_recovery_needed),
+                                TAG, "Failed to check GPS recovery needed");
 
         if (gps_recovery_needed) {
             gps_l96_start_activity_tracking(gps_file_name);
@@ -206,8 +200,6 @@ dog_collar_state_t handle_charging_state(void) {
 
 dog_collar_state_t handle_gps_acquiring_state(void) {
 
-    printf("Acquiring GPS...\n");
-
     /* Check if time is up */
     if (xTaskGetTickCount() - state_entry_time > (GPS_ACQUIRE_TIMEOUT_MS / portTICK_PERIOD_MS) ) {
         return DOG_COLLAR_STATE_NORMAL;
@@ -227,7 +219,9 @@ dog_collar_state_t handle_gps_acquiring_state(void) {
         return DOG_COLLAR_STATE_GPS_READY;
     }
 
-    go_to_light_sleep();
+    ERROR_STATE_ON_FAILURE(go_to_light_sleep(),
+                            TAG, "Failed to go to light sleep");
+    
     return DOG_COLLAR_STATE_GPS_ACQUIRING; 
 }
 
@@ -238,22 +232,22 @@ dog_collar_state_t handle_gps_ready_state(void) {
         return DOG_COLLAR_STATE_GPS_FILE_CREATION; 
     }
     if (is_button_long_pressed()) {
-        return DOG_COLLAR_STATE_NORMAL;            // go back to normal state
+        return DOG_COLLAR_STATE_NORMAL;
     }
 
-    go_to_light_sleep();
+    ERROR_STATE_ON_FAILURE(go_to_light_sleep(),
+                            TAG, "Failed to go to light sleep");
+    
     return DOG_COLLAR_STATE_GPS_READY;
 }
 
 dog_collar_state_t handle_gps_file_creation_state(void) {
 
-    esp_err_t ret = lfs_create_new_csv_file(gps_file_name, sizeof(gps_file_name));
-    if (ret != ESP_OK) {
-        ESP_LOGE(TAG, "Failed to create GPS file");
-        return DOG_COLLAR_STATE_ERROR;
-    }
+    ERROR_STATE_ON_FAILURE(lfs_create_new_csv_file(gps_file_name, sizeof(gps_file_name)),
+                            TAG, "Failed to create GPS file");
 
-    gps_l96_start_activity_tracking(gps_file_name);
+    ERROR_STATE_ON_FAILURE(gps_l96_start_activity_tracking(gps_file_name),
+                            TAG, "Failed to start GPS activity tracking");
 
     return DOG_COLLAR_STATE_GPS_TRACKING;
 }
@@ -269,7 +263,9 @@ dog_collar_state_t handle_waiting_for_gps_fix_state(void) {
         return DOG_COLLAR_STATE_NORMAL;            
     }
 
-    go_to_light_sleep();
+    ERROR_STATE_ON_FAILURE(go_to_light_sleep(),
+                            TAG, "Failed to go to light sleep");
+    
     return DOG_COLLAR_STATE_WAITING_FOR_GPS_FIX;
 }
 
@@ -279,9 +275,11 @@ dog_collar_state_t handle_gps_tracking_state(void) {
         return DOG_COLLAR_STATE_GPS_PAUSED; 
     }
 
-    gps_tracking_task(gps_file_name);
+    gps_tracking_task(gps_file_name); 
 
-    go_to_light_sleep();
+    ERROR_STATE_ON_FAILURE(go_to_light_sleep(),
+                            TAG, "Failed to go to light sleep");
+
     return DOG_COLLAR_STATE_GPS_TRACKING;
 }
 
@@ -295,7 +293,9 @@ dog_collar_state_t handle_gps_paused_state(void) {
         return DOG_COLLAR_STATE_NORMAL; 
     }
 
-    go_to_light_sleep();
+    ERROR_STATE_ON_FAILURE(go_to_light_sleep(),
+                            TAG, "Failed to go to light sleep");
+    
     return DOG_COLLAR_STATE_GPS_PAUSED;
 }
 
@@ -306,7 +306,9 @@ dog_collar_state_t handle_wifi_sync_state(void) {
 
     /* Start WIFI sync and set the start time */
     if (sync_started == false) {
-        wifi_manager_reconnect(); 
+
+        ERROR_STATE_ON_FAILURE(wifi_manager_reconnect(),
+                                TAG, "Failed to reconnect WiFi");
         sync_start_time_us = now;
         sync_started = true;
         clear_button_press_states(); // For some reason we need to clear button press states here
@@ -314,15 +316,21 @@ dog_collar_state_t handle_wifi_sync_state(void) {
 
     // Allow button press to interrupt Wi-Fi sync and go to GPS acquiring state
     if (is_button_short_pressed() || is_button_long_pressed()) {
+
         sync_started = false;
-        wifi_stop_all_services();
+        ERROR_STATE_ON_FAILURE(wifi_stop_all_services(),
+                                TAG, "Failed to stop all WiFi services");
+
         return DOG_COLLAR_STATE_GPS_ACQUIRING;
     }
 
     /* If time is up go deep sleep*/
     if ((now - sync_start_time_us) >= WIFI_SYNC_TIME_S * 1000 * 1000) {
+
         sync_started = false;
-        wifi_stop_all_services();
+        ERROR_STATE_ON_FAILURE(wifi_stop_all_services(),
+                                TAG, "Failed to stop all WiFi services");
+
         return DOG_COLLAR_STATE_DEEP_SLEEP;
     }
 
@@ -332,20 +340,19 @@ dog_collar_state_t handle_wifi_sync_state(void) {
 
 dog_collar_state_t  handle_light_sleep_state(void) {
 
-    //gpio_turn_off_leds(LED_RED | LED_YELLOW | LED_GREEN);
-    esp_sleep_enable_timer_wakeup((uint64_t)LIGHT_SLEEP_TIME_MS * 1000);
-    //esp_light_sleep_start();
-
-    vTaskDelay(pdMS_TO_TICKS(1000));
-
+    ERROR_STATE_ON_FAILURE(go_to_light_sleep(),
+                            TAG, "Failed to go to light sleep");
 
     return DOG_COLLAR_STATE_NORMAL; // You can't easily go back where you came from, so just use function go_to_light_sleep
 }
 
 esp_err_t go_to_light_sleep(void){
 
-    esp_sleep_enable_timer_wakeup((uint64_t)LIGHT_SLEEP_TIME_MS * 1000);
-    //esp_light_sleep_start(); // this line disables future uart comunications from d+ d- pins until next boot
+    ESP_RETURN_ON_ERROR(esp_sleep_enable_timer_wakeup((uint64_t)LIGHT_SLEEP_TIME_MS * 1000),
+                        TAG, "Failed to enable light sleep timer");
+
+    //ESP_RETURN_ON_ERROR(esp_light_sleep_start(),
+    //                    TAG, "Failed to enter light sleep");
     vTaskDelay(pdMS_TO_TICKS(LIGHT_SLEEP_TIME_MS));
     return ESP_OK;
 }
@@ -357,9 +364,11 @@ dog_collar_state_t handle_deep_sleep_state(void) {
     gps_l96_go_to_back_up_mode();
 
     // timer wakeup for periodic wake-ups
-    esp_sleep_enable_timer_wakeup((uint64_t)DEEP_SLEEP_TIME_S * 1000000);
+    ESP_RETURN_ON_ERROR(esp_sleep_enable_timer_wakeup((uint64_t)DEEP_SLEEP_TIME_S * 1000000),
+                        TAG, "Failed to enable deep sleep timer");
 
-    button_interrupt_enable_wakeup();
+    ESP_RETURN_ON_ERROR(button_interrupt_enable_wakeup(),
+                        TAG, "Failed to enable button interrupt wakeup");
 
     esp_deep_sleep_start();
 
@@ -367,6 +376,10 @@ dog_collar_state_t handle_deep_sleep_state(void) {
 }
 
 dog_collar_state_t handle_error_state(void) {
+
+    /* Wait 10 seconds then restart the device*/
+    vTaskDelay(pdMS_TO_TICKS(10000)); 
+    esp_restart();
 
     return DOG_COLLAR_STATE_ERROR;
 }
@@ -431,27 +444,22 @@ esp_err_t gps_tracking_task(char* gps_file_name) {
 
     static char NMEA_sentence[NMEA_SENTENCE_BUF_SIZE] = {0};
     static uint8_t rx_buffer[UART_RX_BUF_SIZE] = {0};
-
     size_t read_len = 0;
 
     esp_err_t ret = uart_receive_cmd(rx_buffer, sizeof(rx_buffer), &read_len);
 
     if( ret == ESP_ERR_TIMEOUT) {
-        ESP_LOGW(TAG, "UART read timed out, no data received");
-        return ESP_OK; // No data to process, just return
+        ESP_LOGW(TAG, "UART read timed out, no data received. GPS module probably not turned on");
+        return ret; // No data to process, just return
     }
 
     if (ret != ESP_OK || read_len == 0) {
-
         ESP_LOGE(TAG, "UART read failed: %s", esp_err_to_name(ret));
         return ret;
     }
 
-    ret = gps_l96_extract_and_process_nmea_sentences(rx_buffer, read_len);
-    if (ret != ESP_OK) {
-        ESP_LOGE(TAG, "NMEA extraction failed: %s", esp_err_to_name(ret));
-        return ret;
-    }
+    ESP_RETURN_ON_ERROR(gps_l96_extract_and_process_nmea_sentences(rx_buffer, read_len),
+                    TAG, "Failed to extract and process NMEA sentences");
 
     if (gps_l96_has_fix() == false) {
         ESP_LOGW(TAG, "No valid GPS fix, not logging data.");
@@ -463,15 +471,11 @@ esp_err_t gps_tracking_task(char* gps_file_name) {
         return ESP_ERR_INVALID_ARG;
     }
 
-    ret = gps_l96_format_csv_line_from_data(NMEA_sentence, sizeof(NMEA_sentence));
-    if (ret != ESP_OK) {
-        ESP_LOGE(TAG, "CSV formatting failed: %s", esp_err_to_name(ret));
-        return ret;
-    }
+    ESP_RETURN_ON_ERROR(gps_l96_format_csv_line_from_data(NMEA_sentence, sizeof(NMEA_sentence)),
+                        TAG, "Failed to format GPS data");
 
-    ret = lfs_append_to_file(NMEA_sentence, gps_file_name);
-    if (ret != ESP_OK) {
-        ESP_LOGE(TAG, "File append failed: %s", esp_err_to_name(ret));
-    }
+    ESP_RETURN_ON_ERROR(lfs_append_to_file(NMEA_sentence, gps_file_name), 
+                        TAG, "Failed to append GPS data to file");
+
     return ret;
 } 

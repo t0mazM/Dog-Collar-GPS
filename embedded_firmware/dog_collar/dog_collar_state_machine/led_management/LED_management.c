@@ -197,7 +197,7 @@ static void deep_sleep_led_pattern() {
 
 static void error_led_pattern() {
     gpio_turn_on_leds(LED_RED);
-    vTaskDelay(pdMS_TO_TICKS(2000));
+    vTaskDelay(pdMS_TO_TICKS(500));
     gpio_turn_off_leds(LED_RED | LED_YELLOW | LED_GREEN);
     vTaskDelay(pdMS_TO_TICKS(500));
 }

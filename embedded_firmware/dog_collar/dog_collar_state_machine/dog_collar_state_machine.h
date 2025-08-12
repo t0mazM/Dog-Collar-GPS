@@ -44,6 +44,15 @@ typedef enum {
 #include "../components/file_system_littlefs/file_system_littlefs.h"
 #include "led_management/led_management.h" // Have to include this here to avoid circular dependency
 
+/* Macro to return error state on failure - to avoid code duplication */
+#define ERROR_STATE_ON_FAILURE(err, tag, message) \
+    do { \
+        if ((err) != ESP_OK) { \
+            ESP_LOGE(tag, "%s: %s", message, esp_err_to_name(err)); \
+            return DOG_COLLAR_STATE_ERROR; \
+        } \
+    } while (0)
+
 #define BATTERY_SOC_HIGH 60.0f      // Battery is considered high if SOC is above this value
 #define BATTERY_SOC_LOW 20.0f       // Battery is considered low if SOC is below this value
 #define BATTERY_SOC_CRITICAL 10.0f  // Battery is considered critically low if SOC is below this value
@@ -51,8 +60,7 @@ typedef enum {
 #define BATTERY_CHECK_INTERVAL_MS_HIGH       5000 //300000 // 5 minutes -for testing 5s
 #define BATTERY_CHECK_INTERVAL_MS_LOW        5000 //60000  // 1 minute -for testing 5s
 
-#define WIFI_SYNC_TIME_S 30             //Time for one sync in seconds
-#define WIFI_SYNC_PERIODIC_TIME_S 10    // Time between each Wi-Fi syncs in seconds
+#define WIFI_SYNC_TIME_S 60             //Time for one sync in seconds
 
 #define LIGHT_SLEEP_MAX_COUNT 15        // After LIGHT_SLEEP_MAX_COUNT light sleeps, we will go for longer deep sleep.
 
@@ -61,7 +69,7 @@ typedef enum {
 
 #define GPS_ACQUIRE_TIMEOUT_MS 5*60*1000 // 5 minutes
 
-#define WAIT_AFTER_USER_PRESS_MS 500    // Wait after user press in milliseconds
+#define WAIT_AFTER_USER_PRESS_MS 200    // Wait after user press in milliseconds
 
 /**
  * @brief Task for freeRTOS that runs the dog collar state machine.
