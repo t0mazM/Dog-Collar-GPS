@@ -1,12 +1,14 @@
 import csv
 import io
+from logging_util import get_logger
 
 RAW_ESP32_FILES_DIR = "raw_esp32_files"
+
+logger = get_logger(__name__)
 
 class GPXConverter:
     def __init__(self, creator: str = "Dog Collar GPS"):
         self.creator = creator
-
 
     def parse_csv_file(self, file: bytes, file_name: str):
 
@@ -30,7 +32,7 @@ class GPXConverter:
         
         # Parse failed
         except Exception as e:
-            print(f"Error parsing CSV file {file_name}: {e}")
+            logger.error(f"Error parsing CSV file {file_name}: {e}")
             return False, []
 
     # --------------- Helper methods to construct GPX XML elements ----------------
@@ -57,7 +59,7 @@ class GPXConverter:
     def add_gpx_end_element(self) -> str:
         return '</gpx>\n'
     # -----------------------------------------------------------------------------
-    
+
     # Main conversion method
     def convert_to_gpx(self, file: bytes, file_name: str) -> str | None:
 
@@ -66,10 +68,10 @@ class GPXConverter:
 
         # Check if parsing was successful, if no points found we abort conversion
         if not success:
-            print(f"Failed to parse file {file_name}.")
+            logger.error(f"Failed to parse file {file_name}.")
             return None
         if not points:
-            print(f"No points found in file {file_name}.")
+            logger.error(f"No points found in file {file_name}.")
             return None
 
         # Add GPX header

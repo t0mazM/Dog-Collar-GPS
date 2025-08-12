@@ -9,6 +9,10 @@ gpx_files/
 __pycache__/
 *.pyc
 
+# Log files
+logs/
+
+# Strava API credentials
 strava_credentials.py
 strava_tokens.json
 

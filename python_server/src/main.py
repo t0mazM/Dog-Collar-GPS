@@ -1,9 +1,15 @@
 from dogcollar_client import DogCollarClient
 from local_storage_manager import GPX_FILES_DIR
 import os
+from logging_util import get_logger, setup_logging
+import time
 
+setup_logging()
+logger = get_logger(__name__)
 
 if __name__ == "__main__":
+
+        logger.info("Starting Dog Collar GPS Client")
         client = DogCollarClient("http://dogcollar.local")
 
         # 1) Get the list of files 
@@ -27,7 +33,6 @@ if __name__ == "__main__":
                 client.storage_manager.save_file_locally(gpx_file_name, gpx_file)
 
                 # 6) Upload to Strava
-
                 client.strava_uploader.upload_gpx_file(os.path.join(GPX_FILES_DIR, gpx_file_name))
 
 

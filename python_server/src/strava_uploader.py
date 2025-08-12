@@ -1,10 +1,12 @@
 import requests
 import json
 import time
-
 from strava_credentials import STRAVA_ACCESS_TOKEN, STRAVA_CLIENT_ID, STRAVA_CLIENT_SECRET, STRAVA_AUTH_CODE
+from logging_util import get_logger
 
 STRAVA_TOKENS_JSON = 'strava_tokens.json'
+
+logger = get_logger(__name__)
 
 def auth_strava_account():
     # You need to authenticate your Strava account - grand certain acces to your tokens
@@ -41,7 +43,7 @@ class StravaUploader:
             with open(STRAVA_TOKENS_JSON, 'r') as file:
                 return json.load(file)
         except FileNotFoundError:
-            print("Strava tokens file not found. Please authenticate your Strava account first using the auth_strava_account function.")
+            logger.error("Strava tokens file not found. Please authenticate your Strava account first using the auth_strava_account function.")
             return None
         
     def refresh_access_token(self):
@@ -52,11 +54,11 @@ class StravaUploader:
 
         # Check if access token is valid - not expired
         if self.tokens['expires_at'] > time.time():
-            print("Access token is still valid. No need to refresh it.")
+            logger.info("Access token is still valid. No need to refresh it.")
             return None
 
         # Access token has expired, so refresh it
-        print("Access token has expired. Refreshing the token...")
+        logger.info("Access token has expired. Refreshing the token...")
         response = requests.post(
             url='https://www.strava.com/oauth/token',
             data={
@@ -73,11 +75,11 @@ class StravaUploader:
             new_tokens = response.json()
             with open(STRAVA_TOKENS_JSON, 'w') as file:
                 json.dump(new_tokens, file)
-            print("Access token refreshed successfully.")
+            logger.info("Access token refreshed successfully.")
             self.tokens = new_tokens
             return None
         else:
-            print(f"Failed to refresh access token: {response.status_code} -> {response.text}")
+            logger.error(f"Failed to refresh access token: {response.status_code} -> {response.text}")
             return None
         
     def upload_gpx_file(self, gpx_file_path: str):
@@ -86,7 +88,7 @@ class StravaUploader:
         self.refresh_access_token()
 
         if not self.tokens:
-            print("No valid Strava tokens available.")
+            logger.error("No valid Strava tokens available.")
             return None
         access_token = self.tokens.get("access_token")
 
@@ -101,10 +103,10 @@ class StravaUploader:
         # Make the request to upload the GPX file
         response = requests.post(url, headers=gpx_file_header, files=gpx_file)
         if response.status_code == 201 or response.status_code == 200:
-            print("GPX file uploaded to Strava.")
+            logger.info("GPX file uploaded to Strava.")
             return response.json()
         else:
-            print(f"Failed to upload GPX file: {response.status_code} -> {response.text}")
+            logger.error(f"Failed to upload GPX file: {response.status_code} -> {response.text}")
             return None
 
 # Example usage
