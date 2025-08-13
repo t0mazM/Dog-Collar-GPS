@@ -200,6 +200,10 @@ dog_collar_state_t handle_charging_state(void) {
 
 dog_collar_state_t handle_gps_acquiring_state(void) {
 
+    /* Start GPS recording */
+    ESP_RETURN_ON_ERROR(gps_l96_start_recording(),
+                        TAG, "Failed to start GPS recording");
+
     /* Check if time is up */
     if (xTaskGetTickCount() - state_entry_time > (GPS_ACQUIRE_TIMEOUT_MS / portTICK_PERIOD_MS) ) {
         return DOG_COLLAR_STATE_NORMAL;
