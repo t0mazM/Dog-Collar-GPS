@@ -95,6 +95,7 @@ esp_err_t wifi_connect_and_start_services(void) { //TODO HANDLE ERRORS - return 
         }
     }
 
+    /* Create default Wi-Fi station network interface */
     if (sta_netif == NULL) {
         sta_netif = esp_netif_create_default_wifi_sta();
         if (sta_netif == NULL) {
@@ -125,6 +126,7 @@ esp_err_t wifi_connect_and_start_services(void) { //TODO HANDLE ERRORS - return 
             .sae_h2e_identifier = "",
         },
     };
+    /* Copy SSID and password defined with CONFIG_WIFI_SSID and CONFIG_WIFI_PASSWORD */
     strncpy((char*)wifi_config.sta.ssid, ssid, sizeof(wifi_config.sta.ssid) - 1);
     strncpy((char*)wifi_config.sta.password, password, sizeof(wifi_config.sta.password) - 1);
 
@@ -149,6 +151,7 @@ esp_err_t wifi_connect_and_start_services(void) { //TODO HANDLE ERRORS - return 
                                            pdFALSE,
                                            pdMS_TO_TICKS(WIFI_MAX_CONNECTION_TIMEOUT_MS));
 
+    /* After WIFI_MAX_CONNECTION_TIMEOUT_MS check if connection was established */
     if (bits & WIFI_CONNECTED_BIT) {
         ESP_LOGI(TAG, "Connected to SSID:%s", ssid);
         return ESP_OK;
@@ -256,17 +259,14 @@ esp_err_t wifi_manager_reconnect(void) {
     }
     // Stop all services and deinit WiFi if already initialized
     if (wifi_initialized) {
-        wifi_stop_all_services();
+        ESP_RETURN_ON_ERROR(wifi_stop_all_services(), TAG, "Failed to stop WiFi services");
     }
 
     // Re-init and connect
-    esp_err_t ret = wifi_init();
-    if (ret == ESP_OK) {
-        ESP_LOGI(TAG, "WiFi reconnected successfully.");
-    } else {
-        ESP_LOGE(TAG, "WiFi reconnection failed!");
-    }
-    return ret;
+    ESP_RETURN_ON_ERROR(wifi_init(), TAG, "Failed to reconnect to Wi-Fi");
+
+    ESP_LOGI(TAG, "Wi-Fi reconnected successfully");
+    return ESP_OK;
 }
 
 bool wifi_manager_is_initialized_and_connected(void) {

@@ -25,9 +25,7 @@
 #include "mdns_service.h"
 #include "network_services/http_server.h"
 
-#define WIFI_RECONNECT_RETRIES_NUM 10
-#define WIFI_MAX_CONNECTION_TIMEOUT_MS 10000
-
+#define WIFI_MAX_CONNECTION_TIMEOUT_MS 1 * 60 * 1000 // 1 minute
 
 /**
  * @brief Initializes all modules for WI-FI connectivity 

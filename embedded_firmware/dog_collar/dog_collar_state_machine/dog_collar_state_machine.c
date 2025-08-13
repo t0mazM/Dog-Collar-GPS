@@ -305,6 +305,7 @@ dog_collar_state_t handle_gps_paused_state(void) {
 }
 
 dog_collar_state_t handle_wifi_sync_state(void) {
+    
     static bool sync_started = false;
     static int64_t sync_start_time_us = 0;
     int64_t now = esp_timer_get_time();
@@ -312,8 +313,14 @@ dog_collar_state_t handle_wifi_sync_state(void) {
     /* Start WIFI sync and set the start time */
     if (sync_started == false) {
 
-        ERROR_STATE_ON_FAILURE(wifi_manager_reconnect(),
-                                TAG, "Failed to reconnect WiFi");
+        /* Start WiFi connection */
+        esp_err_t ret = wifi_manager_reconnect();
+
+        /* Check for errors, ESP_ERR_TIMEOUT is not an error to fail*/
+        if(ret != ESP_OK && ret != ESP_ERR_TIMEOUT) {
+            ERROR_STATE_ON_FAILURE(ret, TAG, "Failed to reconnect to WiFi");
+        }
+
         sync_start_time_us = now;
         sync_started = true;
         clear_button_press_states(); // For some reason we need to clear button press states here
