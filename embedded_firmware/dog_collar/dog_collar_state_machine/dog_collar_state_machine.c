@@ -255,6 +255,7 @@ dog_collar_state_t handle_gps_file_creation_state(void) {
 dog_collar_state_t handle_waiting_for_gps_fix_state(void) {
 
     /* Wait for GPS fix*/
+    gps_tracking_task(NULL); 
     if(gps_l96_has_fix() ) {
         return DOG_COLLAR_STATE_GPS_FILE_CREATION;
     }
@@ -356,7 +357,6 @@ esp_err_t go_to_light_sleep(void){
     vTaskDelay(pdMS_TO_TICKS(LIGHT_SLEEP_TIME_MS));
     return ESP_OK;
 }
-
 
 dog_collar_state_t handle_deep_sleep_state(void) {
     
