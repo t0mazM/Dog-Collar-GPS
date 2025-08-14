@@ -103,10 +103,10 @@ class StravaUploader:
         # Make the request to upload the GPX file
         response = requests.post(url, headers=gpx_file_header, files=gpx_file)
         if response.status_code == 201 or response.status_code == 200:
-            logger.info("GPX file uploaded to Strava.")
+            logger.info(f"GPX file {gpx_file_path} uploaded to Strava.")
             return response.json()
         else:
-            logger.error(f"Failed to upload GPX file: {response.status_code} -> {response.text}")
+            logger.error(f"Failed to upload GPX file {gpx_file_path}: {response.status_code} -> {response.text}")
             return None
 
 # Example usage
